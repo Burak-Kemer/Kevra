@@ -1,0 +1,2268 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Tüm Ürünler | KEVRA</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        html { overscroll-behavior-y: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #fff;
+            color: #1a1a1a;
+            overflow-x: hidden;
+            padding-top: env(safe-area-inset-top);
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* HEADER - index.html ile AYNI */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: calc(70px + env(safe-area-inset-top));
+            padding-top: env(safe-area-inset-top);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 9999;
+            transition: all 0.4s ease;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+        
+        .header.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        
+        .header-btn {
+            padding: 10px 16px;
+            background: transparent;
+            border: 1px solid rgba(0,0,0,0.1);
+            color: #1a1a1a;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            min-height: 44px;
+        }
+        
+        .header.scrolled .header-btn {
+            color: #1a1a1a;
+            border-color: rgba(0,0,0,0.1);
+        }
+        
+        .header-btn:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .header.scrolled .header-btn:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        
+        .brand-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #1a1a1a;
+            line-height: 1;
+            transition: transform 0.3s ease;
+        }
+        
+        .header.scrolled .brand-logo {
+            color: #1a1a1a;
+        }
+        
+        .brand-logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .brand-arabic {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: -6px;
+        }
+        
+        .brand-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 10px;
+            margin-top: 2px;
+        }
+        
+        .header-link {
+            color: #1a1a1a;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        
+        .header.scrolled .header-link {
+            color: #1a1a1a;
+        }
+        
+        .header-icon {
+            position: relative;
+            padding: 10px;
+            background: transparent;
+            border: 1px solid rgba(0,0,0,0.1);
+            color: #1a1a1a;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            min-width: 44px;
+            min-height: 44px;
+            justify-content: center;
+        }
+        
+        .header.scrolled .header-icon {
+            color: #1a1a1a;
+            border-color: rgba(0,0,0,0.1);
+        }
+        
+        .header-icon:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .header.scrolled .header-icon:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        
+        #cartCount, #favCount {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        /* User Dropdown */
+        
+        
+        .user-menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            border: 1px solid rgba(0,0,0,0.15);
+            color: #1a1a1a;
+            padding: 8px 14px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            min-height: 44px;
+        }
+        
+        .header.scrolled .user-menu-btn {
+            border-color: rgba(0,0,0,0.1);
+            color: #1a1a1a;
+        }
+        
+        .user-menu-btn:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        
+        .header.scrolled .user-menu-btn:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            background: #c9a87c;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+        }.user-dropdown-menu.show {
+            display: block;
+            animation: dropdownSlide 0.3s ease;
+        }
+        
+        @keyframes dropdownSlide {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        .dropdown-item.logout:hover {
+            background: #fdf2f2;
+        }
+        
+        
+        
+        /* SEARCH MODAL - index.html ile AYNI */
+        .search-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 10000;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 20px;
+            padding-top: 60px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .search-modal.active {
+            display: flex;
+        }
+        
+        .search-box {
+            background: white;
+            width: 95%;
+            max-width: 700px;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.4);
+            animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .search-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .search-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            color: #1a1a1a;
+            margin: 0;
+        }
+        
+        .search-close-btn {
+            background: #f5f5f5;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .search-close-btn:hover {
+            background: #e74c3c;
+            color: white;
+            transform: rotate(90deg);
+        }
+        
+        .search-input-wrapper {
+            position: relative;
+            margin-bottom: 10px;
+        }
+        
+        .search-input-wrapper input {
+            width: 100%;
+            padding: 20px 25px 20px 55px;
+            border: 2px solid #e8e8e8;
+            border-radius: 16px;
+            font-size: 16px;
+            -webkit-appearance: none;
+            appearance: none;
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            background: #fafafa;
+        }
+        
+        .search-input-wrapper input:focus {
+            border-color: #c9a87c;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(201, 168, 124, 0.1);
+        }
+        
+        .search-results {
+            max-height: 450px;
+            overflow-y: auto;
+            margin-top: 15px;
+            padding-right: 5px;
+        }
+        
+        .search-results::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .search-results::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .search-results::-webkit-scrollbar-thumb {
+            background: #c9a87c;
+            border-radius: 10px;
+        }
+        
+        .search-item {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 18px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            border: 1px solid transparent;
+            margin-bottom: 10px;
+        }
+        
+        .search-item:hover {
+            background: #f8f5f2;
+            border-color: #c9a87c;
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        
+        .search-item img {
+            width: 70px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .search-item-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .search-item-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            line-height: 1.3;
+        }
+        
+        .search-item-category {
+            font-size: 13px;
+            color: #888;
+            text-transform: capitalize;
+        }
+        
+        .search-item-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #c9a87c;
+        }
+        
+        .search-item-original {
+            font-size: 14px;
+            color: #999;
+            text-decoration: line-through;
+            margin-left: 8px;
+        }
+        
+        .search-item-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 4px;
+            width: fit-content;
+        }
+        
+        .search-item-badge.indirim { background: #e74c3c; color: white; }
+        .search-item-badge.yeni { background: #27ae60; color: white; }
+        .search-item-badge.popular { background: #f39c12; color: white; }
+        .search-item-badge.premium { background: #9b59b6; color: white; }
+        
+        .search-item-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+        }
+        
+        .search-view-btn {
+            padding: 10px 20px;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        
+        .search-view-btn:hover {
+            background: #c9a87c;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(201, 168, 124, 0.4);
+        }
+        
+        .search-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .search-empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        .search-empty h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+        
+        .search-count {
+            padding: 10px 15px;
+            background: #f8f5f2;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .search-count strong {
+            color: #1a1a1a;
+        }
+        
+        .search-view-all {
+            display: block;
+            text-align: center;
+            padding: 18px;
+            background: linear-gradient(135deg, #f8f5f2, #e8e0d8);
+            border-radius: 12px;
+            color: #1a1a1a;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .search-view-all:hover {
+            background: white;
+            border-color: #c9a87c;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        /* SIDE MENU */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 85%;
+            max-width: 400px;
+            height: 100vh;
+            background: white;
+            z-index: 10001;
+            transition: left 0.4s ease;
+            box-shadow: 5px 0 30px rgba(0,0,0,0.1);
+        }
+        
+        .side-menu.active {
+            left: 0;
+        }
+        
+        .side-menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .side-menu-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            letter-spacing: 3px;
+        }
+        
+        .side-menu-header button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            min-width: 44px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .side-menu-content {
+            padding: 20px;
+        }
+        
+        .menu-link {
+            display: block;
+            padding: 16px 20px;
+            min-height: 44px;
+            color: #1a1a1a;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 10px;
+            transition: all 0.3s;
+            margin-bottom: 5px;
+        }
+        
+        .menu-link:hover {
+            background: #f5f5f5;
+            padding-left: 25px;
+        }
+        
+        .menu-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+        }
+        
+        .menu-overlay.active {
+            display: block;
+        }
+        
+        /* SHOP PAGE STYLES */
+        .shop-page {
+            padding-top: 0;
+        }
+        
+        .shop-header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            padding: 60px 40px 60px;
+            padding-top: 140px;
+            text-align: center;
+        }
+        
+        .shop-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .breadcrumb a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .shop-container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px;
+            gap: 40px;
+        }
+        
+        .shop-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+        }
+        
+        .filter-section {
+            margin-bottom: 30px;
+        }
+        
+        .filter-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .filter-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
+        .filter-checkbox input {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            min-width: 22px;
+            min-height: 22px;
+        }
+        
+        .size-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .size-filter-btn {
+            padding: 10px 18px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+            min-height: 44px;
+            min-width: 44px;
+        }
+        
+        .size-filter-btn:hover,
+        .size-filter-btn.active {
+            background: #1a1a1a;
+            color: white;
+            border-color: #1a1a1a;
+        }
+        
+        .shop-main {
+            flex: 1;
+        }
+        
+        .shop-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .results-count {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .shop-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        #sortSelect {
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            min-height: 44px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        .view-toggle {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .view-btn {
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 8px;
+            min-height: 44px;
+            min-width: 44px;
+        }
+        
+        .view-btn.active {
+            background: #1a1a1a;
+            color: white;
+            border-color: #1a1a1a;
+        }
+        
+        /* AKTİF FİLTRELER - YENİ */
+        .active-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            min-height: 40px;
+        }
+        
+        .active-filter-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: #1a1a1a;
+            color: white;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+            min-height: 40px;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .active-filter-tag button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        
+        .active-filter-tag button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .clear-all-filters {
+            padding: 10px 16px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 40px;
+        }
+        
+        .clear-all-filters:hover {
+            background: #c0392b;
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        
+        .product-grid.list-view {
+            grid-template-columns: 1fr;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+        
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 5;
+        }
+        
+        .product-badge.indirim { background: #e74c3c; color: white; }
+        .product-badge.yeni { background: #27ae60; color: white; }
+        .product-badge.popular { background: #f39c12; color: white; }
+        .product-badge.premium { background: #9b59b6; color: white; }
+        
+        .fav-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #ccc;
+            transition: all 0.3s;
+            z-index: 5;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .fav-btn:hover, .fav-btn.active {
+            color: #e74c3c;
+            transform: scale(1.1);
+        }
+        
+        .product-image {
+            position: relative;
+            height: 300px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+        
+        .quick-view-btn {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            padding: 12px 24px;
+            background: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .product-card:hover .quick-view-btn {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .product-info {
+            padding: 20px;
+        }
+        
+        .product-info h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
+        .product-price {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .original-price {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .current-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #c9a87c;
+        }
+        
+        .discount-percent {
+            background: #e74c3c;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .add-to-cart-btn {
+            width: 100%;
+            padding: 14px;
+            min-height: 44px;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .add-to-cart-btn:hover {
+            background: #333;
+            transform: translateY(-2px);
+        }
+        
+        /* PAGINATION */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 50px;
+            padding: 20px;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            padding: 12px 20px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+            min-width: 48px;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: #1a1a1a;
+            color: white;
+            border-color: #1a1a1a;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* PAGE NUMBERS - EKSİK OLAN BÖLÜM */
+        #pageNumbers {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .page-number {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 14px;
+            color: #1a1a1a;
+        }
+
+        .page-number.active {
+            background: #1a1a1a;
+            color: white;
+            border-color: #1a1a1a;
+        }
+
+        .page-number:hover:not(.active) {
+            background: #f5f5f5;
+            border-color: #999;
+        }
+
+        #pageNumbers span {
+            padding: 0 8px;
+            color: #999;
+            font-weight: 500;
+        }
+/* CART & FAV DRAWERS */
+        .cart-drawer, .fav-drawer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: 450px;
+            height: 100vh;
+            background: white;
+            z-index: 10002;
+            transition: right 0.4s ease;
+            box-shadow: -5px 0 30px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .cart-drawer.open, .fav-drawer.open {
+            right: 0;
+        }
+        
+        .cart-header, .fav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .cart-header h3, .fav-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+        }
+        
+        .cart-close-btn, .fav-close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            min-width: 44px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .cart-items, .fav-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .cart-overlay, .fav-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 10001;
+        }
+        
+        .cart-overlay.active, .fav-overlay.active {
+            display: block;
+        }
+        
+        /* QUICK VIEW MODAL */
+        .quick-view-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10003;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .quick-view-modal.active {
+            display: flex;
+        }
+        
+        .quick-view-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+        }
+        
+        .quick-view-content {
+            position: relative;
+            background: white;
+            width: 95%;
+            max-width: 1000px;
+            max-height: 90vh;
+            border-radius: 20px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            box-shadow: 0 30px 100px rgba(0,0,0,0.6);
+        }
+        
+        .quick-view-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .quick-view-close:hover {
+            transform: rotate(90deg) scale(1.1);
+            background: #f5f5f5;
+        }
+        
+        .quick-view-image {
+            height: 100%;
+            min-height: 500px;
+            background: #f9f9f9;
+            position: relative;
+        }
+        
+        .quick-view-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .quick-view-info {
+            padding: 40px;
+            overflow-y: auto;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .quick-view-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #c9a87c;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            width: fit-content;
+            text-transform: uppercase;
+        }
+        
+        .quick-view-info h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: #1a1a1a;
+            line-height: 1.2;
+        }
+        
+        .quick-view-price {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-view-price .current {
+            font-size: 28px;
+            font-weight: 700;
+            color: #c9a87c;
+        }
+        
+        .quick-view-price .original {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 18px;
+        }
+        
+        .quick-view-discount {
+            background: #e74c3c;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        
+        .quick-view-desc {
+            color: #666;
+            line-height: 1.7;
+            margin-bottom: 25px;
+            font-size: 15px;
+        }
+        
+        .quick-view-stock {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #27ae60;
+            font-weight: 500;
+        }
+        
+        .quick-view-stock.out-of-stock {
+            color: #e74c3c;
+        }
+        
+        .quick-view-options {
+            margin-bottom: 25px;
+        }
+        
+        .option-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #1a1a1a;
+        }
+        
+        .quick-view-sizes, .quick-view-colors {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .qv-size-btn {
+            min-width: 48px;
+            height: 48px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .qv-size-btn:hover {
+            border-color: #1a1a1a;
+        }
+        
+        .qv-size-btn.selected {
+            border-color: #1a1a1a;
+            background: #1a1a1a;
+            color: white;
+        }
+        
+        .qv-color-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .qv-color-btn.selected {
+            border-color: #1a1a1a;
+            box-shadow: 0 0 0 3px white, 0 0 0 5px #1a1a1a;
+        }
+        
+        .qv-color-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .quick-view-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: auto;
+            padding-top: 20px;
+        }
+        
+        .qv-add-cart {
+            flex: 1;
+            padding: 16px 30px;
+            min-height: 48px;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .qv-add-cart:hover:not(:disabled) {
+            background: #333;
+            transform: translateY(-2px);
+        }
+        
+        .qv-add-cart:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .qv-add-fav {
+            width: 48px;
+            height: 48px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 24px;
+            color: #ccc;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .qv-add-fav:hover {
+            border-color: #e74c3c;
+            color: #e74c3c;
+        }
+        
+        .qv-add-fav.active {
+            border-color: #e74c3c;
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+        }
+        
+        .qv-error {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 8px;
+            display: none;
+        }
+        
+        .qv-error.show {
+            display: block;
+        }
+        
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1a1a1a;
+            color: white;
+            padding: 16px 28px;
+            border-radius: 12px;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.4s;
+            z-index: 10005;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* MOBILE FILTERS */
+        .mobile-filter-btn {
+            display: none;
+            padding: 14px 24px;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 20px;
+            min-height: 48px;
+            font-weight: 600;
+        }
+        
+        
+        /* FOOTER - index.html ile AYNI */
+        .footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 60px 40px 30px;
+            margin-top: 80px;
+        }
+        .footer-inner {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .footer-brand h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            margin-bottom: 15px;
+            letter-spacing: 3px;
+        }
+        .footer-brand p {
+            color: #999;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        .social-links a {
+            font-size: 20px;
+            text-decoration: none;
+        }
+        .footer-links h4 {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .footer-links a {
+            display: block;
+            color: #999;
+            text-decoration: none;
+            margin-bottom: 12px;
+            transition: color 0.3s;
+        }
+        .footer-links a:hover {
+            color: white;
+        }
+        .footer-bottom {
+            border-top: 1px solid #333;
+            margin-top: 40px;
+            padding-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .payment-methods {
+            display: flex;
+            gap: 15px;
+            font-size: 24px;
+        }
+/* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .product-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+            .shop-container { padding: 20px; gap: 20px; }
+            .shop-sidebar { width: 260px; }
+            .header { padding: 0 20px; }
+            .header-link { display: none; }
+        }
+        
+        @media (max-width: 768px) {
+            .header { padding: 0 15px; height: calc(60px + env(safe-area-inset-top)); }
+            .brand-text { font-size: 20px; letter-spacing: 4px; }
+            .brand-arabic { font-size: 20px; }
+            .header-btn { padding: 8px 12px; font-size: 13px; }
+            .header-icon { padding: 8px; font-size: 16px; }
+            .shop-sidebar { display: none; }
+            .shop-sidebar.active {
+                display: block;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100vh;
+                background: white;
+                z-index: 9998;
+                padding: 20px;
+                overflow-y: auto;
+            }
+            .mobile-filter-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
+            .product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .product-image { height: 220px; }
+            .cart-drawer, .fav-drawer { width: 100%; right: -100%; max-width: 100%; }
+            .side-menu { width: 85%; left: -100%; max-width: 320px; }
+            .quick-view-content { grid-template-columns: 1fr; max-height: 95vh; }
+            .quick-view-image { min-height: 200px; height: 200px; }
+            .quick-view-info { padding: 20px; max-height: 60vh; }
+            .quick-view-info h2 { font-size: 20px; }
+            .quick-view-actions { flex-direction: row; gap: 10px; }
+            .qv-add-fav { width: 48px; height: 48px; }
+            .user-name { display: none; }
+            .user-menu-btn { padding: 8px; }
+            .footer-inner { grid-template-columns: 1fr; gap: 30px; }
+            .footer { padding: 40px 20px 20px; }
+            .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
+            .pagination { flex-wrap: wrap; gap: 8px; }
+            .shop-container { padding: 15px; }
+            .shop-header { padding: 100px 20px 40px !important; }
+            .shop-header h1 { font-size: 28px; }
+            .shop-toolbar { flex-direction: column; gap: 15px; align-items: flex-start; }
+        }
+
+        @media (max-width: 576px) {
+            .header { padding: 0 8px; }
+            .header-inner { padding: 0 8px; gap: 4px; }
+            .header-left { gap: 4px; }
+            .header-right { gap: 4px; }
+            .brand-text { font-size: 16px; letter-spacing: 3px; }
+            .brand-arabic { font-size: 16px; }
+            .header-btn { padding: 5px 8px; font-size: 11px; }
+            .header-icon { padding: 5px; font-size: 14px; min-width: 36px; min-height: 36px; }
+            .user-menu-btn { padding: 5px 6px; }
+            .user-avatar { width: 20px; height: 20px; }
+            
+            .product-grid { grid-template-columns: 1fr; gap: 15px; }
+            .product-image { height: 280px; }
+            .page-btn, .page-number { min-height: 44px; min-width: 44px; }
+        }
+    
+        /* ================================================
+           MOBİL HEADER - Kompakt İkon Modu
+        ================================================ */
+        @media (max-width: 768px) {
+
+            /* Header yüksekliği */
+            .header {
+                height: 60px !important;
+                padding: 0 10px !important;
+            }
+
+            /* Sol butonlar - sadece ikon */
+            .header-left {
+                gap: 6px !important;
+            }
+
+            .header-link {
+                display: none !important;
+            }
+
+            .header-btn .btn-text {
+                display: none;
+            }
+
+            .header-btn {
+                width: 40px !important;
+                height: 40px !important;
+                min-width: 40px !important;
+                padding: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                border-radius: 50% !important;
+                font-size: 16px !important;
+            }
+
+            /* Logo küçültme */
+            .brand-arabic { font-size: 16px !important; }
+            .brand-text { font-size: 18px !important; letter-spacing: 4px !important; }
+
+            /* Sağ ikonlar */
+            .header-right {
+                gap: 6px !important;
+            }
+
+            .header-icon {
+                width: 40px !important;
+                height: 40px !important;
+                min-width: 40px !important;
+                border-radius: 50% !important;
+                padding: 0 !important;
+                font-size: 16px !important;
+            }
+
+            /* Profil butonu - sadece avatar */
+            .user-menu-btn {
+                padding: 0 !important;
+                border-radius: 50% !important;
+                width: 40px !important;
+                height: 40px !important;
+                min-width: 40px !important;
+                min-height: 40px !important;
+                justify-content: center !important;
+                gap: 0 !important;
+            }
+            .user-menu-btn .user-name,
+            .user-menu-btn .dropdown-arrow {
+                display: none !important;
+            }
+            .user-menu-btn .user-avatar {
+                width: 26px !important;
+                height: 26px !important;
+                font-size: 11px !important;
+            }
+
+            /* Giriş Yap butonu da küçük */
+            #userMenuContainer > a {
+                width: 40px !important;
+                height: 40px !important;
+                border-radius: 50% !important;
+                padding: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 0 !important;
+                border: 1px solid rgba(0,0,0,0.15) !important;
+                color: #1a1a1a !important;
+                text-decoration: none !important;
+            }
+            #userMenuContainer > a::before {
+                content: "👤";
+                font-size: 16px;
+            }
+            .header.scrolled #userMenuContainer > a {
+                border-color: rgba(0,0,0,0.15) !important;
+                color: #1a1a1a !important;
+            }
+
+            /* Dropdown menü pozisyon */}
+
+
+        /* ===== DROPDOWN MENÜ (tüm sayfalarda aynı) ===== */
+        .user-dropdown { position: relative; }
+        .user-dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 50px;
+            width: 210px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 10000;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .user-dropdown-menu.show { display: block; }
+        .dropdown-user-info {
+            display: flex;
+            gap: 10px;
+            padding: 14px;
+            align-items: center;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .dropdown-avatar {
+            width: 36px;
+            height: 36px;
+            background: #c9a87c;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .dropdown-name { font-size: 13px; font-weight: 600; }
+        .dropdown-email { font-size: 11px; color: #888; }
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.2s;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+        }
+        .dropdown-item:hover { background: #f8f5f2; color: #c9a87c; }
+        .dropdown-item.logout {
+            color: #e74c3c;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: inherit;
+        }
+        .dropdown-divider { border-top: 1px solid #f0f0f0; margin: 4px 0; }
+
+        /* user-menu-btn override - beyaz header için koyu renkler */
+        .user-menu-btn {
+            border-color: rgba(0,0,0,0.15) !important;
+            color: #1a1a1a !important;
+        }
+        .header.scrolled .user-menu-btn {
+            border-color: rgba(0,0,0,0.15) !important;
+            color: #1a1a1a !important;
+        }
+
+        /* Mobil giriş yap butonu koyu */
+        @media (max-width: 768px) {
+            #userMenuContainer > a {
+                width: 40px !important;
+                height: 40px !important;
+                border-radius: 50% !important;
+                padding: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 0 !important;
+                border: 1px solid rgba(0,0,0,0.15) !important;
+                color: #1a1a1a !important;
+                text-decoration: none !important;
+            }
+            #userMenuContainer > a::before {
+                content: "👤";
+                font-size: 16px;
+            }
+            .user-dropdown-menu {
+                position: fixed !important;
+                top: 65px !important;
+                right: 8px !important;
+                width: min(210px, calc(100vw - 16px)) !important;
+            }
+        }
+        </style>
+</head>
+<body class="shop-page">
+
+<!-- HEADER - index.html ile AYNI -->
+<header class="header" id="mainHeader">
+    <div class="header-left">
+        <button class="header-btn" id="openMenuBtn"><span class="btn-icon">☰</span><span class="btn-text">Menü</span></button>
+        <button class="header-btn" id="openSearch"><span class="btn-icon">🔍</span><span class="btn-text">Ara</span></button>
+    </div>
+    <div class="header-center">
+        <a href="index.html" class="brand-logo">
+            <span class="brand-arabic">ك</span>
+            <span class="brand-text">KEVRA</span>
+        </a>
+    </div>
+    <div class="header-right">
+        <a href="hakkimizda.html" class="header-link">Hakkımızda</a>
+        <a href="iletisim.html" class="header-link">İletişim</a>
+        <button class="header-icon" id="favBtn">♡ <span id="favCount">0</span></button>
+        <button class="header-icon" id="cartBtn">👜 <span id="cartCount">0</span></button>
+        <div id="userMenuContainer"></div>
+    </div>
+</header>
+
+<!-- SEARCH MODAL - index.html ile AYNI -->
+<div class="search-modal" id="searchModal">
+    <div class="search-box">
+        <div class="search-head">
+            <h2 class="search-title">Ürün Ara</h2>
+            <button class="search-close-btn" id="closeSearch">✖</button>
+        </div>
+        <div class="search-input-wrapper">
+            <input type="text" id="searchInput" placeholder="Ürün adı yaz...">
+        </div>
+        <div class="search-results" id="searchResults"></div>
+    </div>
+</div>
+
+<!-- SIDE MENU -->
+<div class="side-menu" id="sideMenu">
+    <div class="side-menu-header">
+        <h3>KEVRA</h3>
+        <button id="closeMenuBtn">✖</button>
+    </div>
+    <div class="side-menu-content">
+        <a href="index.html" class="menu-link">Ana Sayfa</a>
+        <a href="shop.html" class="menu-link">Tüm Ürünler</a>
+        <a href="shop.html?category=yeni" class="menu-link">Yeni Sezon</a>
+        <a href="shop.html?category=elbise" class="menu-link">Elbiseler</a>
+        <a href="shop.html?category=ust" class="menu-link">Üst Giyim</a>
+        <a href="shop.html?category=alt" class="menu-link">Alt Giyim</a>
+        <a href="shop.html?category=triko" class="menu-link">Triko</a>
+        <a href="shop.html?category=dis" class="menu-link">Dış Giyim</a>
+        <a href="shop.html?category=aksesuar" class="menu-link">Aksesuar</a>
+        <a href="shop.html?category=indirim" class="menu-link" style="color: #e74c3c;">İndirim</a>
+    </div>
+</div>
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<!-- SHOP HEADER -->
+<div class="shop-header">
+    <h1>Tüm Ürünler</h1>
+    <div class="breadcrumb">
+        <a href="index.html">Ana Sayfa</a>
+        <span>/</span>
+        <span id="breadcrumbCurrent">Tüm Ürünler</span>
+    </div>
+</div>
+
+<!-- SHOP CONTAINER -->
+<div class="shop-container">
+    <!-- SIDEBAR FILTERS -->
+    <aside class="shop-sidebar" id="shopSidebar">
+        <div class="filter-section">
+            <h4 class="filter-title">Kategoriler</h4>
+            <label class="filter-checkbox">
+                <input type="checkbox" data-filter="category" value="elbise" onchange="handleFilterChange(this)"> Elbiseler
+            </label>
+            <label class="filter-checkbox">
+                <input type="checkbox" data-filter="category" value="ust" onchange="handleFilterChange(this)"> Üst Giyim
+            </label>
+            <label class="filter-checkbox">
+                <input type="checkbox" data-filter="category" value="alt" onchange="handleFilterChange(this)"> Alt Giyim
+            </label>
+            <label class="filter-checkbox">
+                <input type="checkbox" data-filter="category" value="triko" onchange="handleFilterChange(this)"> Triko
+            </label>
+            <label class="filter-checkbox">
+                <input type="checkbox" data-filter="category" value="dis" onchange="handleFilterChange(this)"> Dış Giyim
+            </label>
+            <label class="filter-checkbox">
+                <input type="checkbox" data-filter="category" value="aksesuar" onchange="handleFilterChange(this)"> Aksesuar
+            </label>
+        </div>
+        
+        <div class="filter-section">
+            <h4 class="filter-title">Beden</h4>
+            <div class="size-filters">
+                <button class="size-filter-btn" data-size="XS" onclick="handleSizeFilter(this)">XS</button>
+                <button class="size-filter-btn" data-size="S" onclick="handleSizeFilter(this)">S</button>
+                <button class="size-filter-btn" data-size="M" onclick="handleSizeFilter(this)">M</button>
+                <button class="size-filter-btn" data-size="L" onclick="handleSizeFilter(this)">L</button>
+                <button class="size-filter-btn" data-size="XL" onclick="handleSizeFilter(this)">XL</button>
+            </div>
+        </div>
+        
+        <div class="filter-section">
+            <h4 class="filter-title">Fiyat</h4>
+            <label class="filter-checkbox">
+                <input type="checkbox" id="onlyDiscount" onchange="handleDiscountChange(this)"> Sadece İndirimli
+            </label>
+        </div>
+    </aside>
+    
+    <!-- MAIN CONTENT -->
+    <main class="shop-main">
+        <button class="mobile-filter-btn" onclick="openMobileFilters()">☰ Filtreler</button>
+        
+        <div class="shop-toolbar">
+            <span class="results-count"><span id="resultsCount">0</span> ürün bulundu</span>
+            <div class="shop-controls">
+                <select id="sortSelect" onchange="applyFilters()">
+                    <option value="newest">En Yeniler</option>
+                    <option value="price-asc">Fiyat: Düşükten Yükseğe</option>
+                    <option value="price-desc">Fiyat: Yüksekten Düşüğe</option>
+                </select>
+                <div class="view-toggle">
+                    <button class="view-btn active" onclick="toggleView(this, 'grid')">⊞</button>
+                    <button class="view-btn" onclick="toggleView(this, 'list')">☰</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- AKTİF FİLTRELER - YENİ -->
+        <div class="active-filters" id="activeFilters"></div>
+        
+        <div class="product-grid" id="shopProducts"></div>
+        
+        <div class="pagination" id="pagination">
+            <button class="page-btn" id="prevPage" onclick="changePage(-1)" disabled>←</button>
+            <div id="pageNumbers"></div>
+            <button class="page-btn" id="nextPage" onclick="changePage(1)">→</button>
+        </div>
+    </main>
+</div>
+
+
+<!-- FOOTER - index.html ile AYNI -->
+<footer class="footer" id="footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <h3>KEVRA</h3>
+            <p>Premium kadın giyim koleksiyonları. Modern, zarif ve kaliteli.</p>
+            <div class="social-links">
+                <a href="#">📷</a>
+                <a href="#">📘</a>
+                <a href="#">🎵</a>
+                <a href="#">📌</a>
+            </div>
+        </div>
+        <div class="footer-links">
+            <h4>Hızlı Linkler</h4>
+            <a href="shop.html">Tüm Ürünler</a>
+            <a href="shop.html?category=indirim">İndirim</a>
+            <a href="shop.html?category=populer">Çok Satanlar</a>
+        </div>
+        <div class="footer-links">
+            <h4>Destek</h4>
+            <a href="siparistakibi.html">Sipariş Takibi</a>
+            <a href="iadekosullari.html">İade Koşulları</a>
+            <a href="kargobilgisi.html">Kargo Bilgisi</a>
+            <a href="sss.html">SSS</a>
+        </div>
+        <div class="footer-links">
+            <h4>İletişim</h4>
+            <a href="https://wa.me/905555555555">WhatsApp</a>
+            <a href="mailto:info@kevra.com">E-posta</a>
+            <p style="margin-top: 15px; color: #666; font-size: 13px;">Pzt-Cmt: 09:00 - 18:00</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 KEVRA. Tüm hakları saklıdır.</p>
+        <div class="payment-methods">
+            <span>💳</span>
+            <span>🏦</span>
+            <span>🚪</span>
+        </div>
+    </div>
+</footer>
+
+<!-- CART DRAWER - index.html ile AYNI -->
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-header">
+        <h3>Sepetim (<span id="cartDrawerCount">0</span>)</h3>
+        <button class="cart-close-btn" id="closeCartBtn">✖</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer" id="cartFooter">
+        <div class="cart-summary">
+            <div class="summary-row">
+                <span>Ara Toplam</span>
+                <span id="subTotal">0 ₺</span>
+            </div>
+            <div class="summary-row">
+                <span>Kargo</span>
+                <span id="shippingCost">Ücretsiz</span>
+            </div>
+            <div class="cart-total">
+                <span>Toplam</span>
+                <span id="cartTotal">0 ₺</span>
+            </div>
+        </div>
+        <div class="cart-actions">
+            <button class="checkout-btn" id="checkoutBtn" onclick="location.href='odeme.html'">💳 Ödemeye Geç</button>
+            <button class="go-to-cart-btn" onclick="location.href='sepetim.html'">🛒 Sepetime Git</button>
+            <button class="continue-btn" id="continueBtn">Alışverişe Devam Et</button>
+        </div>
+    </div>
+</div>
+
+<!-- FAVORITES DRAWER -->
+<div class="fav-drawer" id="favDrawer">
+    <div class="fav-header">
+        <h3>Favorilerim (<span id="favDrawerCount">0</span>)</h3>
+        <button class="fav-close-btn" id="closeFavBtn">✖</button>
+    </div>
+    <div class="fav-items" id="favItems"></div>
+</div>
+<div class="fav-overlay" id="favOverlay"></div>
+
+<!-- QUICK VIEW MODAL -->
+<div class="quick-view-modal" id="quickViewModal">
+    <div class="quick-view-overlay" onclick="closeQuickView()"></div>
+    <div class="quick-view-content">
+        <button class="quick-view-close" onclick="closeQuickView()">✖</button>
+        <div class="quick-view-image">
+            <img src="" alt="" id="qvImg">
+        </div>
+        <div class="quick-view-info">
+            <span class="quick-view-badge" id="qvBadge">Yeni</span>
+            <h2 id="qvName">Ürün Adı</h2>
+            <div class="quick-view-price">
+                <span class="current" id="qvPrice">0 ₺</span>
+                <span class="original" id="qvOriginalPrice"></span>
+                <span class="quick-view-discount" id="qvDiscount"></span>
+            </div>
+            <p class="quick-view-desc" id="qvDesc">Ürün açıklaması...</p>
+            
+            <div class="quick-view-stock" id="qvStock">
+                <span>✓</span> Stokta var
+            </div>
+            
+            <div class="quick-view-options">
+                <label class="option-label">Beden Seçin *</label>
+                <div class="quick-view-sizes" id="qvSizes"></div>
+                <div class="qv-error" id="sizeError">Lütfen beden seçin</div>
+                
+                <label class="option-label">Renk Seçin *</label>
+                <div class="quick-view-colors" id="qvColors"></div>
+                <div class="qv-error" id="colorError">Lütfen renk seçin</div>
+            </div>
+            
+            <div class="quick-view-actions">
+                <button class="qv-add-cart" id="qvAddCartBtn" onclick="addToCartFromQuickView()">
+                    🛒 Sepete Ekle
+                </button>
+                <button class="qv-add-fav" id="qvFavBtn" onclick="toggleFavFromQuickView()">
+                    ♡
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+    <span id="toastText"></span>
+</div>
+
+<!-- SCRIPTS -->
+<script src="js/storage.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/main.js"></script>
+
+<script>
+// Aktif filtreleri takip et
+let activeFilters = {
+    categories: [],
+    sizes: [],
+    discount: false
+};
+
+// Kategori filtresi değiştiğinde
+function handleFilterChange(checkbox) {
+    const value = checkbox.value;
+    if (checkbox.checked) {
+        if (!activeFilters.categories.includes(value)) {
+            activeFilters.categories.push(value);
+        }
+    } else {
+        activeFilters.categories = activeFilters.categories.filter(c => c !== value);
+    }
+    updateActiveFiltersDisplay();
+    applyFilters();
+}
+
+// Beden filtresi değiştiğinde
+function handleSizeFilter(btn) {
+    const size = btn.dataset.size;
+    btn.classList.toggle('active');
+    
+    if (btn.classList.contains('active')) {
+        if (!activeFilters.sizes.includes(size)) {
+            activeFilters.sizes.push(size);
+        }
+    } else {
+        activeFilters.sizes = activeFilters.sizes.filter(s => s !== size);
+    }
+    updateActiveFiltersDisplay();
+    applyFilters();
+}
+
+// İndirim filtresi değiştiğinde
+function handleDiscountChange(checkbox) {
+    activeFilters.discount = checkbox.checked;
+    updateActiveFiltersDisplay();
+    applyFilters();
+}
+
+// Aktif filtreleri göster
+function updateActiveFiltersDisplay() {
+    const container = document.getElementById('activeFilters');
+    let html = '';
+    
+    // Kategori filtreleri
+    const categoryNames = {
+        'elbise': 'Elbiseler',
+        'ust': 'Üst Giyim',
+        'alt': 'Alt Giyim',
+        'triko': 'Triko',
+        'dis': 'Dış Giyim',
+        'aksesuar': 'Aksesuar'
+    };
+    
+    activeFilters.categories.forEach(cat => {
+        html += `
+            <span class="active-filter-tag">
+                ${categoryNames[cat] || cat}
+                <button onclick="removeCategoryFilter('${cat}')" title="Kaldır">×</button>
+            </span>
+        `;
+    });
+    
+    // Beden filtreleri
+    activeFilters.sizes.forEach(size => {
+        html += `
+            <span class="active-filter-tag">
+                Beden: ${size}
+                <button onclick="removeSizeFilter('${size}')" title="Kaldır">×</button>
+            </span>
+        `;
+    });
+    
+    // İndirim filtresi
+    if (activeFilters.discount) {
+        html += `
+            <span class="active-filter-tag">
+                İndirimli Ürünler
+                <button onclick="removeDiscountFilter()" title="Kaldır">×</button>
+            </span>
+        `;
+    }
+    
+    // Tümünü temizle butonu
+    if (activeFilters.categories.length > 0 || activeFilters.sizes.length > 0 || activeFilters.discount) {
+        html += `<button class="clear-all-filters" onclick="clearAllFilters()">Tümünü Temizle</button>`;
+    }
+    
+    container.innerHTML = html;
+}
+
+// Kategori filtresini kaldır
+function removeCategoryFilter(category) {
+    activeFilters.categories = activeFilters.categories.filter(c => c !== category);
+    // Checkbox'ı unchecked yap
+    const checkbox = document.querySelector(`input[data-filter="category"][value="${category}"]`);
+    if (checkbox) checkbox.checked = false;
+    updateActiveFiltersDisplay();
+    applyFilters();
+}
+
+// Beden filtresini kaldır
+function removeSizeFilter(size) {
+    activeFilters.sizes = activeFilters.sizes.filter(s => s !== size);
+    // Butonu inactive yap
+    const btn = document.querySelector(`.size-filter-btn[data-size="${size}"]`);
+    if (btn) btn.classList.remove('active');
+    updateActiveFiltersDisplay();
+    applyFilters();
+}
+
+// İndirim filtresini kaldır
+function removeDiscountFilter() {
+    activeFilters.discount = false;
+    const checkbox = document.getElementById('onlyDiscount');
+    if (checkbox) checkbox.checked = false;
+    updateActiveFiltersDisplay();
+    applyFilters();
+}
+
+// Tüm filtreleri temizle
+function clearAllFilters() {
+    activeFilters = {
+        categories: [],
+        sizes: [],
+        discount: false
+    };
+    
+    // Tüm checkbox'ları unchecked yap
+    document.querySelectorAll('input[data-filter="category"]').forEach(cb => cb.checked = false);
+    document.getElementById('onlyDiscount').checked = false;
+    
+    // Tüm beden butonlarını inactive yap
+    document.querySelectorAll('.size-filter-btn').forEach(btn => btn.classList.remove('active'));
+    
+    updateActiveFiltersDisplay();
+    applyFilters();
+}
+
+// Filtreleri uygula (main.js'deki fonksiyonu override et)
+function applyFilters() {
+    let result = [...allProducts];
+    
+    // Kategori filtresi
+    if (activeFilters.categories.length > 0) {
+        result = result.filter(p => activeFilters.categories.includes(p.category));
+    }
+    
+    // İndirim filtresi
+    if (activeFilters.discount) {
+        result = result = result.filter(p => p.discount);
+    }
+    
+    // Beden filtresi
+    if (activeFilters.sizes.length > 0) {
+        result = result.filter(p => p.sizes && p.sizes.some(s => activeFilters.sizes.includes(s)));
+    }
+    
+    // Sıralama
+    const sortSelect = document.getElementById("sortSelect");
+    const sortValue = sortSelect ? sortSelect.value : 'newest';
+    switch(sortValue) {
+        case 'price-asc':
+            result.sort((a, b) => a.price - b.price);
+            break;
+        case 'price-desc':
+            result.sort((a, b) => b.price - a.price);
+            break;
+    }
+    
+    filteredProducts = result;
+    currentPage = 1;
+    renderProducts(filteredProducts);
+    
+    // Sonuç sayısını güncelle
+    const resultsCount = document.getElementById("resultsCount");
+    if (resultsCount) resultsCount.textContent = result.length;
+}
+
+// Mobil filtreler
+function openMobileFilters() {
+    const sidebar = document.getElementById("shopSidebar");
+    if (sidebar) sidebar.classList.add("active");
+}
+
+// Sayfa yüklendiğinde
+document.addEventListener('DOMContentLoaded', function() {
+    // main.js'deki init fonksiyonu zaten çalışacak
+    // Aktif filtreler başlangıçta boş
+    updateActiveFiltersDisplay();
+});
+</script>
+
+</body>
+</html>

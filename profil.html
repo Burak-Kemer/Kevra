@@ -1,0 +1,2224 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Profilim | KEVRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- style.css DROPDOWN STILLERINI KULLANMAK ICIN EKLENIYOR -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --kevra-gold: #c9a87c;
+            --kevra-dark: #1a1a1a;
+            --kevra-gray: #666;
+            --kevra-light: #f8f8f8;
+            --kevra-border: #e5e5e5;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f5f5;
+            color: var(--kevra-dark);
+            line-height: 1.6;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ================= HEADER - index.html ile birebir aynı ================= */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 9999;
+            transition: all 0.4s ease;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+        .header.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .header-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .header-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid rgba(0,0,0,0.1);
+            color: #1a1a1a;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .header.scrolled .header-btn {
+            color: #1a1a1a;
+            border-color: rgba(0,0,0,0.1);
+        }
+        .header-btn:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+        .header.scrolled .header-btn:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        .brand-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #1a1a1a;
+            line-height: 1;
+            transition: transform 0.3s ease;
+        }
+        .header.scrolled .brand-logo {
+            color: #1a1a1a;
+        }
+        .brand-logo:hover {
+            transform: scale(1.05);
+        }
+        .brand-arabic {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: -6px;
+        }
+        .brand-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 10px;
+            margin-top: 2px;
+        }
+        .header-link {
+            color: #1a1a1a;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        .header.scrolled .header-link {
+            color: #1a1a1a;
+        }
+        .header-icon {
+            position: relative;
+            padding: 10px;
+            background: transparent;
+            border: 1px solid rgba(0,0,0,0.1);
+            color: #1a1a1a;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .header.scrolled .header-icon {
+            color: #1a1a1a;
+            border-color: rgba(0,0,0,0.1);
+        }
+        .header-icon:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        .header.scrolled .header-icon:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        #cartCount, #favCount {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        /* ================= DROPDOWN STILLERI style.css'TEN GELIYOR ================= */
+        /* ESKI INLINE DROPDOWN CSS KALDIRILDI - style.css'teki yeni stiller kullanılacak */
+        /* #userMenuContainer, .user-dropdown, .user-menu-btn, .user-dropdown-menu */
+        /* gibi stiller artik style.css dosyasindan geliyor */
+
+        /* Side Menu */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 320px;
+            max-width: 85vw;
+            height: 100vh;
+            background: white;
+            z-index: 10001;
+            transition: left 0.4s ease;
+            overflow-y: auto;
+            box-shadow: 5px 0 30px rgba(0,0,0,0.1);
+        }
+        .side-menu.active { left: 0; }
+        .menu-header {
+            padding: 30px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+            color: white;
+        }
+        .menu-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        .menu-header p { font-size: 13px; opacity: 0.8; }
+        .menu-links { padding: 20px 0; }
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 16px 30px;
+            color: #333;
+            text-decoration: none;
+            font-size: 15px;
+            transition: all 0.3s;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .menu-link:hover {
+            background: #f8f5f2;
+            color: #c9a87c;
+            padding-left: 35px;
+        }
+        .menu-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        .menu-overlay.active { opacity: 1; visibility: visible; }
+
+        /* Search Modal */
+        .search-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 10002;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 80px;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .search-modal.active { display: flex; }
+        .search-box {
+            background: white;
+            width: 90%;
+            max-width: 700px;
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.4);
+            animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .search-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .search-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            color: #1a1a1a;
+        }
+        .search-close-btn {
+            background: #f5f5f5;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .search-close-btn:hover {
+            background: #e74c3c;
+            color: white;
+            transform: rotate(90deg);
+        }
+        .search-input-wrapper {
+            position: relative;
+            margin-bottom: 10px;
+        }
+        .search-input-wrapper input {
+            width: 100%;
+            padding: 20px 25px;
+            border: 2px solid #e8e8e8;
+            border-radius: 16px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            background: #fafafa;
+        }
+        .search-input-wrapper input:focus {
+            border-color: #c9a87c;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(201, 168, 124, 0.1);
+        }
+        .search-results {
+            max-height: 450px;
+            overflow-y: auto;
+            margin-top: 15px;
+            padding-right: 5px;
+        }
+        .search-results::-webkit-scrollbar {
+            width: 6px;
+        }
+        .search-results::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .search-results::-webkit-scrollbar-thumb {
+            background: #c9a87c;
+            border-radius: 10px;
+        }
+
+        /* Cart & Fav Drawers */
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 420px;
+            max-width: 100%;
+            height: 100vh;
+            background: white;
+            z-index: 10003;
+            transition: right 0.4s ease;
+            box-shadow: -5px 0 30px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .drawer.open { right: 0; }
+        .drawer-header {
+            padding: 25px 30px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .drawer-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+        }
+        .close-drawer {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        .close-drawer:hover { background: #f5f5f5; color: #333; }
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .drawer-footer {
+            padding: 25px 30px;
+            border-top: 1px solid #eee;
+            background: #fafafa;
+        }
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 10002;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        .drawer-overlay.active { opacity: 1; visibility: visible; }
+
+        /* PAGE CONTENT */
+        .page-content {
+            margin-top: 90px;
+            padding: 40px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .profile-header {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            background: var(--kevra-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            font-weight: 600;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .profile-info h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        .profile-info p {
+            color: var(--kevra-gray);
+            font-size: 15px;
+        }
+        .profile-stats {
+            display: flex;
+            gap: 30px;
+            margin-left: auto;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--kevra-gold);
+        }
+        .stat-label {
+            font-size: 13px;
+            color: var(--kevra-gray);
+        }
+
+        /* Tabs */
+        .tabs-container {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        .tabs-nav {
+            display: flex;
+            border-bottom: 1px solid var(--kevra-border);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .tabs-nav::-webkit-scrollbar {
+            display: none;
+        }
+        .tab-btn {
+            padding: 20px 30px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--kevra-gray);
+            transition: all 0.3s;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .tab-btn:hover { color: var(--kevra-dark); }
+        .tab-btn.active {
+            color: var(--kevra-gold);
+            border-bottom-color: var(--kevra-gold);
+        }
+        .tab-content {
+            display: none;
+            padding: 40px;
+        }
+        .tab-content.active { display: block; }
+
+        /* Orders */
+        .order-card {
+            border: 1px solid var(--kevra-border);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        .order-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--kevra-border);
+        }
+        .order-number {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .order-date {
+            color: var(--kevra-gray);
+            font-size: 14px;
+        }
+        .order-status {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .status-delivered { background: #e8f5e9; color: #2e7d32; }
+        .status-shipped { background: #e3f2fd; color: #1976d2; }
+        .status-processing { background: #fff3e0; color: #f57c00; }
+        .status-cancelled { background: #ffebee; color: #c62828; }
+        .status-pending { background: #f3e5f5; color: #7b1fa2; }
+        .order-products {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .order-product {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+            min-width: 250px;
+        }
+        .order-product img {
+            width: 80px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .order-product-info h4 {
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+        .order-product-info p {
+            color: var(--kevra-gray);
+            font-size: 13px;
+        }
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .order-total {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .order-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-sm {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--kevra-border);
+            color: var(--kevra-dark);
+        }
+        .btn-outline:hover {
+            border-color: var(--kevra-gold);
+            color: var(--kevra-gold);
+        }
+        .btn-primary {
+            background: var(--kevra-dark);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--kevra-gold);
+        }
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        /* Return Request Form */
+        .return-form {
+            background: var(--kevra-light);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .return-form h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid var(--kevra-border);
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+            -webkit-appearance: none;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--kevra-gold);
+            box-shadow: 0 0 0 3px rgba(201,168,124,0.1);
+        }
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Address Cards */
+        .address-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .address-card {
+            border: 2px solid var(--kevra-border);
+            border-radius: 16px;
+            padding: 25px;
+            position: relative;
+            transition: all 0.3s;
+        }
+        .address-card:hover {
+            border-color: var(--kevra-gold);
+        }
+        .address-card.default {
+            border-color: var(--kevra-gold);
+            background: linear-gradient(135deg, rgba(201,168,124,0.05) 0%, white 100%);
+        }
+        .address-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 4px 12px;
+            background: var(--kevra-gold);
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .address-card h4 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            padding-right: 80px;
+        }
+        .address-card p {
+            color: var(--kevra-gray);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .address-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        .btn-icon {
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid var(--kevra-border);
+            background: white;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-icon:hover {
+            background: var(--kevra-light);
+        }
+
+        /* Personal Info */
+        .info-form {
+            max-width: 600px;
+        }
+        .profile-photo-upload {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .photo-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--kevra-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            font-weight: 600;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .photo-upload-btn {
+            padding: 12px 24px;
+            border: 2px dashed var(--kevra-border);
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--kevra-gray);
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+        .photo-upload-btn:hover {
+            border-color: var(--kevra-gold);
+            color: var(--kevra-gold);
+        }
+        #photoInput { display: none; }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .empty-state i {
+            font-size: 64px;
+            color: var(--kevra-border);
+            margin-bottom: 20px;
+        }
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .empty-state p {
+            color: var(--kevra-gray);
+            margin-bottom: 25px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1a1a1a;
+            color: white;
+            padding: 16px 28px;
+            border-radius: 12px;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.4s;
+            z-index: 10005;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast.success { background: #27ae60; }
+        .toast.error { background: #e74c3c; }
+
+        /* Return History Item */
+        .return-item {
+            border: 1px solid var(--kevra-border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: white;
+        }
+        .return-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .return-item-title {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .return-item-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .return-status-pending { background: #fff3e0; color: #f57c00; }
+        .return-status-approved { background: #e8f5e9; color: #2e7d32; }
+        .return-status-rejected { background: #ffebee; color: #c62828; }
+        .return-item-meta {
+            color: var(--kevra-gray);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        /* Address Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 10004;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        .modal-box h2 {
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* ================= MOBIL RESPONSIVE ================= */
+        @media (max-width: 768px) {
+            .header { 
+                padding: 0 15px; 
+                height: 60px;
+            }
+            .header-center {
+                position: static;
+                transform: none;
+                margin: 0 auto;
+            }
+            .brand-text { 
+                font-size: 22px; 
+                letter-spacing: 6px; 
+            }
+            .brand-arabic {
+                font-size: 20px;
+            }
+            .header-link { 
+                display: none; 
+            }
+            .header-btn {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+            .header-icon {
+                padding: 8px;
+                font-size: 16px;
+            }
+            #cartCount, #favCount {
+                width: 18px;
+                height: 18px;
+                font-size: 10px;
+                top: -6px;
+                right: -6px;
+            }
+            .page-content { 
+                padding: 20px; 
+                margin-top: 70px;
+            }
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+                padding: 25px;
+                gap: 20px;
+            }
+            .profile-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 32px;
+            }
+            .profile-info h1 {
+                font-size: 24px;
+            }
+            .profile-stats {
+                margin-left: 0;
+                margin-top: 15px;
+                width: 100%;
+                justify-content: center;
+            }
+            .stat-value {
+                font-size: 24px;
+            }
+            .tabs-nav { 
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .tab-btn { 
+                padding: 15px 20px; 
+                font-size: 14px; 
+            }
+            .tab-content { 
+                padding: 25px; 
+            }
+            .form-row { 
+                grid-template-columns: 1fr; 
+            }
+            .address-grid { 
+                grid-template-columns: 1fr; 
+            }
+            .order-header { 
+                flex-direction: column; 
+                gap: 15px; 
+                text-align: center; 
+            }
+            .order-footer { 
+                flex-direction: column; 
+                gap: 15px; 
+                align-items: stretch;
+            }
+            .order-actions {
+                justify-content: center;
+            }
+            .order-products { 
+                flex-direction: column; 
+            }
+            .order-product {
+                min-width: auto;
+            }
+            .drawer { 
+                width: 100%; 
+                right: -100%; 
+            }
+            .search-box {
+                width: 95%;
+                padding: 25px;
+            }
+            .search-title {
+                font-size: 22px;
+            }
+            .modal-box {
+                padding: 25px;
+            }
+            .profile-photo-upload {
+                flex-direction: column;
+                text-align: center;
+            }
+            .return-form {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .brand-text {
+                font-size: 18px;
+                letter-spacing: 4px;
+            }
+            .brand-arabic {
+                font-size: 16px;
+                margin-bottom: -4px;
+            }
+            .header-btn {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+            .tab-btn {
+                padding: 12px 16px;
+                font-size: 13px;
+            }
+            .tab-content {
+                padding: 20px;
+            }
+            .profile-stats {
+                gap: 20px;
+            }
+            .stat-item {
+                flex: 1;
+            }
+            .btn-sm {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+            .order-product img {
+                width: 60px;
+                height: 75px;
+            }
+        }
+    
+        /* ================================================
+           MOBİL HEADER - Kompakt İkon Modu
+        ================================================ */
+        @media (max-width: 768px) {
+
+            /* Header yüksekliği */
+            .header {
+                height: 60px !important;
+                padding: 0 10px !important;
+            }
+
+            /* Sol butonlar - sadece ikon */
+            .header-left {
+                gap: 6px !important;
+            }
+
+            .header-link {
+                display: none !important;
+            }
+
+            .header-btn .btn-text {
+                display: none;
+            }
+
+            .header-btn {
+                width: 40px !important;
+                height: 40px !important;
+                min-width: 40px !important;
+                padding: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                border-radius: 50% !important;
+                font-size: 16px !important;
+            }
+
+            /* Logo küçültme */
+            .brand-arabic { font-size: 16px !important; }
+            .brand-text { font-size: 18px !important; letter-spacing: 4px !important; }
+
+            /* Sağ ikonlar */
+            .header-right {
+                gap: 6px !important;
+            }
+
+            .header-icon {
+                width: 40px !important;
+                height: 40px !important;
+                min-width: 40px !important;
+                border-radius: 50% !important;
+                padding: 0 !important;
+                font-size: 16px !important;
+            }
+
+            /* Profil butonu - sadece avatar */
+            .user-menu-btn {
+                padding: 0 !important;
+                border-radius: 50% !important;
+                width: 40px !important;
+                height: 40px !important;
+                min-width: 40px !important;
+                min-height: 40px !important;
+                justify-content: center !important;
+                gap: 0 !important;
+            }
+            .user-menu-btn .user-name,
+            .user-menu-btn .dropdown-arrow {
+                display: none !important;
+            }
+            .user-menu-btn .user-avatar {
+                width: 26px !important;
+                height: 26px !important;
+                font-size: 11px !important;
+            }
+
+            /* Giriş Yap butonu da küçük */
+            #userMenuContainer > a {
+                width: 40px !important;
+                height: 40px !important;
+                border-radius: 50% !important;
+                padding: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 0 !important;
+                border: 1px solid rgba(0,0,0,0.15) !important;
+                color: #1a1a1a !important;
+                text-decoration: none !important;
+            }
+            #userMenuContainer > a::before {
+                content: "👤";
+                font-size: 16px;
+            }
+            .header.scrolled #userMenuContainer > a {
+                border-color: rgba(0,0,0,0.15) !important;
+                color: #1a1a1a !important;
+            }
+
+            /* Dropdown menü pozisyon */}
+
+
+        /* user-menu-btn override - beyaz header için koyu renkler */
+        .user-menu-btn {
+            border-color: rgba(0,0,0,0.15) !important;
+            color: #1a1a1a !important;
+        }
+        .header.scrolled .user-menu-btn {
+            border-color: rgba(0,0,0,0.15) !important;
+            color: #1a1a1a !important;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 40px 20px 20px;
+        }
+        .footer-inner {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .footer-brand h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            margin-bottom: 12px;
+            letter-spacing: 3px;
+        }
+        .footer-brand p { color: #999; margin-bottom: 16px; line-height: 1.6; font-size: 14px; }
+        .social-links { display: flex; gap: 12px; }
+        .social-links a {
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: white; font-size: 16px;
+        }
+        .footer-links h4 { font-size: 15px; margin-bottom: 16px; font-weight: 600; }
+        .footer-links a { display: block; color: #999; text-decoration: none; margin-bottom: 10px; font-size: 14px; }
+        .footer-bottom {
+            border-top: 1px solid #333;
+            margin-top: 30px; padding-top: 20px;
+            display: flex; flex-direction: column; gap: 12px;
+            align-items: center; text-align: center;
+            max-width: 1400px; margin-left: auto; margin-right: auto;
+        }
+        .footer-bottom p { font-size: 13px; color: #666; }
+        .payment-methods { display: flex; gap: 10px; font-size: 20px; }
+        @media (min-width: 768px) {
+            .footer-inner { grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
+            .footer-bottom { flex-direction: row; justify-content: space-between; text-align: left; }
+        }
+
+
+        /* ===== DROPDOWN MENÜ (tüm sayfalarda aynı) ===== */
+        .user-dropdown { position: relative; }
+        .user-dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 50px;
+            width: 210px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 10000;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .user-dropdown-menu.show { display: block; }
+        .dropdown-user-info {
+            display: flex;
+            gap: 10px;
+            padding: 14px;
+            align-items: center;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .dropdown-avatar {
+            width: 36px;
+            height: 36px;
+            background: #c9a87c;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .dropdown-name { font-size: 13px; font-weight: 600; }
+        .dropdown-email { font-size: 11px; color: #888; }
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.2s;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+        }
+        .dropdown-item:hover { background: #f8f5f2; color: #c9a87c; }
+        .dropdown-item.logout {
+            color: #e74c3c;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: inherit;
+        }
+        .dropdown-divider { border-top: 1px solid #f0f0f0; margin: 4px 0; }
+        </style>
+</head>
+<body>
+    <!-- HEADER - index.html ILE BIREBIR AYNI YAPI -->
+    <header class="header" id="mainHeader">
+        <div class="header-left">
+            <button class="header-btn" id="openMenuBtn"><span class="btn-icon">☰</span><span class="btn-text">Menü</span></button>
+            <button class="header-btn" id="openSearch"><span class="btn-icon">🔍</span><span class="btn-text">Ara</span></button>
+        </div>
+        <div class="header-center">
+            <a href="index.html" class="brand-logo">
+                <span class="brand-arabic">ك</span>
+                <span class="brand-text">KEVRA</span>
+            </a>
+        </div>
+        <div class="header-right">
+            <a href="hakkimizda.html" class="header-link">Hakkımızda</a>
+            <a href="iletisim.html" class="header-link">İletişim</a>
+            <button class="header-icon" id="favBtn">♡ <span id="favCount">0</span></button>
+            <button class="header-icon" id="cartBtn">👜 <span id="cartCount">0</span></button>
+            <!-- DROPDOWN style.css'TEN GELIYOR - index.html ILE AYNI -->
+            <div id="userMenuContainer"></div>
+        </div>
+    </header>
+
+    <!-- SIDE MENU -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-header">
+            <h2>KEVRA</h2>
+            <p>Zarafetin adresi</p>
+        </div>
+        <div class="menu-links">
+            <a href="index.html" class="menu-link">🏠 Ana Sayfa</a>
+            <a href="shop.html" class="menu-link">🛍️ Tüm Ürünler</a>
+            <a href="shop.html?category=elbise" class="menu-link">👗 Elbiseler</a>
+            <a href="shop.html?category=ust" class="menu-link">👚 Üst Giyim</a>
+            <a href="shop.html?category=alt" class="menu-link">👖 Alt Giyim</a>
+            <a href="shop.html?category=triko" class="menu-link">🧶 Triko</a>
+            <a href="shop.html?category=dis" class="menu-link">🧥 Dış Giyim</a>
+            <a href="shop.html?category=aksesuar" class="menu-link">💎 Aksesuar</a>
+            <a href="shop.html?category=indirim" class="menu-link">🏷️ İndirimli Ürünler</a>
+            <a href="shop.html?category=yeni" class="menu-link">✨ Yeni Gelenler</a>
+            <div style="height: 1px; background: #eee; margin: 10px 0;"></div>
+            <a href="hakkimizda.html" class="menu-link">ℹ️ Hakkımızda</a>
+            <a href="iletisim.html" class="menu-link">📞 İletişim</a>
+            <a href="gizlilik.html" class="menu-link">🔒 Gizlilik Politikası</a>
+            <a href="iade-kosullari.html" class="menu-link">↩️ İade Koşulları</a>
+            <a href="kargo-bilgisi.html" class="menu-link">🚚 Kargo Bilgisi</a>
+            <a href="sss.html" class="menu-link">❓ Sıkça Sorulan Sorular</a>
+        </div>
+    </div>
+
+    <!-- SEARCH MODAL -->
+    <div class="search-modal" id="searchModal">
+        <div class="search-box">
+            <div class="search-head">
+                <h2 class="search-title">Ürün Ara</h2>
+                <button class="search-close-btn" id="closeSearch">✖</button>
+            </div>
+            <div class="search-input-wrapper">
+                <input type="text" id="searchInput" placeholder="Ürün adı yaz...">
+            </div>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+    </div>
+
+    <!-- CART DRAWER -->
+    <div class="drawer-overlay" id="cartOverlay"></div>
+    <div class="drawer" id="cartDrawer">
+        <div class="drawer-header">
+            <h2>🛒 Sepetim <span style="font-size: 14px; color: #999; margin-left: 10px;" id="cartDrawerCount">(0)</span></h2>
+            <button class="close-drawer" id="closeCartBtn">×</button>
+        </div>
+        <div class="drawer-body" id="cartItems"></div>
+        <div class="drawer-footer">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; color: #666;">
+                <span>Ara Toplam</span>
+                <span id="subTotal">0 ₺</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 20px; font-weight: 700;">
+                <span>Toplam</span>
+                <span id="cartTotal">0 ₺</span>
+            </div>
+            <button style="width: 100%; padding: 16px; background: #1a1a1a; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.background='#c9a87c'" onmouseout="this.style.background='#1a1a1a'" onclick="location.href='odeme.html'">
+                Ödemeye Geç →
+            </button>
+            <button id="continueBtn" style="width: 100%; margin-top: 10px; padding: 12px; background: transparent; border: 1px solid #ddd; border-radius: 12px; font-size: 14px; cursor: pointer; color: #666;">
+                Alışverişe Devam Et
+            </button>
+        </div>
+    </div>
+
+    <!-- FAVORITES DRAWER -->
+    <div class="drawer-overlay" id="favOverlay"></div>
+    <div class="drawer" id="favDrawer">
+        <div class="drawer-header">
+            <h2>♡ Favorilerim <span style="font-size: 14px; color: #999; margin-left: 10px;" id="favDrawerCount">(0)</span></h2>
+            <button class="close-drawer" id="closeFavBtn">×</button>
+        </div>
+        <div class="drawer-body" id="favItems"></div>
+    </div>
+
+    <!-- ADDRESS MODAL -->
+    <div class="modal-overlay" id="addressModal">
+        <div class="modal-box">
+            <h2 id="addressModalTitle">Yeni Adres Ekle</h2>
+            <form id="addressForm" onsubmit="saveAddress(event)">
+                <input type="hidden" id="editAddressId">
+                <div class="form-group">
+                    <label>Adres Başlığı *</label>
+                    <input type="text" id="addressTitle" placeholder="Ev, İş vb." required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ad *</label>
+                        <input type="text" id="addressFirstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Soyad *</label>
+                        <input type="text" id="addressLastName" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Telefon *</label>
+                    <input type="tel" id="addressPhone" placeholder="05XX XXX XX XX" required>
+                </div>
+                <div class="form-group">
+                    <label>Adres Satırı 1 *</label>
+                    <input type="text" id="addressLine1" placeholder="Mahalle, Cadde, Sokak, No" required>
+                </div>
+                <div class="form-group">
+                    <label>Adres Satırı 2</label>
+                    <input type="text" id="addressLine2" placeholder="Kat, Daire, Blok (opsiyonel)">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>İlçe *</label>
+                        <input type="text" id="addressDistrict" required>
+                    </div>
+                    <div class="form-group">
+                        <label>İl *</label>
+                        <input type="text" id="addressCity" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Posta Kodu</label>
+                    <input type="text" id="addressZip" placeholder="34000">
+                </div>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="addressDefault" style="width: auto;">
+                        <span>Varsayılan adres olarak ayarla</span>
+                    </label>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button type="button" class="btn-sm btn-outline" onclick="closeAddressModal()" style="flex: 1;">İptal</button>
+                    <button type="submit" class="btn-sm btn-primary" style="flex: 1;">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- PAGE CONTENT -->
+    <main class="page-content">
+        <div class="profile-header">
+            <div class="profile-avatar" id="profileAvatar">B</div>
+            <div class="profile-info">
+                <h1 id="profileName">Burak Kemer</h1>
+                <p id="profileEmail">burakkemer7@gmail.com</p>
+            </div>
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="orderCount">0</div>
+                    <div class="stat-label">Sipariş</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="favCountStat">0</div>
+                    <div class="stat-label">Favori</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="returnCount">0</div>
+                    <div class="stat-label">İade</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs-container">
+            <div class="tabs-nav" id="profileTabs">
+                <button class="tab-btn active" data-tab="siparisler" onclick="switchTab('siparisler', this)">📦 Siparişlerim</button>
+                <button class="tab-btn" data-tab="iade" onclick="switchTab('iade', this)">↩️ İade Talepleri</button>
+                <button class="tab-btn" data-tab="adres" onclick="switchTab('adres', this)">📍 Adreslerim</button>
+                <button class="tab-btn" data-tab="profil" onclick="switchTab('profil', this)">👤 Kişisel Bilgiler</button>
+            </div>
+
+            <!-- Siparişler Tab -->
+            <div class="tab-content active" id="tab-siparisler">
+                <div id="ordersList"></div>
+            </div>
+
+            <!-- İade Talepleri Tab -->
+            <div class="tab-content" id="tab-iade">
+                <div class="return-form">
+                    <h3><i class="fas fa-undo"></i> Yeni İade Talebi Oluştur</h3>
+                    <form id="returnForm" onsubmit="submitReturn(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Sipariş Numarası *</label>
+                                <select id="returnOrderSelect" required>
+                                    <option value="">Sipariş seçin</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>İade Nedeni *</label>
+                                <select id="returnReason" required>
+                                    <option value="">Neden seçin</option>
+                                    <option value="size">Beden Uymadı</option>
+                                    <option value="defect">Ürün Hasarlı</option>
+                                    <option value="wrong">Yanlış Ürün Gönderildi</option>
+                                    <option value="dont_like">Beğenmedim</option>
+                                    <option value="other">Diğer</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Açıklama</label>
+                            <textarea id="returnDesc" placeholder="İade nedeninizi kısaca açıklayın..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>İade Yöntemi *</label>
+                            <select id="returnMethod" required>
+                                <option value="">Yöntem seçin</option>
+                                <option value="refund">Para İadesi</option>
+                                <option value="exchange">Ürün Değişimi</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-sm btn-primary" style="padding: 14px 30px; font-size: 15px;">
+                            İade Talebi Gönder
+                        </button>
+                    </form>
+                </div>
+
+                <h3 style="margin-bottom: 20px;">İade Geçmişim</h3>
+                <div id="returnsList"></div>
+            </div>
+
+            <!-- Adresler Tab -->
+            <div class="tab-content" id="tab-adres">
+                <div style="margin-bottom: 25px;">
+                    <button class="btn-sm btn-primary" onclick="openAddressModal()">
+                        <i class="fas fa-plus"></i> Yeni Adres Ekle
+                    </button>
+                </div>
+                <div class="address-grid" id="addressGrid"></div>
+            </div>
+
+            <!-- Kişisel Bilgiler Tab -->
+            <div class="tab-content" id="tab-profil">
+                <form class="info-form" id="profileForm" onsubmit="updateProfile(event)">
+                    <div class="profile-photo-upload">
+                        <div class="photo-preview" id="profilePhoto">B</div>
+                        <div>
+                            <button type="button" class="photo-upload-btn" onclick="document.getElementById('photoInput').click()">
+                                📷 Fotoğraf Değiştir
+                            </button>
+                            <input type="file" id="photoInput" accept="image/*" onchange="handlePhotoUpload(event)">
+                            <p style="font-size: 12px; color: #999; margin-top: 8px;">Maksimum 2MB, JPG veya PNG</p>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ad *</label>
+                            <input type="text" id="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Soyad *</label>
+                            <input type="text" id="lastName" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Adresi *</label>
+                        <input type="email" id="profileEmailInput" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Telefon *</label>
+                        <input type="tel" id="profilePhone" required>
+                    </div>
+                    <div style="margin-top: 30px; padding-top: 30px; border-top: 1px solid var(--kevra-border);">
+                        <h3 style="margin-bottom: 20px;">Şifre Değiştir</h3>
+                        <div class="form-group">
+                            <label>Mevcut Şifre</label>
+                            <input type="password" id="currentPassword" placeholder="Mevcut şifrenizi girin">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Yeni Şifre</label>
+                                <input type="password" id="newPassword" placeholder="Yeni şifrenizi girin">
+                            </div>
+                            <div class="form-group">
+                                <label>Yeni Şifre (Tekrar)</label>
+                                <input type="password" id="confirmPassword" placeholder="Yeni şifrenizi tekrar girin">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-sm btn-primary" style="padding: 14px 30px; font-size: 15px; margin-top: 20px;">
+                        Değişiklikleri Kaydet
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">
+        <span id="toastText"></span>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="js/storage.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        // ================= PROFIL SAYFASI JAVASCRIPT =================
+
+        // Auth kontrolü
+        if (!KevraAuth.isLoggedIn()) {
+            window.location.href = 'giris.html?redirect=profil.html';
+        }
+
+        let currentUser = KevraAuth.getCurrentUser();
+        let returns = JSON.parse(localStorage.getItem('kevra_returns') || '[]');
+
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('mainHeader');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Tab switching
+        function switchTab(tabName, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            if (btn) btn.classList.add('active');
+            document.getElementById('tab-' + tabName).classList.add('active');
+            
+            // URL hash güncelle
+            window.history.replaceState(null, null, '#' + tabName);
+            
+            // İade tabına geçince sipariş select'ini güncelle
+            if (tabName === 'iade') {
+                updateReturnOrderSelect();
+            }
+        }
+
+        // URL hash kontrolü - sayfa yüklendiğinde
+        function checkUrlHash() {
+            const hash = window.location.hash.replace('#', '');
+            if (hash) {
+                const tabBtn = document.querySelector(`[data-tab="${hash}"]`);
+                if (tabBtn) {
+                    // Tüm tab'ları kapat
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    // İlgili tab'ı aç
+                    tabBtn.classList.add('active');
+                    document.getElementById('tab-' + hash).classList.add('active');
+                    // İade tab'ıysa select'i güncelle
+                    if (hash === 'iade') {
+                        updateReturnOrderSelect();
+                    }
+                }
+            }
+        }
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastText = document.getElementById('toastText');
+            toastText.textContent = message;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // ================= KULLANICI BİLGİLERİ =================
+
+        function loadUserData() {
+            const user = KevraAuth.getCurrentUser();
+            if (!user) return;
+
+            const fullName = (user.firstName || '') + ' ' + (user.lastName || '');
+            const initial = (user.firstName || user.email || 'K')[0].toUpperCase();
+            const photo = user.photo || null;
+
+            document.getElementById('profileName').textContent = fullName.trim() || 'Kullanıcı';
+            document.getElementById('profileEmail').textContent = user.email || '';
+            
+            // Avatar güncelle
+            const avatar = document.getElementById('profileAvatar');
+            const photoPreview = document.getElementById('profilePhoto');
+            
+            if (photo) {
+                avatar.innerHTML = `<img src="${photo}" alt="Profil">`;
+                photoPreview.innerHTML = `<img src="${photo}" alt="Profil">`;
+            } else {
+                avatar.textContent = initial;
+                photoPreview.textContent = initial;
+            }
+
+            // Form alanlarını doldur
+            document.getElementById('firstName').value = user.firstName || '';
+            document.getElementById('lastName').value = user.lastName || '';
+            document.getElementById('profileEmailInput').value = user.email || '';
+            document.getElementById('profilePhone').value = user.phone || '';
+
+            // İstatistikleri güncelle
+            updateStats();
+        }
+
+        function updateStats() {
+            const user = KevraAuth.getCurrentUser();
+            const orders = user?.orders || [];
+            const favs = JSON.parse(localStorage.getItem('kevra_favorites') || '[]');
+            const userReturns = returns.filter(r => r.userId === (user?.id || ''));
+
+            document.getElementById('orderCount').textContent = orders.length;
+            document.getElementById('favCountStat').textContent = favs.length;
+            document.getElementById('returnCount').textContent = userReturns.length;
+        }
+
+        // ================= PROFİL GÜNCELLEME =================
+
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('Fotoğraf 2MB\'dan küçük olmalıdır', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const photoData = e.target.result;
+                
+                // Kullanıcıyı güncelle
+                const result = KevraAuth.updateUser({ photo: photoData });
+                if (result.success) {
+                    // Avatarları güncelle
+                    const avatar = document.getElementById('profileAvatar');
+                    const photoPreview = document.getElementById('profilePhoto');
+                    avatar.innerHTML = `<img src="${photoData}" alt="Profil">`;
+                    photoPreview.innerHTML = `<img src="${photoData}" alt="Profil">`;
+                    
+                    // Header avatarını da güncelle
+                    updateUserMenu();
+                    showToast('Profil fotoğrafınız güncellendi');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateProfile(e) {
+            e.preventDefault();
+            
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('profileEmailInput').value.trim();
+            const phone = document.getElementById('profilePhone').value.trim();
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Temel bilgileri güncelle
+            const updates = { firstName, lastName, email, phone };
+            const result = KevraAuth.updateUser(updates);
+            
+            if (!result.success) {
+                showToast(result.message, 'error');
+                return;
+            }
+
+            // Şifre değiştirme
+            if (currentPassword || newPassword || confirmPassword) {
+                if (!currentPassword) {
+                    showToast('Mevcut şifrenizi girin', 'error');
+                    return;
+                }
+                if (newPassword !== confirmPassword) {
+                    showToast('Yeni şifreler eşleşmiyor', 'error');
+                    return;
+                }
+                if (newPassword.length < 6) {
+                    showToast('Yeni şifre en az 6 karakter olmalı', 'error');
+                    return;
+                }
+
+                const passResult = KevraAuth.changePassword(currentPassword, newPassword);
+                if (!passResult.success) {
+                    showToast(passResult.message, 'error');
+                    return;
+                }
+                
+                // Şifre alanlarını temizle
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+            }
+
+            // Header ve profil başlığını güncelle
+            loadUserData();
+            updateUserMenu();
+            showToast('Profil bilgileriniz güncellendi!');
+        }
+
+        // ================= SİPARİŞLER =================
+
+        function renderOrders() {
+            const user = KevraAuth.getCurrentUser();
+            const orders = user?.orders || [];
+            const container = document.getElementById('ordersList');
+
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <span style="font-size: 64px;">📦</span>
+                        <h3>Henüz Siparişiniz Yok</h3>
+                        <p>İlk siparişinizi vermek için ürünlerimizi keşfedin</p>
+                        <button class="btn-sm btn-primary" onclick="location.href='shop.html'" style="margin-top: 15px;">
+                            Alışverişe Başla
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            const statusMap = {
+                'pending': { class: 'status-pending', text: 'Beklemede' },
+                'processing': { class: 'status-processing', text: 'Hazırlanıyor' },
+                'shipped': { class: 'status-shipped', text: 'Kargoda' },
+                'delivered': { class: 'status-delivered', text: 'Teslim Edildi' },
+                'cancelled': { class: 'status-cancelled', text: 'İptal Edildi' }
+            };
+
+            container.innerHTML = orders.map(order => {
+                const status = statusMap[order.status] || statusMap.pending;
+                const date = new Date(order.createdAt).toLocaleDateString('tr-TR', {
+                    day: 'numeric', month: 'long', year: 'numeric'
+                });
+                const items = order.items || [];
+                const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+                return `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div>
+                                <div class="order-number">Sipariş #${order.id}</div>
+                                <div class="order-date">${date}</div>
+                            </div>
+                            <span class="order-status ${status.class}">${status.text}</span>
+                        </div>
+                        <div class="order-products">
+                            ${items.map(item => `
+                                <div class="order-product">
+                                    <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/80?text=No+Image'">
+                                    <div class="order-product-info">
+                                        <h4>${item.name}</h4>
+                                        <p>Beden: ${item.size || '-'} | Renk: ${item.color || '-'} | Adet: ${item.quantity}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="order-footer">
+                            <div class="order-total">Toplam: ${total.toLocaleString('tr-TR')} ₺</div>
+                            <div class="order-actions">
+                                <button class="btn-sm btn-outline" onclick="showOrderDetail('${order.id}')">Detaylar</button>
+                                ${order.status === 'delivered' ? `<button class="btn-sm btn-primary" onclick="initiateReturn('${order.id}')">İade Talebi</button>` : ''}
+                                ${order.status === 'shipped' ? `<button class="btn-sm btn-outline" onclick="trackOrder('${order.id}')">Kargo Takip</button>` : ''}
+                                ${order.status === 'pending' || order.status === 'processing' ? `<button class="btn-sm btn-danger" onclick="cancelOrder('${order.id}')">İptal Et</button>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showOrderDetail(orderId) {
+            const user = KevraAuth.getCurrentUser();
+            const order = user?.orders?.find(o => o.id === orderId);
+            if (!order) return;
+
+            const items = order.items || [];
+            const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const date = new Date(order.createdAt).toLocaleDateString('tr-TR');
+
+            alert(`Sipariş Detayı #${orderId}\n\nTarih: ${date}\nDurum: ${order.statusText || order.status}\n\nÜrünler:\n${items.map(i => `- ${i.name} (${i.quantity} adet) - ${i.price.toLocaleString('tr-TR')} ₺`).join('\n')}\n\nToplam: ${total.toLocaleString('tr-TR')} ₺`);
+        }
+
+        function trackOrder(orderNumber) {
+            window.open(`siparistakibi.html?order=${orderNumber}`, '_blank');
+        }
+
+        function cancelOrder(orderNumber) {
+            if (!confirm('Siparişi iptal etmek istediğinize emin misiniz?')) return;
+
+            const user = KevraAuth.getCurrentUser();
+            const users = KevraAuth.getUsers();
+            const userIndex = users.findIndex(u => u.id === user.id);
+            
+            if (userIndex === -1) return;
+
+            const orderIndex = users[userIndex].orders.findIndex(o => o.id === orderNumber);
+            if (orderIndex === -1) return;
+
+            users[userIndex].orders[orderIndex].status = 'cancelled';
+            users[userIndex].orders[orderIndex].statusText = 'İptal Edildi';
+            users[userIndex].orders[orderIndex].updatedAt = new Date().toISOString();
+
+            KevraStorage.set('kevra_users', users);
+            localStorage.setItem('kevra_current_user', JSON.stringify(users[userIndex]));
+
+            renderOrders();
+            updateStats();
+            showToast('Sipariş iptal edildi');
+        }
+
+        // ================= İADE TALEPLERİ =================
+
+        function updateReturnOrderSelect() {
+            const user = KevraAuth.getCurrentUser();
+            const orders = user?.orders?.filter(o => o.status === 'delivered') || [];
+            const select = document.getElementById('returnOrderSelect');
+            
+            select.innerHTML = '<option value="">Sipariş seçin</option>' +
+                orders.map(o => {
+                    const item = o.items?.[0];
+                    return `<option value="${o.id}">${o.id} - ${item?.name || 'Ürün'}</option>`;
+                }).join('');
+        }
+
+        function submitReturn(e) {
+            e.preventDefault();
+            
+            const orderId = document.getElementById('returnOrderSelect').value;
+            const reason = document.getElementById('returnReason').value;
+            const reasonText = document.getElementById('returnReason').options[document.getElementById('returnReason').selectedIndex].text;
+            const method = document.getElementById('returnMethod').value;
+            const methodText = document.getElementById('returnMethod').options[document.getElementById('returnMethod').selectedIndex].text;
+            const desc = document.getElementById('returnDesc').value;
+
+            if (!orderId || !reason || !method) {
+                showToast('Lütfen tüm zorunlu alanları doldurun', 'error');
+                return;
+            }
+
+            const user = KevraAuth.getCurrentUser();
+            const newReturn = {
+                id: 'RET-' + Date.now(),
+                userId: user.id,
+                orderId: orderId,
+                reason: reason,
+                reasonText: reasonText,
+                method: method,
+                methodText: methodText,
+                description: desc,
+                status: 'pending',
+                statusText: 'İnceleniyor',
+                createdAt: new Date().toISOString()
+            };
+
+            returns.push(newReturn);
+            localStorage.setItem('kevra_returns', JSON.stringify(returns));
+
+            document.getElementById('returnForm').reset();
+            renderReturns();
+            updateStats();
+            showToast('İade talebiniz alındı! En kısa sürede size dönüş yapılacak.');
+        }
+
+        function renderReturns() {
+            const user = KevraAuth.getCurrentUser();
+            const userReturns = returns.filter(r => r.userId === (user?.id || ''));
+            const container = document.getElementById('returnsList');
+
+            if (userReturns.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <span style="font-size: 64px;">📭</span>
+                        <h3>Henüz İade Talebiniz Yok</h3>
+                        <p>Yukarıdaki formdan yeni bir iade talebi oluşturabilirsiniz.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const statusClassMap = {
+                'pending': 'return-status-pending',
+                'approved': 'return-status-approved',
+                'rejected': 'return-status-rejected'
+            };
+
+            container.innerHTML = userReturns.map(ret => {
+                const date = new Date(ret.createdAt).toLocaleDateString('tr-TR');
+                return `
+                    <div class="return-item">
+                        <div class="return-item-header">
+                            <div class="return-item-title">İade #${ret.id} | Sipariş #${ret.orderId}</div>
+                            <span class="return-item-status ${statusClassMap[ret.status] || 'return-status-pending'}">${ret.statusText}</span>
+                        </div>
+                        <div class="return-item-meta">
+                            <strong>Neden:</strong> ${ret.reasonText}<br>
+                            <strong>Yöntem:</strong> ${ret.methodText}<br>
+                            <strong>Tarih:</strong> ${date}<br>
+                            ${ret.description ? `<strong>Açıklama:</strong> ${ret.description}<br>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function initiateReturn(orderNumber) {
+            document.getElementById('returnOrderSelect').value = orderNumber;
+            switchTab('iade', document.querySelector('[data-tab="iade"]'));
+            showToast('İade formu doldurulmaya hazır');
+        }
+
+        // ================= ADRESLER =================
+
+        function renderAddresses() {
+            const addresses = KevraAuth.getAddresses();
+            const container = document.getElementById('addressGrid');
+
+            if (addresses.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px;">
+                        <span style="font-size: 64px;">📍</span>
+                        <h3>Henüz Adresiniz Yok</h3>
+                        <p>Yeni bir adres ekleyerek başlayabilirsiniz</p>
+                        <button class="btn-sm btn-primary" onclick="openAddressModal()" style="margin-top: 15px;">
+                            Adres Ekle
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = addresses.map(addr => `
+                <div class="address-card ${addr.isDefault ? 'default' : ''}">
+                    ${addr.isDefault ? '<span class="address-badge">Varsayılan</span>' : ''}
+                    <h4>${addr.title}</h4>
+                    <p>
+                        <strong>${addr.firstName} ${addr.lastName}</strong><br>
+                        ${addr.phone}<br>
+                        ${addr.line1}<br>
+                        ${addr.line2 ? addr.line2 + '<br>' : ''}
+                        ${addr.district} / ${addr.city}<br>
+                        ${addr.zip ? addr.zip : ''}
+                    </p>
+                    <div class="address-actions">
+                        <button class="btn-icon" onclick="editAddress('${addr.id}')">✏️ Düzenle</button>
+                        <button class="btn-icon" onclick="deleteAddress('${addr.id}')">🗑️ Sil</button>
+                        ${!addr.isDefault ? `<button class="btn-icon" onclick="setDefaultAddress('${addr.id}')">⭐ Varsayılan Yap</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openAddressModal(addressId = null) {
+            const modal = document.getElementById('addressModal');
+            const form = document.getElementById('addressForm');
+            const title = document.getElementById('addressModalTitle');
+            
+            form.reset();
+            document.getElementById('editAddressId').value = '';
+
+            if (addressId) {
+                const addresses = KevraAuth.getAddresses();
+                const addr = addresses.find(a => a.id === addressId);
+                if (addr) {
+                    title.textContent = 'Adres Düzenle';
+                    document.getElementById('editAddressId').value = addr.id;
+                    document.getElementById('addressTitle').value = addr.title;
+                    document.getElementById('addressFirstName').value = addr.firstName;
+                    document.getElementById('addressLastName').value = addr.lastName;
+                    document.getElementById('addressPhone').value = addr.phone;
+                    document.getElementById('addressLine1').value = addr.line1;
+                    document.getElementById('addressLine2').value = addr.line2 || '';
+                    document.getElementById('addressDistrict').value = addr.district;
+                    document.getElementById('addressCity').value = addr.city;
+                    document.getElementById('addressZip').value = addr.zip || '';
+                    document.getElementById('addressDefault').checked = addr.isDefault || false;
+                }
+            } else {
+                title.textContent = 'Yeni Adres Ekle';
+                // Mevcut kullanıcı bilgilerini otomatik doldur
+                const user = KevraAuth.getCurrentUser();
+                if (user) {
+                    document.getElementById('addressFirstName').value = user.firstName || '';
+                    document.getElementById('addressLastName').value = user.lastName || '';
+                    document.getElementById('addressPhone').value = user.phone || '';
+                }
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeAddressModal() {
+            document.getElementById('addressModal').classList.remove('active');
+        }
+
+        function saveAddress(e) {
+            e.preventDefault();
+
+            const addressId = document.getElementById('editAddressId').value;
+            const addressData = {
+                title: document.getElementById('addressTitle').value.trim(),
+                firstName: document.getElementById('addressFirstName').value.trim(),
+                lastName: document.getElementById('addressLastName').value.trim(),
+                phone: document.getElementById('addressPhone').value.trim(),
+                line1: document.getElementById('addressLine1').value.trim(),
+                line2: document.getElementById('addressLine2').value.trim(),
+                district: document.getElementById('addressDistrict').value.trim(),
+                city: document.getElementById('addressCity').value.trim(),
+                zip: document.getElementById('addressZip').value.trim(),
+                isDefault: document.getElementById('addressDefault').checked
+            };
+
+            let result;
+            if (addressId) {
+                result = KevraAuth.updateAddress(addressId, addressData);
+            } else {
+                result = KevraAuth.addAddress(addressData);
+            }
+
+            if (result.success) {
+                closeAddressModal();
+                renderAddresses();
+                showToast(addressId ? 'Adres güncellendi' : 'Yeni adres eklendi');
+            } else {
+                showToast(result.message, 'error');
+            }
+        }
+
+        function editAddress(addressId) {
+            openAddressModal(addressId);
+        }
+
+        function deleteAddress(addressId) {
+            if (!confirm('Bu adresi silmek istediğinize emin misiniz?')) return;
+
+            const result = KevraAuth.deleteAddress(addressId);
+            if (result.success) {
+                renderAddresses();
+                showToast('Adres silindi');
+            } else {
+                showToast(result.message, 'error');
+            }
+        }
+
+        function setDefaultAddress(addressId) {
+            const addresses = KevraAuth.getAddresses();
+            const updates = addresses.map(a => ({
+                id: a.id,
+                isDefault: a.id === addressId
+            }));
+
+            // Tüm adresleri güncelle
+            const users = KevraAuth.getUsers();
+            const user = KevraAuth.getCurrentUser();
+            const userIndex = users.findIndex(u => u.id === user.id);
+            
+            if (userIndex !== -1) {
+                users[userIndex].addresses.forEach(a => {
+                    a.isDefault = (a.id === addressId);
+                });
+                KevraStorage.set('kevra_users', users);
+                localStorage.setItem('kevra_current_user', JSON.stringify(users[userIndex]));
+                renderAddresses();
+                showToast('Varsayılan adres güncellendi');
+            }
+        }
+
+        // ================= SAYFA YÜKLENİNCE =================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Kullanıcı verilerini yükle
+            loadUserData();
+            
+            // Siparişleri render et
+            renderOrders();
+            
+            // İade geçmişini render et
+            renderReturns();
+            
+            // Adresleri render et
+            renderAddresses();
+
+            // URL hash kontrolü
+            checkUrlHash();
+
+            // Header menü, arama, sepet, favori setup'ları main.js'ten geliyor
+            if (typeof setupSearch === 'function') setupSearch();
+            if (typeof setupMenu === 'function') setupMenu();
+            if (typeof setupDrawers === 'function') setupDrawers();
+            if (typeof setupEscapeKey === 'function') setupEscapeKey();
+            
+            // Sepet ve favori UI'ını güncelle
+            if (typeof updateCartUI === 'function') updateCartUI();
+            if (typeof updateFavUI === 'function') updateFavUI();
+        });
+
+        // Modal dışına tıklayınca kapat
+        document.getElementById('addressModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAddressModal();
+        });
+    </script>
+
+<!-- FOOTER -->
+<footer class="footer" id="footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <h3>KEVRA</h3>
+            <p>Premium kadın giyim koleksiyonları. Modern, zarif ve kaliteli.</p>
+            <div class="social-links">
+                <a href="#">📷</a>
+                <a href="#">📘</a>
+                <a href="#">🎵</a>
+                <a href="#">📌</a>
+            </div>
+        </div>
+        <div class="footer-links">
+            <h4>Hızlı Linkler</h4>
+            <a href="shop.html">Tüm Ürünler</a>
+            <a href="shop.html?category=indirim">İndirim</a>
+            <a href="shop.html?category=populer">Çok Satanlar</a>
+        </div>
+        <div class="footer-links">
+            <h4>Destek</h4>
+            <a href="siparistakibi.html">Sipariş Takibi</a>
+            <a href="iadekosullari.html">İade Koşulları</a>
+            <a href="kargobilgisi.html">Kargo Bilgisi</a>
+            <a href="sss.html">SSS</a>
+        </div>
+        <div class="footer-links">
+            <h4>İletişim</h4>
+            <a href="https://wa.me/905555555555">WhatsApp</a>
+            <a href="mailto:info@kevra.com">E-posta</a>
+            <p style="margin-top: 12px; color: #666; font-size: 13px;">Pzt-Cmt: 09:00 - 18:00</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 KEVRA. Tüm hakları saklıdır.</p>
+        <div class="payment-methods">
+            <span>💳</span>
+            <span>🏦</span>
+            <span>🚪</span>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

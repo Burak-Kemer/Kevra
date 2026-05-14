@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ürünler | KEVRA Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f5f5f5; color: #333; }
+        .admin-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 260px; background: #1a1a1a; color: #fff; position: fixed; height: 100vh; overflow-y: auto; }
+        .sidebar-header { padding: 30px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header h1 { font-size: 24px; font-weight: 600; letter-spacing: 2px; }
+        .sidebar-header p { font-size: 12px; opacity: 0.6; margin-top: 5px; }
+        .nav-menu { padding: 20px 0; }
+        .nav-item { padding: 15px 25px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 12px; border-left: 3px solid transparent; text-decoration: none; color: #fff; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.05); border-left-color: #c9a87c; }
+        .nav-item.active { background: rgba(201, 168, 124, 0.1); }
+        .nav-icon { font-size: 20px; }
+        .main-content { flex: 1; margin-left: 260px; padding: 30px; }
+        .header { background: #fff; padding: 20px 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header h2 { font-size: 24px; font-weight: 600; }
+        .btn { padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; background: #1a1a1a; color: #fff; }
+        .btn:hover { background: #333; transform: translateY(-2px); }
+        .content-card { background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden; }
+        .card-header { padding: 25px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .search-box input { padding: 10px 15px; border: 1px solid #ddd; border-radius: 8px; width: 250px; font-size: 14px; }
+        .table-container { overflow-x: auto; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px 20px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f9f9f9; font-weight: 600; font-size: 13px; text-transform: uppercase; color: #666; }
+        .product-img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; }
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .badge-popular { background: #c9a87c; color: #fff; }
+        .badge-yeni { background: #27ae60; color: #fff; }
+        .badge-indirim { background: #e74c3c; color: #fff; }
+        .stock-low { color: #e74c3c; }
+        .btn-icon { width: 35px; height: 35px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+        .btn-edit { background: #f0f0f0; color: #333; }
+        .btn-edit:hover { background: #1a1a1a; color: #fff; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        @media (max-width: 768px) { .sidebar { transform: translateX(-100%); } .main-content { margin-left: 0; } }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>KEVRA</h1>
+                <p>Admin Panel v2.0</p>
+            </div>
+            <nav class="nav-menu">
+    <a href="admin.html" class="nav-item">
+        <span class="nav-icon">📊</span>
+        <span>Dashboard</span>
+    </a>
+    <a href="admin-siparisler.html" class="nav-item">
+        <span class="nav-icon">📦</span>
+        <span>Siparişler</span>
+    </a>
+    <a href="admin-musteriler.html" class="nav-item">
+        <span class="nav-icon">👥</span>
+        <span>Müşteriler</span>
+    </a>
+    <a href="admin-urunler.html" class="nav-item active">
+        <span class="nav-icon">👕</span>
+        <span>Ürünler</span>
+    </a>
+    <a href="admin-fatura.html" class="nav-item">
+        <span class="nav-icon">📄</span>
+        <span>Fatura Yükleme</span>
+    </a>
+    <a href="paytr-ayarlari.html" class="nav-item">
+        <span class="nav-icon">💳</span>
+        <span>PayTR Ayarları</span>
+    </a>
+    <a href="../index.html" class="nav-item">
+        <span class="nav-icon">🏠</span>
+        <span>Siteye Dön</span>
+    </a>
+</nav>
+        </aside>
+        <main class="main-content">
+            <div class="header">
+                <h2>Tüm Ürünler</h2>
+                <a href="admin.html" class="btn">+ Yeni Ürün Ekle</a>
+            </div>
+            <div class="content-card">
+                <div class="card-header">
+                    <h3>Ürün Listesi</h3>
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Ürün ara..." onkeyup="searchProducts()">
+                    </div>
+                </div>
+                <div class="table-container" id="productsTable">
+                    <div class="empty-state">Yükleniyor...</div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="../db.js"></script>
+    <script>
+        function loadProducts() {
+            const products = JSON.parse(localStorage.getItem('kevra_products') || '[]');
+            renderTable(products);
+        }
+        function renderTable(products) {
+            const container = document.getElementById('productsTable');
+            if (products.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h4>Ürün bulunamadı</h4></div>';
+                return;
+            }
+            let html = `<table><thead><tr><th>Ürün</th><th>Kategori</th><th>Fiyat</th><th>Stok</th><th>Durum</th></tr></thead><tbody>`;
+            const catNames = { elbise: 'Elbise', ust: 'Üst Giyim', alt: 'Alt Giyim', triko: 'Triko', dis: 'Dış Giyim', aksesuar: 'Aksesuar' };
+            products.forEach(p => {
+                const badgeClass = p.badge ? `badge-${p.badge}` : '';
+                const badgeText = p.badge ? p.badge.toUpperCase() : '-';
+                html += `<tr><td><div style="display:flex;align-items:center;gap:12px;"><img src="${p.image}" class="product-img" onerror="this.src='https://via.placeholder.com/50'"><div><div style="font-weight:600;">${p.name}</div></div></div></td><td>${catNames[p.category] || p.category}</td><td>₺${p.price}</td><td class="${p.stock < 10 ? 'stock-low' : ''}">${p.stock} adet</td><td><span class="badge ${badgeClass}">${badgeText}</span></td></tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        function searchProducts() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const products = JSON.parse(localStorage.getItem('kevra_products') || '[]');
+            const filtered = products.filter(p => p.name.toLowerCase().includes(term) || p.category.toLowerCase().includes(term));
+            renderTable(filtered);
+        }
+        document.addEventListener('DOMContentLoaded', loadProducts);
+    </script>
+</body>
+</html>

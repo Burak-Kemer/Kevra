@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Müşteriler | KEVRA Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f5f5f5; color: #333; }
+        .admin-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 260px; background: #1a1a1a; color: #fff; position: fixed; height: 100vh; overflow-y: auto; }
+        .sidebar-header { padding: 30px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header h1 { font-size: 24px; font-weight: 600; letter-spacing: 2px; }
+        .sidebar-header p { font-size: 12px; opacity: 0.6; margin-top: 5px; }
+        .nav-menu { padding: 20px 0; }
+        .nav-item { padding: 15px 25px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 12px; border-left: 3px solid transparent; text-decoration: none; color: #fff; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.05); border-left-color: #c9a87c; }
+        .nav-item.active { background: rgba(201, 168, 124, 0.1); }
+        .nav-icon { font-size: 20px; }
+        .main-content { flex: 1; margin-left: 260px; padding: 30px; }
+        .header { background: #fff; padding: 20px 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header h2 { font-size: 24px; font-weight: 600; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .stat-card h3 { font-size: 14px; color: #666; margin-bottom: 10px; text-transform: uppercase; }
+        .stat-value { font-size: 28px; font-weight: 700; color: #1a1a1a; }
+        .content-card { background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden; }
+        .card-header { padding: 20px 25px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .search-box input { padding: 10px 15px; border: 1px solid #ddd; border-radius: 8px; width: 250px; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px 20px; text-align: left; border-bottom: 1px solid #eee; }
+        th { font-weight: 600; color: #666; font-size: 13px; text-transform: uppercase; background: #f9f9f9; }
+        .customer-info { display: flex; align-items: center; gap: 12px; }
+        .customer-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .badge.active { background: #d4edda; color: #155724; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        @media (max-width: 768px) { .sidebar { transform: translateX(-100%); } .main-content { margin-left: 0; } .stats-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>KEVRA</h1>
+                <p>Admin Panel v2.0</p>
+            </div>
+            <nav class="nav-menu">
+    <a href="admin.html" class="nav-item">
+        <span class="nav-icon">📊</span>
+        <span>Dashboard</span>
+    </a>
+    <a href="admin-siparisler.html" class="nav-item">
+        <span class="nav-icon">📦</span>
+        <span>Siparişler</span>
+    </a>
+    <a href="admin-musteriler.html" class="nav-item active">
+        <span class="nav-icon">👥</span>
+        <span>Müşteriler</span>
+    </a>
+    <a href="admin-urunler.html" class="nav-item">
+        <span class="nav-icon">👕</span>
+        <span>Ürünler</span>
+    </a>
+    <a href="admin-fatura.html" class="nav-item">
+        <span class="nav-icon">📄</span>
+        <span>Fatura Yükleme</span>
+    </a>
+    <a href="paytr-ayarlari.html" class="nav-item">
+        <span class="nav-icon">💳</span>
+        <span>PayTR Ayarları</span>
+    </a>
+    <a href="../index.html" class="nav-item">
+        <span class="nav-icon">🏠</span>
+        <span>Siteye Dön</span>
+    </a>
+</nav>
+        </aside>
+        <main class="main-content">
+            <div class="header">
+                <h2>Müşteri Yönetimi</h2>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Toplam Müşteri</h3>
+                    <div class="stat-value" id="totalCustomers">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Aktif Müşteri</h3>
+                    <div class="stat-value" id="activeCustomers">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Yeni (Bu Ay)</h3>
+                    <div class="stat-value" id="newCustomers">0</div>
+                </div>
+            </div>
+            <div class="content-card">
+                <div class="card-header">
+                    <h3>Tüm Müşteriler</h3>
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Müşteri ara..." onkeyup="searchCustomers()">
+                    </div>
+                </div>
+                <div id="customersTable">
+                    <table>
+                        <thead>
+                            <tr><th>MÜŞTERİ</th><th>TELEFON</th><th>ADRES</th><th>SİPARİŞ</th><th>DURUM</th></tr>
+                        </thead>
+                        <tbody id="customersTableBody">
+                            <tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Müşteriler yükleniyor...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="../db.js"></script>
+    <script>
+        function loadCustomers() {
+            const users = JSON.parse(localStorage.getItem('kevra_users') || '[]');
+            const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+            document.getElementById('totalCustomers').textContent = users.length;
+            document.getElementById('activeCustomers').textContent = users.filter(u => u.active !== false).length;
+            const thirtyDaysAgo = new Date(); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            document.getElementById('newCustomers').textContent = users.filter(u => new Date(u.registerDate) > thirtyDaysAgo).length;
+            renderCustomers(users, orders);
+        }
+        function renderCustomers(users, orders) {
+            const tbody = document.getElementById('customersTableBody');
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Henüz kayıtlı müşteri bulunmuyor.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = '';
+            users.forEach(user => {
+                const userOrders = orders.filter(o => o.userId === user.id);
+                const initials = (user.firstName?.[0] || '') + (user.lastName?.[0] || '');
+                const row = document.createElement('tr');
+                row.innerHTML = `<td><div class="customer-info"><div class="customer-avatar">${initials || 'U'}</div><div><div style="font-weight:500;">${user.firstName || ''} ${user.lastName || ''}</div><div style="font-size:12px;color:#666;">${user.email}</div></div></div></td><td>${user.phone || '-'}</td><td>${user.city || '-'}${user.address ? ' <small>(' + user.address.substring(0, 20) + '...)</small>' : ''}</td><td><strong>${userOrders.length}</strong> sipariş</td><td><span class="badge ${user.active !== false ? 'active' : 'inactive'}">${user.active !== false ? 'Aktif' : 'Pasif'}</span></td>`;
+                tbody.appendChild(row);
+            });
+        }
+        function searchCustomers() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const users = JSON.parse(localStorage.getItem('kevra_users') || '[]');
+            const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+            const filtered = users.filter(u => (u.firstName && u.firstName.toLowerCase().includes(term)) || (u.lastName && u.lastName.toLowerCase().includes(term)) || (u.email && u.email.toLowerCase().includes(term)) || (u.phone && u.phone.includes(term)));
+            renderCustomers(filtered, orders);
+        }
+        document.addEventListener('DOMContentLoaded', loadCustomers);
+    </script>
+</body>
+</html>

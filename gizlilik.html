@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="KEVRA Gizlilik Politikası ve KVKK Aydınlatma Metni">
+    <title>Gizlilik Politikası | KEVRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8f5f2;
+            color: #1a1a1a;
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* HEADER - index.html ile AYNI */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 9999;
+            transition: all 0.4s ease;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+        
+        .header.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .header-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid rgba(0,0,0,0.1);
+            color: #1a1a1a;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .header.scrolled .header-btn {
+            color: #1a1a1a;
+            border-color: rgba(0,0,0,0.1);
+        }
+        
+        .header-btn:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .header.scrolled .header-btn:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        
+        .brand-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #1a1a1a;
+            line-height: 1;
+            transition: transform 0.3s ease;
+        }
+        
+        .header.scrolled .brand-logo {
+            color: #1a1a1a;
+        }
+        
+        .brand-logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .brand-arabic {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: -6px;
+        }
+        
+        .brand-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 10px;
+            margin-top: 2px;
+        }
+        
+        .header-link {
+            color: #1a1a1a;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+        
+        .header.scrolled .header-link {
+            color: #1a1a1a;
+        }
+        
+        .header-link:hover {
+            color: #c9a87c;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .header-icon {
+            position: relative;
+            padding: 10px;
+            background: transparent;
+            border: 1px solid rgba(0,0,0,0.1);
+            color: #1a1a1a;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .header.scrolled .header-icon {
+            color: #1a1a1a;
+            border-color: rgba(0,0,0,0.1);
+        }
+        
+        .header-icon:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .header.scrolled .header-icon:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        
+        #cartCount, #favCount {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        /* User Dropdown - index.html ile aynı */
+        .user-dropdown {
+            position: relative;
+        }
+        
+        .user-menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            border: 1px solid rgba(0,0,0,0.1);
+            color: #1a1a1a;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .header.scrolled .user-menu-btn {
+            border-color: rgba(0,0,0,0.1);
+            color: #1a1a1a;
+        }
+        
+        .user-menu-btn:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        
+        .header.scrolled .user-menu-btn:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            background: #c9a87c;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        
+        .user-dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 55px;
+            width: 220px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 10000;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .user-dropdown-menu.show {
+            display: block;
+            animation: dropdownSlide 0.3s ease;
+        }
+        
+        @keyframes dropdownSlide {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .dropdown-user-info {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            align-items: center;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .dropdown-avatar {
+            width: 40px;
+            height: 40px;
+            background: #c9a87c;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .dropdown-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .dropdown-email {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            font-size: 14px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+        }
+        
+        .dropdown-item:hover {
+            background: #f8f5f2;
+            color: #c9a87c;
+        }
+        
+        .dropdown-item.logout {
+            color: #e74c3c;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: inherit;
+        }
+        
+        .dropdown-item.logout:hover {
+            background: #fdf2f2;
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background: #eee;
+            margin: 8px 0;
+        }
+        
+        /* SEARCH MODAL - index.html ile AYNI */
+        .search-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 10000;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 80px;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .search-modal.active {
+            display: flex;
+        }
+        
+        .search-box {
+            background: white;
+            width: 90%;
+            max-width: 700px;
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.4);
+            animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        @keyframes slideDown {
+            from { 
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .search-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .search-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .search-close-btn {
+            background: #f5f5f5;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .search-close-btn:hover {
+            background: #e74c3c;
+            color: white;
+            transform: rotate(90deg);
+        }
+        
+        .search-input-wrapper {
+            position: relative;
+            margin-bottom: 10px;
+        }
+        
+        .search-input-wrapper input {
+            width: 100%;
+            padding: 20px 25px;
+            border: 2px solid #e8e8e8;
+            border-radius: 16px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            background: #fafafa;
+        }
+        
+        .search-input-wrapper input:focus {
+            border-color: #c9a87c;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(201, 168, 124, 0.1);
+        }
+        
+        .search-input-wrapper input::placeholder {
+            color: #999;
+        }
+        
+        .search-results {
+            max-height: 450px;
+            overflow-y: auto;
+            margin-top: 15px;
+            padding-right: 5px;
+        }
+        
+        .search-results::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .search-results::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .search-results::-webkit-scrollbar-thumb {
+            background: #c9a87c;
+            border-radius: 10px;
+        }
+        
+        .search-item {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 18px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            border: 1px solid transparent;
+            margin-bottom: 10px;
+        }
+        
+        .search-item:hover {
+            background: #f8f5f2;
+            border-color: #c9a87c;
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        
+        .search-item img {
+            width: 70px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .search-item-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .search-item-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            line-height: 1.3;
+        }
+        
+        .search-item-category {
+            font-size: 13px;
+            color: #888;
+            text-transform: capitalize;
+        }
+        
+        .search-item-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #c9a87c;
+        }
+        
+        .search-item-original {
+            font-size: 14px;
+            color: #999;
+            text-decoration: line-through;
+            margin-left: 8px;
+        }
+        
+        .search-item-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 4px;
+            width: fit-content;
+        }
+        
+        .search-item-badge.indirim { background: #e74c3c; color: white; }
+        .search-item-badge.yeni { background: #27ae60; color: white; }
+        .search-item-badge.popular { background: #f39c12; color: white; }
+        .search-item-badge.premium { background: #9b59b6; color: white; }
+        
+        .search-item-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+        }
+        
+        .search-view-btn {
+            padding: 10px 20px;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        
+        .search-view-btn:hover {
+            background: #c9a87c;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(201, 168, 124, 0.4);
+        }
+        
+        .search-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .search-empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        .search-empty h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+        
+        .search-count {
+            padding: 10px 15px;
+            background: #f8f5f2;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .search-count strong {
+            color: #1a1a1a;
+        }
+        
+        .search-view-all {
+            display: block;
+            text-align: center;
+            padding: 18px;
+            background: linear-gradient(135deg, #f8f5f2, #e8e0d8);
+            border-radius: 12px;
+            color: #1a1a1a;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .search-view-all:hover {
+            background: white;
+            border-color: #c9a87c;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        /* SIDE MENU - index.html ile AYNI */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -400px;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            z-index: 10001;
+            transition: left 0.4s ease;
+            box-shadow: 5px 0 30px rgba(0,0,0,0.1);
+        }
+        
+        .side-menu.active {
+            left: 0;
+        }
+        
+        .side-menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .side-menu-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            letter-spacing: 3px;
+        }
+        
+        .side-menu-header button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .side-menu-content {
+            padding: 20px;
+        }
+        
+        .menu-link {
+            display: block;
+            padding: 15px 20px;
+            color: #1a1a1a;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 10px;
+            transition: all 0.3s;
+            margin-bottom: 5px;
+        }
+        
+        .menu-link:hover {
+            background: #f5f5f5;
+            padding-left: 25px;
+        }
+        
+        .menu-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+        }
+        
+        .menu-overlay.active {
+            display: block;
+        }
+        
+        /* CART DRAWER - index.html ile AYNI */
+        .cart-drawer {
+            position: fixed;
+            top: 0;
+            right: -450px;
+            width: 450px;
+            height: 100vh;
+            background: white;
+            z-index: 10002;
+            transition: right 0.4s ease;
+            box-shadow: -5px 0 30px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .cart-drawer.open {
+            right: 0;
+        }
+        
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .cart-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+        }
+        
+        .cart-close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .cart-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .cart-item img {
+            width: 80px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .cart-item-info {
+            flex: 1;
+        }
+        
+        .cart-item-info h4 {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .cart-item-info p {
+            color: #c9a87c;
+            font-weight: 600;
+        }
+        
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .qty-btn {
+            width: 28px;
+            height: 28px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .remove-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        
+        .cart-footer {
+            padding: 25px;
+            border-top: 1px solid #eee;
+            background: #f9f9f9;
+        }
+        
+        .cart-summary {
+            margin-bottom: 20px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 20px;
+            font-weight: 700;
+            padding-top: 15px;
+            border-top: 2px solid #ddd;
+            margin-top: 15px;
+        }
+        
+        .cart-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .checkout-btn, .go-to-cart-btn, .continue-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .checkout-btn {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .checkout-btn:hover {
+            background: #219a52;
+        }
+        
+        .go-to-cart-btn {
+            background: #1a1a1a;
+            color: white;
+        }
+        
+        .go-to-cart-btn:hover {
+            background: #333;
+        }
+        
+        .continue-btn {
+            background: transparent;
+            color: #666;
+            border: 1px solid #ddd;
+        }
+        
+        .cart-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 10001;
+        }
+        
+        .cart-overlay.active {
+            display: block;
+        }
+        
+        /* FAVORITES DRAWER - index.html ile AYNI */
+        .fav-drawer {
+            position: fixed;
+            top: 0;
+            right: -450px;
+            width: 450px;
+            height: 100vh;
+            background: white;
+            z-index: 10002;
+            transition: right 0.4s ease;
+            box-shadow: -5px 0 30px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .fav-drawer.open {
+            right: 0;
+        }
+        
+        .fav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .fav-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .fav-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+        
+        .fav-item img {
+            width: 80px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .fav-item-info {
+            flex: 1;
+        }
+        
+        .fav-item-info h4 {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .fav-item-info p {
+            color: #c9a87c;
+            font-weight: 600;
+        }
+        
+        .fav-item-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .fav-add-btn, .fav-remove-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .fav-add-btn {
+            background: #1a1a1a;
+            color: white;
+        }
+        
+        .fav-remove-btn {
+            background: transparent;
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+        }
+        
+        .fav-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 10001;
+        }
+        
+        .fav-overlay.active {
+            display: block;
+        }
+        
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1a1a1a;
+            color: white;
+            padding: 16px 28px;
+            border-radius: 12px;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.4s;
+            z-index: 10005;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .toast.success { background: #27ae60; }
+        .toast.error { background: #e74c3c; }
+        
+        /* PAGE HEADER */
+        .page-header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+            color: white;
+            padding: 140px 40px 80px;
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        .breadcrumb a {
+            color: #c9a87c;
+            text-decoration: none;
+        }
+        
+        /* CONTENT */
+        .content-section {
+            padding: 60px 40px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .policy-box {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        .policy-box h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            margin: 40px 0 20px;
+            color: #1a1a1a;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .policy-box h2:first-child {
+            margin-top: 0;
+        }
+        
+        .policy-box h3 {
+            font-size: 20px;
+            margin: 30px 0 15px;
+            color: #333;
+        }
+        
+        .policy-box p {
+            margin-bottom: 15px;
+            color: #555;
+            font-size: 15px;
+        }
+        
+        .policy-box ul {
+            margin: 15px 0 15px 30px;
+            color: #555;
+        }
+        
+        .policy-box li {
+            margin-bottom: 10px;
+        }
+        
+        .highlight-box {
+            background: #f8f5f2;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+            border-left: 4px solid #c9a87c;
+        }
+        
+        .highlight-box h4 {
+            color: #1a1a1a;
+            margin-bottom: 10px;
+        }
+        
+        /* COOKIE BANNER */
+        .cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1a1a1a;
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10000;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+        }
+        
+        .cookie-banner.show {
+            transform: translateY(0);
+        }
+        
+        .cookie-banner p {
+            font-size: 14px;
+            max-width: 600px;
+        }
+        
+        .cookie-banner a {
+            color: #c9a87c;
+        }
+        
+        .cookie-btn {
+            padding: 10px 25px;
+            background: #c9a87c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        /* FOOTER */
+        .footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 60px 40px 100px;
+        }
+        
+        .footer-inner {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .footer-brand h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            margin-bottom: 15px;
+            letter-spacing: 3px;
+        }
+        
+        .footer-brand p {
+            color: #999;
+            margin-bottom: 20px;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        
+        .social-links a:hover {
+            background: #c9a87c;
+        }
+        
+        .footer-links h4 {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .footer-links a {
+            display: block;
+            color: #999;
+            text-decoration: none;
+            margin-bottom: 12px;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid #333;
+            margin-top: 40px;
+            padding-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .header { padding: 0 20px; }
+            .side-menu { width: 100%; left: -100%; }
+            .cart-drawer, .fav-drawer { width: 100%; right: -100%; }
+        }
+        
+        @media (max-width: 768px) {
+            .header { 
+                height: 60px; 
+                padding: 0 15px;
+            }
+            .brand-text { 
+                font-size: 22px; 
+                letter-spacing: 6px; 
+            }
+            .brand-arabic {
+                font-size: 20px;
+            }
+            .header-btn {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+            .header-link { 
+                display: none; 
+            }
+            .page-header { 
+                padding: 100px 20px 50px; 
+            }
+            .page-header h1 { 
+                font-size: 32px; 
+            }
+            .content-section { 
+                padding: 40px 20px; 
+            }
+            .policy-box { 
+                padding: 30px; 
+            }
+            .search-box {
+                padding: 25px;
+                width: 95%;
+            }
+            .search-title {
+                font-size: 22px;
+            }
+            .cookie-banner { 
+                flex-direction: column; 
+                gap: 15px; 
+                text-align: center;
+                padding: 15px;
+            }
+            .footer-inner { 
+                grid-template-columns: 1fr; 
+                gap: 30px;
+            }
+            .footer-bottom { 
+                flex-direction: column; 
+                gap: 15px;
+                text-align: center;
+            }
+            .user-name { 
+                display: none; 
+            }
+        }
+
+        /* Safe area for notched phones */
+        @supports (padding: max(0px)) {
+            .header {
+                padding-left: max(15px, env(safe-area-inset-left));
+                padding-right: max(15px, env(safe-area-inset-right));
+            }
+            .page-header {
+                padding-left: max(20px, env(safe-area-inset-left));
+                padding-right: max(20px, env(safe-area-inset-right));
+            }
+            .content-section {
+                padding-left: max(15px, env(safe-area-inset-left));
+                padding-right: max(15px, env(safe-area-inset-right));
+            }
+            .footer {
+                padding-left: max(20px, env(safe-area-inset-left));
+                padding-right: max(20px, env(safe-area-inset-right));
+                padding-bottom: max(100px, env(safe-area-inset-bottom));
+            }
+            .cookie-banner {
+                padding-bottom: max(15px, env(safe-area-inset-bottom));
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER - index.html ile AYNI -->
+<header class="header" id="mainHeader">
+    <div class="header-left">
+        <button class="header-btn" id="openMenuBtn">☰ Menü</button>
+        <button class="header-btn" id="openSearch">🔍 Ara</button>
+    </div>
+    <div class="header-center">
+        <a href="index.html" class="brand-logo">
+            <span class="brand-arabic">ك</span>
+            <span class="brand-text">KEVRA</span>
+        </a>
+    </div>
+    <div class="header-right">
+        <a href="hakkimizda.html" class="header-link">Hakkımızda</a>
+        <a href="iletisim.html" class="header-link">İletişim</a>
+        <button class="header-icon" id="favBtn">♡ <span id="favCount">0</span></button>
+        <button class="header-icon" id="cartBtn">👜 <span id="cartCount">0</span></button>
+        <div id="userMenuContainer"></div>
+    </div>
+</header>
+
+<!-- SEARCH MODAL - index.html ile AYNI -->
+<div class="search-modal" id="searchModal">
+    <div class="search-box">
+        <div class="search-head">
+            <h2 class="search-title">🔍 Ürün Ara</h2>
+            <button class="search-close-btn" id="closeSearch">✖</button>
+        </div>
+        <div class="search-input-wrapper">
+            <input type="text" id="searchInput" placeholder="Ürün adı yaz..." autocomplete="off">
+        </div>
+        <div class="search-results" id="searchResults"></div>
+    </div>
+</div>
+
+<!-- SIDE MENU - index.html ile AYNI -->
+<div class="side-menu" id="sideMenu">
+    <div class="side-menu-header">
+        <h3>KEVRA</h3>
+        <button id="closeMenuBtn">✖</button>
+    </div>
+    <div class="side-menu-content">
+        <a href="index.html" class="menu-link"> Ana Sayfa</a>
+        <a href="shop.html" class="menu-link"> Tüm Ürünler</a>
+        <a href="shop.html?category=yeni" class="menu-link"> Yeni Sezon</a>
+        <a href="shop.html?category=elbise" class="menu-link"> Elbiseler</a>
+        <a href="shop.html?category=ust" class="menu-link"> Üst Giyim</a>
+        <a href="shop.html?category=alt" class="menu-link"> Alt Giyim</a>
+        <a href="shop.html?category=triko" class="menu-link"> Triko</a>
+        <a href="shop.html?category=dis" class="menu-link"> Dış Giyim</a>
+        <a href="shop.html?category=aksesuar" class="menu-link"> Aksesuar</a>
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+        </div>
+    </div>
+</div>
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<!-- CART DRAWER - index.html ile AYNI -->
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-header">
+        <h3>Sepetim (<span id="cartDrawerCount">0</span>)</h3>
+        <button class="cart-close-btn" id="closeCartBtn">✖</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer" id="cartFooter">
+        <div class="cart-summary">
+            <div class="summary-row">
+                <span>Ara Toplam</span>
+                <span id="subTotal">0 ₺</span>
+            </div>
+            <div class="summary-row">
+                <span>Kargo</span>
+                <span id="shippingCost">Ücretsiz</span>
+            </div>
+            <div class="cart-total">
+                <span>Toplam</span>
+                <span id="cartTotal">0 ₺</span>
+            </div>
+        </div>
+        <div class="cart-actions">
+            <button class="checkout-btn" id="checkoutBtn">📱 WhatsApp ile Sipariş Ver</button>
+            <button class="go-to-cart-btn" onclick="location.href='sepetim.html'">🛒 Sepetime Git</button>
+            <button class="continue-btn" id="continueBtn">Alışverişe Devam Et</button>
+        </div>
+    </div>
+</div>
+<div class="cart-overlay" id="cartOverlay"></div>
+
+<!-- FAVORITES DRAWER - index.html ile AYNI -->
+<div class="fav-drawer" id="favDrawer">
+    <div class="fav-header">
+        <h3>Favorilerim (<span id="favDrawerCount">0</span>)</h3>
+        <button class="cart-close-btn" id="closeFavBtn">✖</button>
+    </div>
+    <div class="fav-items" id="favItems"></div>
+</div>
+<div class="fav-overlay" id="favOverlay"></div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+    <span id="toastText"></span>
+</div>
+
+<!-- PAGE HEADER -->
+<section class="page-header">
+    <h1>Gizlilik Politikası</h1>
+    <p>KVKK Aydınlatma Metni ve Çerez Politikası</p>
+    <div class="breadcrumb">
+        <a href="index.html">Ana Sayfa</a>
+        <span>/</span>
+        <span>Gizlilik Politikası</span>
+    </div>
+</section>
+
+<!-- CONTENT -->
+<section class="content-section">
+    <div class="policy-box">
+        <h2>1. Giriş</h2>
+        <p>
+            KEVRA olarak, kişisel verilerinizin güvenliği ve gizliliği bizim için en önemli önceliktir. 
+            Bu Gizlilik Politikası, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında 
+            hazırlanmış olup, kişisel verilerinizin nasıl toplandığını, kullanıldığını ve korunduğunu 
+            açıklamaktadır.
+        </p>
+        
+        <div class="highlight-box">
+            <h4>Veri Sorumlusu</h4>
+            <p><strong>KEVRA Tekstil San. ve Tic. A.Ş.</strong><br>
+            Adres: Nişantaşı, Şişli, İstanbul<br>
+            E-posta: kvkk@kevra.com<br>
+            Telefon: +90 212 123 45 67</p>
+        </div>
+        
+        <h2>2. Toplanan Kişisel Veriler</h2>
+        <p>Aşağıdaki kişisel verilerinizi toplayabiliriz:</p>
+        <ul>
+            <li><strong>Kimlik Bilgileri:</strong> Ad, soyad, T.C. kimlik numarası (fatura için)</li>
+            <li><strong>İletişim Bilgileri:</strong> E-posta adresi, telefon numarası, adres</li>
+            <li><strong>Finansal Bilgiler:</strong> Banka hesap bilgileri (iade işlemleri için)</li>
+            <li><strong>İşlem Bilgileri:</strong> Sipariş geçmişi, favori ürünler, sepet içeriği</li>
+            <li><strong>Teknik Bilgiler:</strong> IP adresi, tarayıcı bilgileri, çerezler</li>
+        </ul>
+        
+        <h2>3. Verilerin Kullanım Amaçları</h2>
+        <p>Kişisel verileriniz aşağıdaki amaçlarla kullanılmaktadır:</p>
+        <ul>
+            <li>Siparişlerinizi işleme almak ve teslim etmek</li>
+            <li>Müşteri hizmetleri desteği sağlamak</li>
+            <li>Yasal yükümlülüklerimizi yerine getirmek</li>
+            <li>Kampanya ve promosyonlardan haberdar etmek (izninizle)</li>
+            <li>Site deneyimini iyileştirmek ve kişiselleştirmek</li>
+            <li>Dolandırıcılığı önlemek ve güvenliği sağlamak</li>
+        </ul>
+        
+        <h2>4. Çerezler (Cookies)</h2>
+        <p>
+            Web sitemizde çerezler kullanılmaktadır. Çerezler, tarayıcınız aracılığıyla cihazınıza 
+            kaydedilen küçük metin dosyalarıdır. Kullandığımız çerez türleri:
+        </p>
+        <ul>
+            <li><strong>Zorunlu Çerezler:</strong> Site çalışması için gerekli (sepet, oturum)</li>
+            <li><strong>Analitik Çerezler:</strong> Site kullanımını analiz etmek için</li>
+            <li><strong>Pazarlama Çerezleri:</strong> Kişiselleştirilmiş reklamlar için</li>
+        </ul>
+        
+        <h2>5. Veri Saklama Süresi</h2>
+        <p>
+            Kişisel verileriniz, yasal yükümlülüklerimiz ve iş amaçlarımız doğrultusunda 
+            gerekli olduğu sürece saklanmaktadır. Genel olarak:
+        </p>
+        <ul>
+            <li>Sipariş bilgileri: 10 yıl (vergi mevzuatı gereği)</li>
+            <li>Üyelik bilgileri: Hesabınız aktif olduğu sürece</li>
+            <li>Çerezler: 6 ay - 2 yıl arası</li>
+        </ul>
+        
+        <h2>6. Haklarınız</h2>
+        <p>KVKK kapsamında aşağıdaki haklara sahipsiniz:</p>
+        <ul>
+            <li>Kişisel verilerinizin işlenip işlenmediğini öğrenme</li>
+            <li>İşlenen veriler hakkında bilgi talep etme</li>
+            <li>Verilerinizin düzeltilmesini veya silinmesini isteme</li>
+            <li>İşlemeye itiraz etme</li>
+            <li>Veri taşınabilirliği hakkı</li>
+        </ul>
+        
+        <div class="highlight-box">
+            <h4>Başvuru</h4>
+            <p>Haklarınızı kullanmak için <strong>kvkk@kevra.com</strong> adresine e-posta gönderebilir 
+            veya yazılı başvuruda bulunabilirsiniz. Başvurularınız 30 gün içinde yanıtlanacaktır.</p>
+        </div>
+        
+        <h2>7. Güvenlik</h2>
+        <p>
+            Kişisel verilerinizin güvenliğini sağlamak için SSL şifreleme, güvenlik duvarları ve 
+            erişim kontrolleri gibi teknik ve idari tedbirler uygulamaktayız. 
+            Veri ihlali durumunda 72 saat içinde ilgili kurumlara ve etkilenen kişilere bildirim 
+            yapılacaktır.
+        </p>
+        
+        <h2>8. Değişiklikler</h2>
+        <p>
+            Bu Gizlilik Politikası, yasal düzenlemeler ve iş pratiklerimizdeki değişiklikler 
+            doğrultusunda güncellenebilir. Güncel versiyon her zaman bu sayfada yayınlanmaktadır.
+        </p>
+        <p><strong>Son Güncelleme:</strong> 13 Nisan 2026</p>
+    </div>
+</section>
+
+<!-- COOKIE BANNER -->
+<div class="cookie-banner" id="cookieBanner">
+    <p>
+        Çerezleri kullanıyoruz. 
+        <a href="gizlilik.html">Daha fazla bilgi</a>
+    </p>
+    <button class="cookie-btn" onclick="acceptCookies()">Kabul Et</button>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <h3>KEVRA</h3>
+            <p>Premium kadın giyim koleksiyonları.</p>
+            <div class="social-links">
+                <a href="#">📷</a>
+                <a href="#">📘</a>
+                <a href="#">🎵</a>
+                <a href="#">📌</a>
+            </div>
+        </div>
+        <div class="footer-links">
+            <h4>Hızlı Linkler</h4>
+            <a href="shop.html">Tüm Ürünler</a>
+            <a href="hakkimizda.html">Hakkımızda</a>
+            <a href="iletisim.html">İletişim</a>
+        </div>
+        <div class="footer-links">
+            <h4>Yasal</h4>
+            <a href="gizlilik.html">Gizlilik Politikası</a>
+            <a href="#">Kullanım Koşulları</a>
+            <a href="#">Mesafeli Satış Sözleşmesi</a>
+        </div>
+        <div class="footer-links">
+            <h4>İletişim</h4>
+            <a href="https://wa.me/905555555555">WhatsApp</a>
+            <a href="mailto:info@kevra.com">E-posta</a>
+            <a href="mailto:kvkk@kevra.com">KVKK Başvuru</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 KEVRA. Tüm hakları saklıdır.</p>
+        <p style="color: #666; font-size: 13px;">6698 sayılı KVKK kapsamında korunmaktadır.</p>
+    </div>
+</footer>
+
+<!-- SCRIPTS - index.html ile AYNI -->
+<script src="js/storage.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/main.js"></script>
+
+<script>
+// HEADER SCROLL
+window.addEventListener('scroll', () => {
+    const header = document.getElementById('mainHeader');
+    if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+    } else {
+        header.classList.remove('scrolled');
+    }
+});
+
+// COOKIE BANNER
+function acceptCookies() {
+    localStorage.setItem('kevra_cookies_accepted', 'true');
+    document.getElementById('cookieBanner').classList.remove('show');
+}
+
+if (!localStorage.getItem('kevra_cookies_accepted')) {
+    setTimeout(() => {
+        document.getElementById('cookieBanner').classList.add('show');
+    }, 1000);
+}
+
+// KEYBOARD SHORTCUTS
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        // Close all modals and drawers
+        document.getElementById('searchModal').classList.remove('active');
+        document.getElementById('sideMenu').classList.remove('active');
+        document.getElementById('menuOverlay').classList.remove('active');
+        document.getElementById('cartDrawer').classList.remove('open');
+        document.getElementById('cartOverlay').classList.remove('active');
+        document.getElementById('favDrawer').classList.remove('open');
+        document.getElementById('favOverlay').classList.remove('active');
+        document.body.style.overflow = '';
+        
+        const menu = document.getElementById('userDropdownMenu');
+        if (menu) menu.classList.remove('show');
+    }
+});
+</script>
+
+</body>
+</html>

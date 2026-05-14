@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="KEVRA iletişim bilgileri. WhatsApp, e-posta ve mağaza adreslerimiz.">
+    <title>İletişim | KEVRA Premium Kadın Giyim</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8f5f2;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+        
+        /* HEADER - index.html ile AYNI */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 9999;
+            transition: all 0.4s ease;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+        
+        .header.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .header-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid rgba(0,0,0,0.1);
+            color: #1a1a1a;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .header.scrolled .header-btn {
+            color: #1a1a1a;
+            border-color: rgba(0,0,0,0.1);
+        }
+        
+        .header-btn:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .header.scrolled .header-btn:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        
+        .brand-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #1a1a1a;
+            line-height: 1;
+            transition: transform 0.3s ease;
+        }
+        
+        .header.scrolled .brand-logo {
+            color: #1a1a1a;
+        }
+        
+        .brand-logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .brand-arabic {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: -6px;
+        }
+        
+        .brand-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 10px;
+            margin-top: 2px;
+        }
+        
+        .header-link {
+            color: #1a1a1a;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+        
+        .header.scrolled .header-link {
+            color: #1a1a1a;
+        }
+        
+        .header-link:hover {
+            color: #c9a87c;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .header.scrolled .header-link:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        
+        .header-icon {
+            position: relative;
+            padding: 10px;
+            background: transparent;
+            border: 1px solid rgba(0,0,0,0.1);
+            color: #1a1a1a;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .header.scrolled .header-icon {
+            color: #1a1a1a;
+            border-color: rgba(0,0,0,0.1);
+        }
+        
+        .header-icon:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .header.scrolled .header-icon:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        
+        #cartCount, #favCount {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        /* USER MENU */
+        
+        
+        .user-menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            border: 1px solid rgba(0,0,0,0.1);
+            color: #1a1a1a;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .header.scrolled .user-menu-btn {
+            border-color: rgba(0,0,0,0.1);
+            color: #1a1a1a;
+        }
+        
+        .user-menu-btn:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        
+        .header.scrolled .user-menu-btn:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            background: #c9a87c;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+        }.user-dropdown-menu.show {
+            display: block;
+            animation: dropdownSlide 0.3s ease;
+        }
+        
+        @keyframes dropdownSlide {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        .dropdown-item.logout:hover {
+            background: #fdf2f2;
+        }
+        
+        
+        
+        /* SIDE MENU */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -400px;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            z-index: 10001;
+            transition: left 0.4s ease;
+            box-shadow: 5px 0 30px rgba(0,0,0,0.1);
+        }
+        
+        .side-menu.active {
+            left: 0;
+        }
+        
+        .side-menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .side-menu-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            letter-spacing: 3px;
+        }
+        
+        .side-menu-header button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .side-menu-content {
+            padding: 20px;
+        }
+        
+        .menu-link {
+            display: block;
+            padding: 15px 20px;
+            color: #1a1a1a;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 10px;
+            transition: all 0.3s;
+            margin-bottom: 5px;
+        }
+        
+        .menu-link:hover {
+            background: #f5f5f5;
+            padding-left: 25px;
+        }
+        
+        .menu-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+        }
+        
+        .menu-overlay.active {
+            display: block;
+        }
+        
+        /* SEARCH MODAL */
+        .search-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 10000;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 100px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .search-modal.active {
+            display: flex;
+        }
+        
+        .search-box {
+            background: white;
+            width: 90%;
+            max-width: 700px;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .search-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .search-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+        }
+        
+        .search-close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .search-input-wrapper input {
+            width: 100%;
+            padding: 18px 25px;
+            border: 2px solid #eee;
+            border-radius: 50px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .search-input-wrapper input:focus {
+            border-color: #c9a87c;
+        }
+        
+        .search-results {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        /* PAGE HEADER */
+        .page-header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+            color: white;
+            padding: 140px 40px 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .page-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .page-header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        .breadcrumb a {
+            color: #c9a87c;
+            text-decoration: none;
+        }
+        
+        /* CONTACT SECTION */
+        .contact-section {
+            padding: 80px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+        }
+        
+        /* CONTACT INFO CARDS */
+        .contact-info h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        
+        .contact-info > p {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+        
+        .info-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .info-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 25px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+        
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+        
+        .info-icon {
+            width: 50px;
+            height: 50px;
+            background: #c9a87c;
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        .info-content h4 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+        
+        .info-content p {
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+        
+        .info-content a {
+            color: #c9a87c;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        /* CONTACT FORM */
+        .contact-form-wrapper {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        .contact-form-wrapper h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #c9a87c;
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .submit-btn:hover {
+            background: #333;
+            transform: translateY(-2px);
+        }
+        
+        /* MAP SECTION */
+        .map-section {
+            padding: 0 40px 80px;
+        }
+        
+        .map-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .map-container iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+        }
+        
+        /* FAQ SECTION */
+        .faq-section {
+            padding: 80px 40px;
+            background: white;
+        }
+        
+        .faq-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .faq-grid {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .faq-item {
+            border: 2px solid #f0f0f0;
+            border-radius: 16px;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .faq-question {
+            padding: 20px 25px;
+            background: #f8f5f2;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .faq-question:hover {
+            background: #f0e8e0;
+        }
+        
+        .faq-question::after {
+            content: '+';
+            font-size: 24px;
+            color: #c9a87c;
+        }
+        
+        .faq-item.active .faq-question::after {
+            content: '−';
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+            background: white;
+        }
+        
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            padding: 20px 25px;
+        }
+        
+        .faq-answer p {
+            color: #555;
+            line-height: 1.8;
+            margin: 0 0 10px 0;
+        }
+        
+        .faq-answer ul {
+            margin: 10px 0 10px 20px;
+            color: #555;
+        }
+        
+        .faq-answer li {
+            margin-bottom: 5px;
+        }
+        
+        /* CART & FAV DRAWERS - index.html ile AYNI */
+        .cart-drawer, .fav-drawer {
+            position: fixed;
+            top: 0;
+            right: -450px;
+            width: 450px;
+            height: 100vh;
+            background: white;
+            z-index: 10002;
+            transition: right 0.4s ease;
+            box-shadow: -5px 0 30px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .cart-drawer.open, .fav-drawer.open {
+            right: 0;
+        }
+        
+        .cart-header, .fav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .cart-header h3, .fav-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+        }
+        
+        .cart-close-btn, .fav-close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .cart-items, .fav-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .cart-footer {
+            padding: 25px;
+            border-top: 1px solid #eee;
+            background: #f9f9f9;
+        }
+        
+        .cart-summary {
+            margin-bottom: 20px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 20px;
+            font-weight: 700;
+            padding-top: 15px;
+            border-top: 2px solid #ddd;
+            margin-top: 15px;
+        }
+        
+        .cart-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .checkout-btn, .go-to-cart-btn, .continue-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .checkout-btn {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .checkout-btn:hover {
+            background: #219a52;
+        }
+        
+        .go-to-cart-btn {
+            background: #1a1a1a;
+            color: white;
+        }
+        
+        .go-to-cart-btn:hover {
+            background: #333;
+        }
+        
+        .continue-btn {
+            background: transparent;
+            color: #666;
+            border: 1px solid #ddd;
+        }
+        
+        .cart-overlay, .fav-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 10001;
+        }
+        
+        .cart-overlay.active, .fav-overlay.active {
+            display: block;
+        }
+        
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1a1a1a;
+            color: white;
+            padding: 16px 28px;
+            border-radius: 12px;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.4s;
+            z-index: 10005;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* FOOTER */
+        .footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 60px 40px 30px;
+        }
+        
+        .footer-inner {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .footer-brand h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            margin-bottom: 15px;
+            letter-spacing: 3px;
+        }
+        
+        .footer-brand p {
+            color: #999;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        
+        .social-links a:hover {
+            background: #c9a87c;
+        }
+        
+        .footer-links h4 {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .footer-links a {
+            display: block;
+            color: #999;
+            text-decoration: none;
+            margin-bottom: 12px;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid #333;
+            margin-top: 40px;
+            padding-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+            .footer-inner {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header { padding: 0 20px; }
+            .page-header { padding: 120px 20px 60px; }
+            .page-header h1 { font-size: 32px; }
+            .form-row { grid-template-columns: 1fr; }
+            .footer-inner { grid-template-columns: 1fr; }
+            .cart-drawer, .fav-drawer {
+                width: 100%;
+                right: -100%;
+            }
+        }
+    
+        /* ================================================
+           MOBİL HEADER - Kompakt İkon Modu
+        ================================================ */
+        @media (max-width: 768px) {
+
+            /* Header yüksekliği */
+            .header {
+                height: 60px !important;
+                padding: 0 10px !important;
+            }
+
+            /* Sol butonlar - sadece ikon */
+            .header-left {
+                gap: 6px !important;
+            }
+
+            .header-link {
+                display: none !important;
+            }
+
+            .header-btn .btn-text {
+                display: none;
+            }
+
+            .header-btn {
+                width: 40px !important;
+                height: 40px !important;
+                min-width: 40px !important;
+                padding: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                border-radius: 50% !important;
+                font-size: 16px !important;
+            }
+
+            /* Logo küçültme */
+            .brand-arabic { font-size: 16px !important; }
+            .brand-text { font-size: 18px !important; letter-spacing: 4px !important; }
+
+            /* Sağ ikonlar */
+            .header-right {
+                gap: 6px !important;
+            }
+
+            .header-icon {
+                width: 40px !important;
+                height: 40px !important;
+                min-width: 40px !important;
+                border-radius: 50% !important;
+                padding: 0 !important;
+                font-size: 16px !important;
+            }
+
+            /* Profil butonu - sadece avatar */
+            .user-menu-btn {
+                padding: 0 !important;
+                border-radius: 50% !important;
+                width: 40px !important;
+                height: 40px !important;
+                min-width: 40px !important;
+                min-height: 40px !important;
+                justify-content: center !important;
+                gap: 0 !important;
+            }
+            .user-menu-btn .user-name,
+            .user-menu-btn .dropdown-arrow {
+                display: none !important;
+            }
+            .user-menu-btn .user-avatar {
+                width: 26px !important;
+                height: 26px !important;
+                font-size: 11px !important;
+            }
+
+            /* Giriş Yap butonu da küçük */
+            #userMenuContainer > a {
+                width: 40px !important;
+                height: 40px !important;
+                border-radius: 50% !important;
+                padding: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 0 !important;
+                border: 1px solid rgba(255,255,255,0.3) !important;
+                color: white !important;
+                text-decoration: none !important;
+            }
+            #userMenuContainer > a::before {
+                content: "👤";
+                font-size: 16px;
+            }
+            .header.scrolled #userMenuContainer > a {
+                border-color: rgba(0,0,0,0.15) !important;
+                color: #1a1a1a !important;
+            }
+
+            /* Dropdown menü pozisyon */}
+
+
+        /* ===== DROPDOWN MENÜ (tüm sayfalarda aynı) ===== */
+        .user-dropdown { position: relative; }
+        .user-dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 50px;
+            width: 210px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 10000;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .user-dropdown-menu.show { display: block; }
+        .dropdown-user-info {
+            display: flex;
+            gap: 10px;
+            padding: 14px;
+            align-items: center;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .dropdown-avatar {
+            width: 36px;
+            height: 36px;
+            background: #c9a87c;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .dropdown-name { font-size: 13px; font-weight: 600; }
+        .dropdown-email { font-size: 11px; color: #888; }
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.2s;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+        }
+        .dropdown-item:hover { background: #f8f5f2; color: #c9a87c; }
+        .dropdown-item.logout {
+            color: #e74c3c;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: inherit;
+        }
+        .dropdown-divider { border-top: 1px solid #f0f0f0; margin: 4px 0; }
+
+        /* user-menu-btn override - beyaz header için koyu renkler */
+        .user-menu-btn {
+            border-color: rgba(0,0,0,0.15) !important;
+            color: #1a1a1a !important;
+        }
+        .header.scrolled .user-menu-btn {
+            border-color: rgba(0,0,0,0.15) !important;
+            color: #1a1a1a !important;
+        }
+
+        /* Mobil giriş yap butonu koyu */
+        @media (max-width: 768px) {
+            #userMenuContainer > a {
+                width: 40px !important;
+                height: 40px !important;
+                border-radius: 50% !important;
+                padding: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 0 !important;
+                border: 1px solid rgba(0,0,0,0.15) !important;
+                color: #1a1a1a !important;
+                text-decoration: none !important;
+            }
+            #userMenuContainer > a::before {
+                content: "👤";
+                font-size: 16px;
+            }
+            .user-dropdown-menu {
+                position: fixed !important;
+                top: 65px !important;
+                right: 8px !important;
+                width: min(210px, calc(100vw - 16px)) !important;
+            }
+        }
+        </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header" id="mainHeader">
+    <div class="header-left">
+        <button class="header-btn" id="openMenuBtn"><span class="btn-icon">☰</span><span class="btn-text">Menü</span></button>
+        <button class="header-btn" id="openSearch"><span class="btn-icon">🔍</span><span class="btn-text">Ara</span></button>
+    </div>
+    <div class="header-center">
+        <a href="index.html" class="brand-logo">
+            <span class="brand-arabic">ك</span>
+            <span class="brand-text">KEVRA</span>
+        </a>
+    </div>
+    <div class="header-right">
+        <a href="hakkimizda.html" class="header-link">Hakkımızda</a>
+        <a href="iletisim.html" class="header-link">İletişim</a>
+        <button class="header-icon" id="favBtn">♡ <span id="favCount">0</span></button>
+        <button class="header-icon" id="cartBtn">👜 <span id="cartCount">0</span></button>
+        <div id="userMenuContainer"></div>
+    </div>
+</header>
+
+<!-- SIDE MENU -->
+<div class="side-menu" id="sideMenu">
+    <div class="side-menu-header">
+        <h3>KEVRA</h3>
+        <button id="closeMenuBtn">✖</button>
+    </div>
+    <div class="side-menu-content">
+        <a href="index.html" class="menu-link">Ana Sayfa</a>
+        <a href="shop.html" class="menu-link">Tüm Ürünler</a>
+        <a href="shop.html?category=yeni" class="menu-link">Yeni Sezon</a>
+        <a href="shop.html?category=elbise" class="menu-link">Elbiseler</a>
+        <a href="shop.html?category=ust" class="menu-link">Üst Giyim</a>
+        <a href="shop.html?category=alt" class="menu-link">Alt Giyim</a>
+        <a href="shop.html?category=triko" class="menu-link">Triko</a>
+        <a href="shop.html?category=dis" class="menu-link">Dış Giyim</a>
+        <a href="shop.html?category=aksesuar" class="menu-link">Aksesuar</a>
+        <a href="shop.html?category=indirim" class="menu-link" style="color: #e74c3c;">İndirim</a>
+    </div>
+</div>
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<!-- SEARCH MODAL -->
+<div class="search-modal" id="searchModal">
+    <div class="search-box">
+        <div class="search-head">
+            <h2 class="search-title">Ürün Ara</h2>
+            <button class="search-close-btn" id="closeSearch">✖</button>
+        </div>
+        <div class="search-input-wrapper">
+            <input type="text" id="searchInput" placeholder="Ürün adı yaz...">
+        </div>
+        <div class="search-results" id="searchResults"></div>
+    </div>
+</div>
+
+<!-- CART DRAWER - index.html ile AYNI -->
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-header">
+        <h3>Sepetim (<span id="cartDrawerCount">0</span>)</h3>
+        <button class="cart-close-btn" id="closeCartBtn">✖</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer" id="cartFooter">
+        <div class="cart-summary">
+            <div class="summary-row">
+                <span>Ara Toplam</span>
+                <span id="subTotal">0 ₺</span>
+            </div>
+            <div class="summary-row">
+                <span>Kargo</span>
+                <span id="shippingCost">Ücretsiz</span>
+            </div>
+            <div class="cart-total">
+                <span>Toplam</span>
+                <span id="cartTotal">0 ₺</span>
+            </div>
+        </div>
+        <div class="cart-actions">
+            <button class="checkout-btn" id="checkoutBtn" onclick="location.href='odeme.html'" style="background: linear-gradient(135deg, #c9a87c, #b08d65); color: white; font-weight: 700; letter-spacing: 1px;">
+                💳 Ödemeye Geç <span id="checkoutTotal">0 ₺</span>
+            </button>
+            <button class="go-to-cart-btn" onclick="location.href='sepetim.html'">🛒 Sepeti Görüntüle</button>
+            <button class="continue-btn" id="continueBtn">Alışverişe Devam Et</button>
+        </div>
+    </div>
+</div>
+<div class="cart-overlay" id="cartOverlay"></div>
+
+<!-- FAVORITES DRAWER -->
+<div class="fav-drawer" id="favDrawer">
+    <div class="fav-header">
+        <h3>Favorilerim (<span id="favDrawerCount">0</span>)</h3>
+        <button class="fav-close-btn" id="closeFavBtn">✖</button>
+    </div>
+    <div class="fav-items" id="favItems"></div>
+</div>
+<div class="fav-overlay" id="favOverlay"></div>
+
+<!-- PAGE HEADER -->
+<section class="page-header">
+    <h1>İletişim</h1>
+    <p>Bizimle iletişime geçin, size yardımcı olmaktan mutluluk duyarız</p>
+    <div class="breadcrumb">
+        <a href="index.html">Ana Sayfa</a>
+        <span>/</span>
+        <span>İletişim</span>
+    </div>
+</section>
+
+<!-- CONTACT SECTION -->
+<section class="contact-section">
+    <div class="contact-grid">
+        <div class="contact-info">
+            <h2>Bize Ulaşın</h2>
+            <p>Soru, öneri veya şikayetleriniz için bize ulaşabilirsiniz. En kısa sürede size dönüş yapacağız.</p>
+            
+            <div class="info-cards">
+                <div class="info-card">
+                    <div class="info-icon">💬</div>
+                    <div class="info-content">
+                        <h4>WhatsApp</h4>
+                        <p>7/24 hızlı destek</p>
+                        <a href="https://wa.me/905555555555">+90 555 555 55 55</a>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">✉️</div>
+                    <div class="info-content">
+                        <h4>E-posta</h4>
+                        <p>24 saat içinde yanıt</p>
+                        <a href="mailto:info@kevra.com">info@kevra.com</a>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">📞</div>
+                    <div class="info-content">
+                        <h4>Telefon</h4>
+                        <p>Pzt-Cmt: 09:00 - 18:00</p>
+                        <a href="tel:+902121234567">+90 212 123 45 67</a>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">📍</div>
+                    <div class="info-content">
+                        <h4>Mağaza</h4>
+                        <p>İstanbul, Türkiye</p>
+                        <span style="color: #666;">Nişantaşı, Şişli</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="contact-form-wrapper">
+            <h3>Form Gönder</h3>
+            <form id="contactForm" onsubmit="handleContactSubmit(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ad *</label>
+                        <input type="text" name="firstName" required placeholder="Adınız">
+                    </div>
+                    <div class="form-group">
+                        <label>Soyad *</label>
+                        <input type="text" name="lastName" required placeholder="Soyadınız">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>E-posta *</label>
+                    <input type="email" name="email" required placeholder="ornek@email.com">
+                </div>
+                
+                <div class="form-group">
+                    <label>Telefon</label>
+                    <input type="tel" name="phone" placeholder="0555 123 45 67">
+                </div>
+                
+                <div class="form-group">
+                    <label>Konu *</label>
+                    <select name="subject" required>
+                        <option value="">Seçiniz...</option>
+                        <option value="order">Sipariş Durumu</option>
+                        <option value="return">İade/Değişim</option>
+                        <option value="product">Ürün Bilgisi</option>
+                        <option value="suggestion">Öneri/Şikayet</option>
+                        <option value="other">Diğer</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Mesaj *</label>
+                    <textarea name="message" required placeholder="Mesajınızı yazın..."></textarea>
+                </div>
+                
+                <button type="submit" class="submit-btn">
+                    ✉️ Gönder
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- MAP SECTION -->
+<section class="map-section">
+    <div class="map-container">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3011.595451620943!2d28.999016315413!3d41.050968979297!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14cab708f9e5b1f1%3A0x4f5c5c5c5c5c5c5c!2sNi%C5%9Fanta%C5%9F%C4%B1%2C%20%C5%9Ei%C5%9Fli%2FIstanbul!5e0!3m2!1str!2str!4v1234567890" allowfullscreen="" loading="lazy"></iframe>
+    </div>
+</section>
+
+<!-- FAQ SECTION -->
+<section class="faq-section">
+    <h2>Sıkça Sorulan Sorular</h2>
+    <div class="faq-grid">
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">Siparişim ne zaman elime ulaşır?</div>
+            <div class="faq-answer">
+                <p>Siparişleriniz genellikle <strong>1-3 iş günü</strong> içinde kargoya verilir. Türkiye'nin her yerine ortalama <strong>2-5 iş günü</strong> içinde teslimat yapılmaktadır.</p>
+                <p>Kargo takip numaranızı siparişiniz kargoya verildiğinde SMS ve e-posta ile bilgilendirme yapılmaktadır.</p>
+            </div>
+        </div>
+        
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">İade ve değişim nasıl yapılır?</div>
+            <div class="faq-answer">
+                <p>Ürünleri teslim aldıktan sonra <strong>14 gün</strong> içinde iade veya değişim yapabilirsiniz. İade koşulları:</p>
+                <ul>
+                    <li>Ürünler kullanılmamış ve etiketleri takılı olmalıdır</li>
+                    <li>Orijinal ambalajında olmalıdır</li>
+                    <li>Fatura veya irsaliye ile birlikte gönderilmelidir</li>
+                </ul>
+                <p>İade için WhatsApp üzerinden bizimle iletişime geçebilirsiniz.</p>
+            </div>
+        </div>
+        
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">Ücretsiz kargo var mı?</div>
+            <div class="faq-answer">
+                <p>Evet! <strong>150₺ ve üzeri</strong> siparişlerinizde kargo tamamen <strong>ücretsizdir</strong>.</p>
+                <p>150₺ altı siparişlerde ise 29,90₺ kargo ücreti uygulanmaktadır.</p>
+            </div>
+        </div>
+        
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">Hangi ödeme yöntemlerini kabul ediyorsunuz?</div>
+            <div class="faq-answer">
+                <p>Aşağıdaki ödeme yöntemlerini kullanabilirsiniz:</p>
+                <ul>
+                    <li><strong>Kredi Kartı</strong> - Visa, MasterCard, American Express</li>
+                    <li><strong>Banka Kartı</strong> - Tüm banka kartları</li>
+                    <li><strong>Havale/EFT</strong> - %5 indirimli</li>
+                    <li><strong>Kapıda Ödeme</strong> - Nakit veya kredi kartı (+15₺)</li>
+                </ul>
+                <p>Tüm ödemeler 256-bit SSL şifreleme ile güvence altındadır.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <h3>KEVRA</h3>
+            <p>Premium kadın giyim koleksiyonları. Modern, zarif ve kaliteli.</p>
+            <div class="social-links">
+                <a href="#">📷</a>
+                <a href="#">📘</a>
+                <a href="#">🎵</a>
+                <a href="#">📌</a>
+            </div>
+        </div>
+        <div class="footer-links">
+            <h4>Hızlı Linkler</h4>
+            <a href="shop.html">Tüm Ürünler</a>
+            <a href="shop.html?category=yeni">Yeni Gelenler</a>
+            <a href="shop.html?category=indirim">İndirim</a>
+        </div>
+        <div class="footer-links">
+            <h4>Destek</h4>
+            <a href="siparistakibi.html">Sipariş Takibi</a>
+            <a href="#">İade Koşulları</a>
+            <a href="#">Kargo Bilgisi</a>
+            <a href="#">SSS</a>
+        </div>
+        <div class="footer-links">
+            <h4>İletişim</h4>
+            <a href="https://wa.me/905555555555">WhatsApp</a>
+            <a href="mailto:info@kevra.com">E-posta</a>
+            <a href="iletisim.html">Bize Ulaşın</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 KEVRA. Tüm hakları saklıdır.</p>
+        <div style="display: flex; gap: 20px;">
+            <a href="gizlilik.html" style="color: #666; text-decoration: none; font-size: 13px;">Gizlilik Politikası</a>
+            <a href="#" style="color: #666; text-decoration: none; font-size: 13px;">Kullanım Koşulları</a>
+        </div>
+    </div>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+    <span id="toastText"></span>
+</div>
+
+<!-- SCRIPTS -->
+<script src="js/storage.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/main.js"></script>
+
+<script>
+// FAQ Toggle
+function toggleFaq(item) {
+    item.classList.toggle('active');
+}
+
+// Form Submit
+function handleContactSubmit(e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    
+    let message = `Merhaba KEVRA,%0A%0A`;
+    message += `Yeni mesajınız var:%0A%0A`;
+    message += `Ad: ${formData.get('firstName')} ${formData.get('lastName')}%0A`;
+    message += `Email: ${formData.get('email')}%0A`;
+    message += `Telefon: ${formData.get('phone') || 'Belirtilmemiş'}%0A`;
+    message += `Konu: ${formData.get('subject')}%0A%0A`;
+    message += `Mesaj:%0A${formData.get('message')}`;
+    
+    window.open(`https://wa.me/905555555555?text=${message}`, '_blank');
+    e.target.reset();
+    alert('Mesajınız için teşekkürler! WhatsApp üzerinden iletildi.');
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Giriş Yap | KEVRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --kevra-dark: #0f0f1a;
+            --kevra-navy: #1a1a2e;
+            --kevra-navy-light: #16213e;
+            --kevra-gold: #c9a96e;
+            --kevra-gold-light: #d4b87a;
+            --kevra-gold-dark: #b8956a;
+            --kevra-text: #1f2937;
+            --kevra-text-muted: #6b7280;
+            --kevra-border: rgba(201, 169, 110, 0.25);
+            --kevra-border-hover: rgba(201, 169, 110, 0.4);
+            --kevra-input-bg: #f9fafb;
+            --kevra-input-bg-focus: #ffffff;
+            --kevra-card-bg: #ffffff;
+            --kevra-glass: #ffffff;
+            --kevra-shadow: 0 25px 80px rgba(0, 0, 0, 0.08);
+            --kevra-shadow-gold: 0 0 40px rgba(201, 169, 110, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Main Container */
+        .login-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 460px;
+        }
+
+        .login-container {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 24px;
+            box-shadow: 0 4px 60px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0,0,0,0.02);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .login-header {
+            background: #ffffff;
+            padding: 40px 30px 30px;
+            text-align: center;
+            position: relative;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .brand-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .brand-icon {
+            width: 72px;
+            height: 72px;
+            background: #ffffff;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 2px solid #f3f4f6;
+        }
+
+        .brand-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 6px;
+        }
+
+        .login-header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: #111827;
+            letter-spacing: 4px;
+        }
+
+        .login-header p {
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 400;
+            margin-top: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Body */
+        .login-body {
+            padding: 30px 32px 35px;
+            background: #ffffff;
+        }
+
+        /* Back Link */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+            padding: 6px 0;
+        }
+
+        .back-link:hover {
+            color: var(--kevra-gold);
+            transform: translateX(-3px);
+        }
+
+        .back-link i {
+            font-size: 12px;
+        }
+
+        /* Alert */
+        .alert {
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid transparent;
+        }
+
+        .alert.show {
+            display: flex;
+        }
+
+        .alert.success {
+            background: #ecfdf5;
+            color: #059669;
+            border-color: #a7f3d0;
+        }
+
+        .alert.error {
+            background: #fef2f2;
+            color: #dc2626;
+            border-color: #fecaca;
+        }
+
+        .alert i {
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+            font-size: 13px;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group label i {
+            color: var(--kevra-gold);
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 15px;
+            transition: color 0.3s ease;
+            pointer-events: none;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px 14px 46px;
+            background: #f9fafb;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 15px;
+            color: #111827;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            -webkit-appearance: none;
+            outline: none;
+        }
+
+        .form-group input::placeholder {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            background: #ffffff;
+            border-color: var(--kevra-gold);
+            box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.15);
+        }
+
+        .form-group input:focus + i,
+        .form-group input:focus ~ i {
+            color: var(--kevra-gold);
+        }
+
+        .form-group input.error {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .form-group input.error:focus {
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        /* Password Toggle */
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 15px;
+            padding: 8px;
+            transition: color 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .toggle-password:hover {
+            color: var(--kevra-gold);
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 12px;
+            margin-top: 6px;
+            display: none;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+        }
+
+        .error-message.show {
+            display: flex;
+        }
+
+        /* Options Row */
+        .form-options {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            font-size: 13px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: #6b7280;
+            transition: color 0.3s ease;
+        }
+
+        .remember-me:hover {
+            color: #374151;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--kevra-gold);
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .forgot-password {
+            color: var(--kevra-gold);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .forgot-password:hover {
+            color: var(--kevra-gold-dark);
+        }
+
+        /* Login Button */
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--kevra-gold) 0%, var(--kevra-gold-dark) 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            min-height: 48px;
+            -webkit-tap-highlight-color: transparent;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(201, 169, 110, 0.35);
+        }
+
+        .btn-login:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .btn-login i {
+            margin-left: 8px;
+            font-size: 13px;
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #9ca3af;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e5e7eb;
+        }
+
+        .divider span {
+            padding: 0 16px;
+        }
+
+        /* Auth Switch */
+        .auth-switch {
+            text-align: center;
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .auth-switch a {
+            color: var(--kevra-gold);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .auth-switch a:hover {
+            color: var(--kevra-gold-dark);
+        }
+
+        /* Security Badge */
+        .security-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+            color: #9ca3af;
+            font-size: 11px;
+        }
+
+        .security-badge i {
+            color: var(--kevra-gold);
+            font-size: 12px;
+        }
+
+        /* Loading State */
+        .btn-login.loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .btn-login.loading .btn-text {
+            display: none;
+        }
+
+        .btn-login.loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Google Button Wrapper */
+        .google-btn-wrapper {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+        .google-btn-wrapper iframe {
+            width: 100% !important;
+        }
+
+        /* Mobile */
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+                background: #ffffff;
+            }
+
+            .login-container {
+                border-radius: 16px;
+                border: none;
+                box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+            }
+
+            .login-header {
+                padding: 32px 24px 24px;
+            }
+
+            .login-header h1 {
+                font-size: 28px;
+                letter-spacing: 3px;
+            }
+
+            .brand-icon {
+                width: 60px;
+                height: 60px;
+                border-radius: 14px;
+            }
+
+            .login-body {
+                padding: 24px 20px 28px;
+            }
+
+            .form-group input {
+                font-size: 16px;
+                padding: 13px 14px 13px 44px;
+            }
+
+            .btn-login {
+                padding: 13px;
+                font-size: 15px;
+                min-height: 46px;
+            }
+
+            .form-options {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .login-header {
+                padding: 28px 18px 20px;
+            }
+
+            .login-header h1 {
+                font-size: 24px;
+            }
+
+            .login-body {
+                padding: 20px 16px 24px;
+            }
+        }
+
+        /* Safe area */
+        @supports (padding: max(0px)) {
+            body {
+                padding-left: max(20px, env(safe-area-inset-left));
+                padding-right: max(20px, env(safe-area-inset-right));
+                padding-bottom: max(20px, env(safe-area-inset-bottom));
+            }
+        }
+    </style>
+
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+<base target="_blank">
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="brand-logo">
+                    <div class="brand-icon">
+                        <img src="img/logo.jpg" alt="KEVRA Logo">
+                    </div>
+                </div>
+                <h1>KEVRA</h1>
+                <p>Hesabınıza giriş yapın</p>
+            </div>
+
+            <div class="login-body">
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Ana Sayfaya Dön
+                </a>
+
+                <div id="alertBox" class="alert">
+                    <i class="fas fa-circle-info"></i>
+                    <span id="alertText"></span>
+                </div>
+
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="email">
+                            <i class="fas fa-envelope"></i>
+                            Email Adresi
+                        </label>
+                        <div class="input-wrapper">
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="ornek@email.com"
+                                required
+                                autocomplete="email"
+                                inputmode="email"
+                            >
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="error-message" id="emailError">
+                            <i class="fas fa-circle-exclamation"></i>
+                            Geçerli bir email adresi girin
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock"></i>
+                            Şifre
+                        </label>
+                        <div class="input-wrapper">
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="••••••••"
+                                required
+                                minlength="6"
+                                autocomplete="current-password"
+                            >
+                            <i class="fas fa-lock"></i>
+                            <button type="button" class="toggle-password" id="togglePassword" aria-label="Şifreyi göster">
+                                <i class="fas fa-eye" id="toggleIcon"></i>
+                            </button>
+                        </div>
+                        <div class="error-message" id="passwordError">
+                            <i class="fas fa-circle-exclamation"></i>
+                            Şifrenizi girin
+                        </div>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" id="rememberMe" name="remember">
+                            <span>Beni hatırla</span>
+                        </label>
+                        <a href="sifremi-unuttum.html" class="forgot-password">Şifremi Unuttum</a>
+                    </div>
+
+                    <button type="submit" class="btn-login" id="loginBtn">
+                        <span class="btn-text">Giriş Yap <i class="fas fa-arrow-right"></i></span>
+                    </button>
+                </form>
+
+                <div class="divider">
+                    <span>veya</span>
+                </div>
+
+                <div id="g_id_onload"
+                    data-client_id="817187490536-l2cioqk06d35vl67c6c1e5kosag7s3mh.apps.googleusercontent.com"
+                    data-context="signin"
+                    data-ux_mode="popup"
+                    data-callback="handleGoogleSignIn"
+                    data-auto_prompt="false">
+                </div>
+
+                <div class="google-btn-wrapper">
+                    <div class="g_id_signin"
+                        data-type="standard"
+                        data-shape="rectangular"
+                        data-theme="outline"
+                        data-text="signin_with"
+                        data-size="large"
+                        data-logo_alignment="center"
+                        data-width="100%">
+                    </div>
+                </div>
+
+                <div class="auth-switch">
+                    <span>Hesabınız yok mu?</span>
+                    <a href="kayit.html">Kayıt Ol</a>
+                </div>
+
+                <div class="security-badge">
+                    <i class="fas fa-shield-halved"></i>
+                    <span>256-bit SSL ile güvenli bağlantı</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/auth.js"></script>
+
+    <script>
+        // Alert Helper
+        function showAlert(message, type = 'error') {
+            const alertBox = document.getElementById('alertBox');
+            const alertText = document.getElementById('alertText');
+            const icon = alertBox.querySelector('i');
+
+            alertText.textContent = message;
+            alertBox.className = 'alert show ' + type;
+
+            if (type === 'success') {
+                icon.className = 'fas fa-circle-check';
+            } else {
+                icon.className = 'fas fa-circle-exclamation';
+            }
+
+            setTimeout(() => {
+                alertBox.classList.remove('show');
+            }, 5000);
+        }
+
+        // Password Toggle
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        const toggleIcon = document.getElementById('toggleIcon');
+
+        togglePassword.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            toggleIcon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+        });
+
+        // Form Submit
+        document.getElementById("loginForm").addEventListener("submit", e => {
+            e.preventDefault();
+
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+            const loginBtn = document.getElementById('loginBtn');
+
+            let hasError = false;
+
+            if (!email || !email.includes('@')) {
+                document.getElementById('email').classList.add('error');
+                document.getElementById('emailError').classList.add('show');
+                hasError = true;
+            } else {
+                document.getElementById('email').classList.remove('error');
+                document.getElementById('emailError').classList.remove('show');
+            }
+
+            if (!password || password.length < 6) {
+                document.getElementById('password').classList.add('error');
+                document.getElementById('passwordError').classList.add('show');
+                hasError = true;
+            } else {
+                document.getElementById('password').classList.remove('error');
+                document.getElementById('passwordError').classList.remove('show');
+            }
+
+            if (hasError) return;
+
+            loginBtn.classList.add('loading');
+
+            setTimeout(() => {
+                const res = KevraAuth.login(email, password);
+                loginBtn.classList.remove('loading');
+
+                if (!res.success) {
+                    showAlert(res.message, 'error');
+                    return;
+                }
+
+                showAlert('Giriş başarılı! Yönlendiriliyorsunuz...', 'success');
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 1200);
+            }, 800);
+        });
+
+        ['email', 'password'].forEach(id => {
+            document.getElementById(id).addEventListener('input', function() {
+                this.classList.remove('error');
+                document.getElementById(id + 'Error').classList.remove('show');
+            });
+        });
+
+        // Google Sign In
+        window.handleGoogleSignIn = function(response) {
+            const credential = response.credential;
+            try {
+                const base64Url = credential.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                const googleProfile = JSON.parse(jsonPayload);
+                const profile = {
+                    firstName: googleProfile.given_name || googleProfile.name?.split(' ')[0] || 'Google',
+                    lastName: googleProfile.family_name || googleProfile.name?.split(' ').slice(1).join(' ') || 'Kullanıcı',
+                    email: googleProfile.email,
+                    googleId: googleProfile.sub,
+                    picture: googleProfile.picture || null
+                };
+                const users = KevraAuth.getUsers ? KevraAuth.getUsers() : [];
+                let existingUser = users.find(u => u.email === profile.email);
+                if (!existingUser) {
+                    const registerRes = KevraAuth.register({
+                        email: profile.email,
+                        password: 'google_oauth_' + profile.googleId,
+                        firstName: profile.firstName,
+                        lastName: profile.lastName
+                    });
+                    if (!registerRes.success && registerRes.message !== "Bu e-posta adresi zaten kayıtlı") {
+                        showAlert('Google ile giriş başarısız. Lütfen tekrar deneyin.', 'error');
+                        return;
+                    }
+                    existingUser = registerRes.user || users.find(u => u.email === profile.email);
+                } else {
+                    if (!existingUser.firstName || existingUser.firstName === 'Google') {
+                        existingUser.firstName = profile.firstName;
+                        existingUser.lastName = profile.lastName;
+                        const userIndex = users.findIndex(u => u.email === profile.email);
+                        if (userIndex !== -1) {
+                            users[userIndex] = existingUser;
+                            KevraAuth.saveUsers(users);
+                        }
+                    }
+                }
+                if (existingUser) {
+                    localStorage.setItem("kevra_current_user", JSON.stringify(existingUser));
+                    showAlert('Google ile giriş başarılı! Yönlendiriliyorsunuz...', 'success');
+                    setTimeout(() => {
+                        window.location.href = "index.html";
+                    }, 1200);
+                } else {
+                    showAlert('Google ile giriş sırasında bir hata oluştu.', 'error');
+                }
+            } catch (error) {
+                console.error('Google Sign-In hatası:', error);
+                showAlert('Google ile giriş sırasında bir hata oluştu.', 'error');
+            }
+        };
+    </script>
+</body>
+</html>

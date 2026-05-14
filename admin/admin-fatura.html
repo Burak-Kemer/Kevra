@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fatura Yükleme | KEVRA Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f5f5f5; color: #333; }
+        .admin-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 260px; background: #1a1a1a; color: #fff; position: fixed; height: 100vh; overflow-y: auto; }
+        .sidebar-header { padding: 30px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header h1 { font-size: 24px; font-weight: 600; letter-spacing: 2px; }
+        .sidebar-header p { font-size: 12px; opacity: 0.6; margin-top: 5px; }
+        .nav-menu { padding: 20px 0; }
+        .nav-item { padding: 15px 25px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 12px; border-left: 3px solid transparent; text-decoration: none; color: #fff; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.05); border-left-color: #c9a87c; }
+        .nav-item.active { background: rgba(201, 168, 124, 0.1); }
+        .nav-icon { font-size: 20px; }
+        .main-content { flex: 1; margin-left: 260px; padding: 30px; }
+        .header { background: #fff; padding: 20px 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header h2 { font-size: 24px; font-weight: 600; }
+        .content-card { background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden; margin-bottom: 30px; }
+        .card-header { padding: 25px; border-bottom: 1px solid #eee; }
+        .card-header h3 { font-size: 18px; font-weight: 600; }
+        .card-body { padding: 25px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; }
+        .form-group select, .form-group input { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .form-group select:focus, .form-group input:focus { outline: none; border-color: #c9a87c; }
+        .file-upload-area { border: 2px dashed #ddd; border-radius: 12px; padding: 60px 20px; text-align: center; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; background: #fafafa; }
+        .file-upload-area:hover { border-color: #c9a87c; background: #f5f5f5; }
+        .file-upload-area.has-file { border-style: solid; border-color: #27ae60; background: #f0fff4; }
+        .file-upload-input { position: absolute; inset: 0; opacity: 0; cursor: pointer; z-index: 10; }
+        .upload-icon { font-size: 64px; margin-bottom: 15px; }
+        .upload-text { color: #666; font-size: 16px; margin-bottom: 8px; font-weight: 500; }
+        .upload-hint { color: #999; font-size: 14px; }
+        .file-info { display: none; padding: 20px; }
+        .file-upload-area.has-file .file-info { display: block; }
+        .file-upload-area.has-file .upload-placeholder { display: none; }
+        .file-preview { display: flex; align-items: center; justify-content: center; gap: 15px; }
+        .file-icon { font-size: 48px; }
+        .file-details { text-align: left; }
+        .file-name { font-weight: 600; color: #1a1a1a; margin-bottom: 5px; }
+        .file-size { color: #666; font-size: 14px; }
+        .remove-file { background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; margin-top: 10px; }
+        .btn { padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: #1a1a1a; color: #fff; }
+        .btn-primary:hover { background: #333; transform: translateY(-2px); }
+        .btn-success { background: #27ae60; color: #fff; }
+        .btn-success:hover { background: #219a52; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .invoice-item { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid #eee; transition: background 0.2s; }
+        .invoice-item:hover { background: #f9f9f9; }
+        .invoice-info { display: flex; align-items: center; gap: 15px; }
+        .invoice-icon { font-size: 32px; }
+        .invoice-details h4 { font-size: 16px; margin-bottom: 5px; }
+        .invoice-details p { font-size: 13px; color: #666; }
+        .invoice-actions { display: flex; gap: 10px; }
+        .btn-small { padding: 8px 16px; font-size: 13px; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        .toast { position: fixed; bottom: 30px; right: 30px; background: #1a1a1a; color: #fff; padding: 16px 24px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: none; z-index: 2000; }
+        .toast.show { display: block; }
+        @media (max-width: 768px) { .sidebar { transform: translateX(-100%); } .main-content { margin-left: 0; } }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>KEVRA</h1>
+                <p>Admin Panel v2.0</p>
+            </div>
+            <nav class="nav-menu">
+    <a href="admin.html" class="nav-item">
+        <span class="nav-icon">📊</span>
+        <span>Dashboard</span>
+    </a>
+    <a href="admin-siparisler.html" class="nav-item">
+        <span class="nav-icon">📦</span>
+        <span>Siparişler</span>
+    </a>
+    <a href="admin-musteriler.html" class="nav-item">
+        <span class="nav-icon">👥</span>
+        <span>Müşteriler</span>
+    </a>
+    <a href="admin-urunler.html" class="nav-item">
+        <span class="nav-icon">👕</span>
+        <span>Ürünler</span>
+    </a>
+    <a href="admin-fatura.html" class="nav-item active">
+        <span class="nav-icon">📄</span>
+        <span>Fatura Yükleme</span>
+    </a>
+    <a href="paytr-ayarlari.html" class="nav-item">
+        <span class="nav-icon">💳</span>
+        <span>PayTR Ayarları</span>
+    </a>
+    <a href="../index.html" class="nav-item">
+        <span class="nav-icon">🏠</span>
+        <span>Siteye Dön</span>
+    </a>
+</nav>
+        </aside>
+        <main class="main-content">
+            <div class="header">
+                <h2>Fatura Yükleme</h2>
+            </div>
+            <div class="content-card">
+                <div class="card-header">
+                    <h3>Yeni Fatura Yükle</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Sipariş Seç *</label>
+                        <select id="orderSelect"><option value="">Sipariş seçin...</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fatura Dosyası *</label>
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <input type="file" class="file-upload-input" id="invoiceFile" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileSelect(event)">
+                            <div class="upload-placeholder">
+                                <div class="upload-icon">📄</div>
+                                <div class="upload-text">Fatura yüklemek için tıklayın veya sürükleyin</div>
+                                <div class="upload-hint">PDF, JPG, PNG (Max. 5MB)</div>
+                            </div>
+                            <div class="file-info">
+                                <div class="file-preview">
+                                    <div class="file-icon" id="fileIcon">📄</div>
+                                    <div class="file-details">
+                                        <div class="file-name" id="fileName">-</div>
+                                        <div class="file-size" id="fileSize">-</div>
+                                        <button type="button" class="remove-file" onclick="removeFile()">Kaldır</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" id="uploadBtn" onclick="uploadInvoice()" disabled>📤 Faturayı Yükle</button>
+                </div>
+            </div>
+            <div class="content-card">
+                <div class="card-header"><h3>Yüklenen Faturalar</h3></div>
+                <div class="card-body">
+                    <div id="invoicesList">
+                        <div class="empty-state">
+                            <div style="font-size:64px;margin-bottom:20px;opacity:0.3;">📋</div>
+                            <p>Henüz fatura yüklenmemiş</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <div class="toast" id="toast"></div>
+    <script src="../db.js"></script>
+    <script>
+        let selectedFile = null, selectedOrderId = null;
+        function loadOrders() {
+            const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+            const select = document.getElementById('orderSelect');
+            orders.forEach(order => {
+                const option = document.createElement('option');
+                option.value = order.id;
+                option.textContent = `${order.id} - ${order.customer?.firstName || ''} ${order.customer?.lastName || ''} (₺${order.total})`;
+                select.appendChild(option);
+            });
+            select.addEventListener('change', function() { selectedOrderId = this.value; checkFormValidity(); });
+        }
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) { showToast('Dosya boyutu 5MB\'dan büyük olamaz!', 'error'); return; }
+            const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+            if (!allowedTypes.includes(file.type)) { showToast('Sadece PDF, JPG veya PNG dosyaları yükleyebilirsiniz!', 'error'); return; }
+            selectedFile = file;
+            const uploadArea = document.getElementById('fileUploadArea');
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = formatFileSize(file.size);
+            document.getElementById('fileIcon').textContent = file.type === 'application/pdf' ? '📄' : '🖼️';
+            uploadArea.classList.add('has-file');
+            checkFormValidity();
+        }
+        function removeFile() {
+            selectedFile = null;
+            document.getElementById('invoiceFile').value = '';
+            document.getElementById('fileUploadArea').classList.remove('has-file');
+            checkFormValidity();
+        }
+        function checkFormValidity() { document.getElementById('uploadBtn').disabled = !(selectedOrderId && selectedFile); }
+        function formatFileSize(bytes) { if (bytes === 0) return '0 Bytes'; const k = 1024; const sizes = ['Bytes', 'KB', 'MB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]; }
+        function uploadInvoice() {
+            if (!selectedOrderId || !selectedFile) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const invoiceData = { orderId: selectedOrderId, fileName: selectedFile.name, fileSize: selectedFile.size, fileType: selectedFile.type, data: e.target.result, uploadDate: new Date().toISOString() };
+                const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+                const order = orders.find(o => o.id === selectedOrderId);
+                if (order) {
+                    order.invoice = invoiceData;
+                    localStorage.setItem('kevra_orders', JSON.stringify(orders));
+                    showToast('Fatura başarıyla yüklendi!');
+                    removeFile();
+                    document.getElementById('orderSelect').value = '';
+                    selectedOrderId = null;
+                    loadInvoices();
+                }
+            };
+            reader.readAsDataURL(selectedFile);
+        }
+        function loadInvoices() {
+            const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+            const invoicesWithOrders = orders.filter(o => o.invoice);
+            const container = document.getElementById('invoicesList');
+            if (invoicesWithOrders.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div style="font-size:64px;margin-bottom:20px;opacity:0.3;">📋</div><p>Henüz fatura yüklenmemiş</p></div>';
+                return;
+            }
+            container.innerHTML = '<div id="invoicesContainer"></div>';
+            const list = document.getElementById('invoicesContainer');
+            invoicesWithOrders.forEach(order => {
+                const invoice = order.invoice;
+                const item = document.createElement('div');
+                item.className = 'invoice-item';
+                item.innerHTML = `<div class="invoice-info"><div class="invoice-icon">${invoice.fileType === 'application/pdf' ? '📄' : '🖼️'}</div><div class="invoice-details"><h4>${invoice.fileName}</h4><p>Sipariş: ${order.id} | Müşteri: ${order.customer?.firstName || ''} ${order.customer?.lastName || ''} | ${formatFileSize(invoice.fileSize)} | ${new Date(invoice.uploadDate).toLocaleDateString('tr-TR')}</p></div></div><div class="invoice-actions"><button class="btn btn-primary btn-small" onclick="viewInvoice('${order.id}')">👁 Görüntüle</button><button class="btn btn-success btn-small" onclick="downloadInvoice('${order.id}')">⬇ İndir</button><button class="btn btn-danger btn-small" onclick="deleteInvoice('${order.id}')">🗑 Sil</button></div>`;
+                list.appendChild(item);
+            });
+        }
+        function viewInvoice(orderId) {
+            const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+            const order = orders.find(o => o.id === orderId);
+            if (order && order.invoice) {
+                const newWindow = window.open();
+                newWindow.document.write(`<iframe src="${order.invoice.data}" style="width:100%;height:100vh;border:none;"></iframe>`);
+            }
+        }
+        function downloadInvoice(orderId) {
+            const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+            const order = orders.find(o => o.id === orderId);
+            if (order && order.invoice) {
+                const link = document.createElement('a');
+                link.href = order.invoice.data;
+                link.download = order.invoice.fileName;
+                link.click();
+            }
+        }
+        function deleteInvoice(orderId) {
+            if (!confirm('Bu faturayı silmek istediğinize emin misiniz?')) return;
+            const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+            const order = orders.find(o => o.id === orderId);
+            if (order) { order.invoice = null; localStorage.setItem('kevra_orders', JSON.stringify(orders)); showToast('Fatura silindi!'); loadInvoices(); }
+        }
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        const uploadArea = document.getElementById('fileUploadArea');
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
+        });
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => { uploadArea.style.borderColor = '#c9a87c'; uploadArea.style.background = '#f5f5f5'; }, false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => { uploadArea.style.borderColor = '#ddd'; uploadArea.style.background = '#fafafa'; }, false);
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length) { document.getElementById('invoiceFile').files = files; handleFileSelect({ target: { files: files } }); }
+        }, false);
+        document.addEventListener('DOMContentLoaded', () => { loadOrders(); loadInvoices(); });
+    </script>
+</body>
+</html>

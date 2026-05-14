@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ödeme | KEVRA</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#1a1a1a">
+    <style>
+        /* ===== FOOTER ===== */
+        .footer { background: #1a1a1a; color: white; padding: 40px 20px 20px; margin-top: 60px; }
+        .footer-inner { display: grid; grid-template-columns: 1fr; gap: 30px; max-width: 1400px; margin: 0 auto; }
+        .footer-brand h3 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 12px; letter-spacing: 3px; }
+        .footer-brand p { color: #999; margin-bottom: 16px; line-height: 1.6; font-size: 14px; }
+        .social-links { display: flex; gap: 12px; }
+        .social-links a { width: 36px; height: 36px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; color: white; font-size: 16px; transition: all 0.3s ease; }
+        .social-links a:hover { background: #c9a87c; transform: translateY(-2px); }
+        .footer-links h4 { font-size: 15px; margin-bottom: 16px; font-weight: 600; }
+        .footer-links a { display: block; color: #999; text-decoration: none; margin-bottom: 10px; transition: color 0.3s; font-size: 14px; }
+        .footer-links a:hover { color: #c9a87c; }
+        .footer-bottom { border-top: 1px solid #333; margin-top: 30px; padding-top: 20px; display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; max-width: 1400px; margin-left: auto; margin-right: auto; }
+        .footer-bottom p { font-size: 13px; color: #666; }
+        .payment-methods { display: flex; gap: 12px; font-size: 20px; }
+        @media (min-width: 481px) {
+            .footer-inner { grid-template-columns: repeat(2, 1fr); }
+            .footer-bottom { flex-direction: row; justify-content: space-between; }
+        }
+        @media (min-width: 769px) {
+            .footer { padding: 60px 40px 30px; }
+            .footer-inner { grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
+            .footer-bottom { flex-direction: row; }
+            .header { padding: 0 40px; height: 70px; }
+            .header-link { display: block; }
+        }
+
+        /* ===== CHECKOUT PAGE ===== */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f5f5;
+            color: #1a1a1a;
+            overflow-x: hidden;
+            padding-top: 70px;
+        }
+
+        /* ===== HEADER (index.html ile aynı) ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        .header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            z-index: 9999;
+            transition: all 0.4s ease;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+        }
+        .header.scrolled {
+            background: rgba(255,255,255,0.98);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        .header-left, .header-right { display: flex; align-items: center; gap: 8px; flex: 1; }
+        .header-right { justify-content: flex-end; }
+        .header-center { display: flex; align-items: center; justify-content: center; }
+        .header-btn {
+            padding: 8px 14px;
+            background: transparent;
+            border: 1px solid rgba(0,0,0,0.1);
+            color: #1a1a1a;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+        .brand-logo { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #1a1a1a; line-height: 1; }
+        .brand-arabic { font-size: 20px; font-weight: bold; margin-bottom: -4px; }
+        .brand-text { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; letter-spacing: 6px; margin-top: 2px; }
+        .header-link { color: #1a1a1a; text-decoration: none; font-size: 13px; transition: color 0.3s; display: none; }
+        .header-icon {
+            position: relative; padding: 8px;
+            background: transparent;
+            border: 1px solid rgba(0,0,0,0.1);
+            color: #1a1a1a;
+            border-radius: 8px; cursor: pointer; font-size: 16px;
+            transition: all 0.3s; display: flex; align-items: center; gap: 4px;
+            min-width: 36px; min-height: 36px; justify-content: center;
+        }
+        #cartCount, #favCount {
+            position: absolute; top: -6px; right: -6px;
+            background: #e74c3c; color: white; font-size: 10px; font-weight: 700;
+            width: 18px; height: 18px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .checkout-page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .checkout-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .checkout-subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 40px;
+            font-size: 14px;
+        }
+
+        .checkout-grid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 40px;
+            align-items: start;
+        }
+
+        /* Sol Kolon - Ödeme Formu */
+        .checkout-form-section {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        .form-section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-section-title .step-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #1a1a1a;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .form-label .required {
+            color: #e74c3c;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e8e8e8;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+            outline: none;
+            background: #fafafa;
+        }
+
+        .form-input:focus {
+            border-color: #c9a87c;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(201, 168, 124, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #e74c3c;
+        }
+
+        .form-input::placeholder {
+            color: #aaa;
+        }
+
+        select.form-input {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 18px center;
+            padding-right: 40px;
+        }
+
+        /* Ödeme Yöntemleri */
+        .payment-methods-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .payment-method-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 18px 20px;
+            border: 2px solid #e8e8e8;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .payment-method-item:hover {
+            border-color: #c9a87c;
+        }
+
+        .payment-method-item.active {
+            border-color: #1a1a1a;
+            background: #fafafa;
+        }
+
+        .payment-method-item input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #1a1a1a;
+            cursor: pointer;
+        }
+
+        .payment-icon {
+            font-size: 28px;
+            width: 40px;
+            text-align: center;
+        }
+
+        .payment-method-info {
+            flex: 1;
+        }
+
+        .payment-method-info strong {
+            display: block;
+            font-size: 15px;
+            margin-bottom: 3px;
+        }
+
+        .payment-method-info span {
+            font-size: 12px;
+            color: #888;
+        }
+
+        /* Kart Bilgileri */
+        .card-details {
+            display: none;
+            background: #f8f8f8;
+            border-radius: 14px;
+            padding: 25px;
+            margin-top: 15px;
+            border: 2px solid #e8e8e8;
+        }
+
+        .card-details.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Kupon */
+        .coupon-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .coupon-input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px dashed #c9a87c;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            background: #fdfbf7;
+            text-transform: uppercase;
+        }
+
+        .coupon-input:focus {
+            border-color: #c9a87c;
+            border-style: solid;
+            background: white;
+        }
+
+        .coupon-btn {
+            padding: 14px 24px;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+
+        .coupon-btn:hover {
+            background: #333;
+        }
+
+        .coupon-message {
+            font-size: 13px;
+            margin-top: 8px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .coupon-message.success {
+            display: block;
+            background: #e8f5e9;
+            color: #27ae60;
+        }
+
+        .coupon-message.error {
+            display: block;
+            background: #ffebee;
+            color: #e74c3c;
+        }
+
+        /* Sağ Kolon - Sipariş Özeti */
+        .order-summary {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 90px;
+        }
+
+        .order-summary-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .order-summary-title .step-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #1a1a1a;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .summary-items {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 5px;
+        }
+
+        .summary-items::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .summary-items::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 4px;
+        }
+
+        .summary-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-item img {
+            width: 70px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .summary-item-info {
+            flex: 1;
+        }
+
+        .summary-item-info h4 {
+            font-size: 14px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .summary-item-meta {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .summary-item-price {
+            font-weight: 700;
+            color: #c9a87c;
+            font-size: 15px;
+        }
+
+        .summary-divider {
+            height: 1px;
+            background: #eee;
+            margin: 20px 0;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .summary-row.discount {
+            color: #27ae60;
+        }
+
+        .summary-row.total {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            padding-top: 15px;
+            border-top: 2px solid #eee;
+            margin-top: 15px;
+        }
+
+        .place-order-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #1a1a1a, #333);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .place-order-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .place-order-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        /* Boş Sepet */
+        .empty-cart-message {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-cart-message .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-cart-message h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .empty-cart-message p {
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .empty-cart-message a {
+            display: inline-flex;
+            padding: 14px 28px;
+            background: #1a1a1a;
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .empty-cart-message a:hover {
+            background: #333;
+            transform: translateY(-2px);
+        }
+
+        /* Başarı Modalı */
+        .success-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10005;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .success-modal.active {
+            display: flex;
+        }
+
+        .success-modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .success-modal-content {
+            position: relative;
+            background: white;
+            border-radius: 24px;
+            padding: 50px;
+            text-align: center;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto 25px;
+        }
+
+        .success-modal-content h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .success-modal-content p {
+            color: #666;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .order-id {
+            background: #f5f5f5;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 16px;
+            color: #1a1a1a;
+            margin: 20px 0;
+            display: inline-block;
+            font-weight: 600;
+        }
+
+        .success-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .success-btn {
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .success-btn.primary {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .success-btn.primary:hover {
+            background: #333;
+        }
+
+        .success-btn.secondary {
+            background: transparent;
+            color: #1a1a1a;
+            border: 2px solid #1a1a1a;
+        }
+
+        .success-btn.secondary:hover {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1a1a1a;
+            color: white;
+            padding: 16px 28px;
+            border-radius: 12px;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.4s;
+            z-index: 10005;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success { background: #27ae60; }
+        .toast.error { background: #e74c3c; }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .checkout-grid {
+                grid-template-columns: 1fr;
+            }
+            .order-summary {
+                position: static;
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .checkout-page { padding: 20px 15px; }
+            .checkout-form-section, .order-summary { padding: 25px 20px; }
+            .form-row { grid-template-columns: 1fr; }
+            .card-row { grid-template-columns: 1fr; }
+        }
+    
+        /* ================================================
+           MOBİL HEADER - Kompakt İkon Modu
+        ================================================ */
+        @media (max-width: 768px) {
+
+            /* Header yüksekliği */
+            .header {
+                height: 60px !important;
+                padding: 0 10px !important;
+            }
+
+            /* Sol butonlar - sadece ikon */
+            .header-left {
+                gap: 6px !important;
+            }
+
+            .header-link {
+                display: none !important;
+            }
+
+            .header-btn .btn-text {
+                display: none;
+            }
+
+            .header-btn {
+                width: 40px !important;
+                height: 40px !important;
+                min-width: 40px !important;
+                padding: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                border-radius: 50% !important;
+                font-size: 16px !important;
+            }
+
+            /* Logo küçültme */
+            .brand-arabic { font-size: 16px !important; }
+            .brand-text { font-size: 18px !important; letter-spacing: 4px !important; }
+
+            /* Sağ ikonlar */
+            .header-right {
+                gap: 6px !important;
+            }
+
+            .header-icon {
+                width: 40px !important;
+                height: 40px !important;
+                min-width: 40px !important;
+                border-radius: 50% !important;
+                padding: 0 !important;
+                font-size: 16px !important;
+            }
+
+            /* Profil butonu - sadece avatar */
+            .user-menu-btn {
+                padding: 0 !important;
+                border-radius: 50% !important;
+                width: 40px !important;
+                height: 40px !important;
+                min-width: 40px !important;
+                min-height: 40px !important;
+                justify-content: center !important;
+                gap: 0 !important;
+            }
+            .user-menu-btn .user-name,
+            .user-menu-btn .dropdown-arrow {
+                display: none !important;
+            }
+            .user-menu-btn .user-avatar {
+                width: 26px !important;
+                height: 26px !important;
+                font-size: 11px !important;
+            }
+
+            /* Giriş Yap butonu da küçük */
+            #userMenuContainer > a {
+                width: 40px !important;
+                height: 40px !important;
+                border-radius: 50% !important;
+                padding: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 0 !important;
+                border: 1px solid rgba(255,255,255,0.3) !important;
+                color: white !important;
+                text-decoration: none !important;
+            }
+            #userMenuContainer > a::before {
+                content: "👤";
+                font-size: 16px;
+            }
+            .header.scrolled #userMenuContainer > a {
+                border-color: rgba(0,0,0,0.15) !important;
+                color: #1a1a1a !important;
+            }
+
+            /* Dropdown menü pozisyon */}
+
+
+        /* ===== DROPDOWN MENÜ (tüm sayfalarda aynı) ===== */
+        .user-dropdown { position: relative; }
+        .user-dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 50px;
+            width: 210px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 10000;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .user-dropdown-menu.show { display: block; }
+        .dropdown-user-info {
+            display: flex;
+            gap: 10px;
+            padding: 14px;
+            align-items: center;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .dropdown-avatar {
+            width: 36px;
+            height: 36px;
+            background: #c9a87c;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .dropdown-name { font-size: 13px; font-weight: 600; }
+        .dropdown-email { font-size: 11px; color: #888; }
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.2s;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+        }
+        .dropdown-item:hover { background: #f8f5f2; color: #c9a87c; }
+        .dropdown-item.logout {
+            color: #e74c3c;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: inherit;
+        }
+        .dropdown-divider { border-top: 1px solid #f0f0f0; margin: 4px 0; }
+
+        /* user-menu-btn override - beyaz header için koyu renkler */
+        .user-menu-btn {
+            border-color: rgba(0,0,0,0.15) !important;
+            color: #1a1a1a !important;
+        }
+        .header.scrolled .user-menu-btn {
+            border-color: rgba(0,0,0,0.15) !important;
+            color: #1a1a1a !important;
+        }
+
+        /* Mobil giriş yap butonu koyu */
+        @media (max-width: 768px) {
+            #userMenuContainer > a {
+                width: 40px !important;
+                height: 40px !important;
+                border-radius: 50% !important;
+                padding: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 0 !important;
+                border: 1px solid rgba(0,0,0,0.15) !important;
+                color: #1a1a1a !important;
+                text-decoration: none !important;
+            }
+            #userMenuContainer > a::before {
+                content: "👤";
+                font-size: 16px;
+            }
+            .user-dropdown-menu {
+                position: fixed !important;
+                top: 65px !important;
+                right: 8px !important;
+                width: min(210px, calc(100vw - 16px)) !important;
+            }
+        }
+        </style>
+</head>
+<body>
+
+<!-- ================= HEADER (index.html ile BİREBİR AYNI) ================= -->
+<header class="header" id="mainHeader">
+    <div class="header-left">
+        <button class="header-btn" id="openMenuBtn"><span class="btn-icon">☰</span><span class="btn-text">Menü</span></button>
+        <button class="header-btn" id="openSearch"><span class="btn-icon">🔍</span><span class="btn-text">Ara</span></button>
+    </div>
+    <div class="header-center">
+        <a href="index.html" class="brand-logo">
+            <span class="brand-arabic">ك</span>
+            <span class="brand-text">KEVRA</span>
+        </a>
+    </div>
+    <div class="header-right">
+        <a href="hakkimizda.html" class="header-link">Hakkımızda</a>
+        <a href="iletisim.html" class="header-link">İletişim</a>
+        <button class="header-icon" id="favBtn" style="border-radius:8px; width:44px; height:44px; font-size:18px;">♡ <span id="favCount">0</span></button>
+        <button class="header-icon" id="cartBtn" style="border-radius:8px; width:44px; height:44px; font-size:18px;">👜 <span id="cartCount">0</span></button>
+        <div id="userMenuContainer"></div>
+    </div>
+</header>
+
+<!-- ================= SEARCH MODAL (index.html ile AYNI) ================= -->
+<div class="search-modal" id="searchModal">
+    <div class="search-box">
+        <div class="search-head">
+            <h2 class="search-title"> Ürün Ara</h2>
+            <button class="search-close-btn" id="closeSearch">✖</button>
+        </div>
+        <div class="search-input-wrapper">
+            <input type="text" id="searchInput" placeholder="Ürün adı yaz...">
+        </div>
+        <div class="search-results" id="searchResults"></div>
+    </div>
+</div>
+
+<!-- ================= SIDE MENU (index.html ile AYNI) ================= -->
+<div class="side-menu" id="sideMenu">
+    <div class="side-menu-header">
+        <h3>KEVRA</h3>
+        <button id="closeMenuBtn">✖</button>
+    </div>
+    <div class="side-menu-content">
+        <a href="index.html" class="menu-link">Ana Sayfa</a>
+        <a href="shop.html" class="menu-link">Tüm Ürünler</a>
+        <a href="shop.html?category=yeni" class="menu-link">Yeni Sezon</a>
+        <a href="shop.html?category=elbise" class="menu-link">Elbiseler</a>
+        <a href="shop.html?category=ust" class="menu-link">Üst Giyim</a>
+        <a href="shop.html?category=alt" class="menu-link">Alt Giyim</a>
+        <a href="shop.html?category=triko" class="menu-link">Triko</a>
+        <a href="shop.html?category=dis" class="menu-link">Dış Giyim</a>
+        <a href="shop.html?category=aksesuar" class="menu-link">Aksesuar</a>
+        <a href="shop.html?category=indirim" class="menu-link" style="color: #e74c3c;">İndirim</a>
+    </div>
+</div>
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<!-- ================= CART DRAWER (index.html ile AYNI) ================= -->
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-header">
+        <h3>Sepetim (<span id="cartDrawerCount">0</span>)</h3>
+        <button class="cart-close-btn" id="closeCartBtn">✖</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer" id="cartFooter">
+        <div class="cart-summary">
+            <div class="summary-row">
+                <span>Ara Toplam</span>
+                <span id="subTotal">0 ₺</span>
+            </div>
+            <div class="summary-row">
+                <span>Kargo</span>
+                <span id="shippingCost">Ücretsiz</span>
+            </div>
+            <div class="cart-total">
+                <span>Toplam</span>
+                <span id="cartTotal">0 ₺</span>
+            </div>
+        </div>
+        <div class="cart-actions">
+            <button class="checkout-btn" id="checkoutBtn" onclick="location.href='odeme.html'" style="background: linear-gradient(135deg, #c9a87c, #b08d65); color: white; font-weight: 700; letter-spacing: 1px;">
+                💳 Ödemeye Geç <span id="checkoutTotal">0 ₺</span>
+            </button>
+            <button class="go-to-cart-btn" onclick="location.href='sepetim.html'">🛒 Sepeti Görüntüle</button>
+            <button class="continue-btn" id="continueBtn">Alışverişe Devam Et</button>
+        </div>
+    </div>
+</div>
+<div class="cart-overlay" id="cartOverlay"></div>
+
+<!-- ================= FAVORITES DRAWER (index.html ile AYNI) ================= -->
+<div class="fav-drawer" id="favDrawer">
+    <div class="fav-header">
+        <h3>Favorilerim (<span id="favDrawerCount">0</span>)</h3>
+        <button class="fav-close-btn" id="closeFavBtn" style="background:none;border:none;font-size:24px;cursor:pointer;">✖</button>
+    </div>
+    <div class="fav-items" id="favItems"></div>
+</div>
+<div class="fav-overlay" id="favOverlay"></div>
+
+<!-- ================= TOAST ================= -->
+<div class="toast" id="toast">
+    <span id="toastText"></span>
+</div>
+
+<!-- ================= ÖDEME SAYFASI İÇERİĞİ ================= -->
+<div class="checkout-page">
+    <h1 class="checkout-title">Ödeme</h1>
+    <p class="checkout-subtitle">Siparişinizi tamamlamak için bilgilerinizi girin</p>
+
+    <div class="checkout-grid" id="checkoutContent">
+        <!-- Sol: Ödeme Formu -->
+        <div class="checkout-form-section">
+            <!-- Teslimat Bilgileri -->
+            <div class="form-section">
+                <h3 class="form-section-title">
+                    <span class="step-num">1</span>
+                    Teslimat Bilgileri
+                </h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Ad <span class="required">*</span></label>
+                        <input type="text" class="form-input" id="firstName" placeholder="Adınız">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Soyad <span class="required">*</span></label>
+                        <input type="text" class="form-input" id="lastName" placeholder="Soyadınız">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">E-posta <span class="required">*</span></label>
+                    <input type="email" class="form-input" id="email" placeholder="ornek@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Telefon <span class="required">*</span></label>
+                    <input type="tel" class="form-input" id="phone" placeholder="05XX XXX XX XX">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Adres <span class="required">*</span></label>
+                    <input type="text" class="form-input" id="address" placeholder="Sokak, Mahalle, Bina No">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">İl <span class="required">*</span></label>
+                        <select class="form-input" id="city">
+                            <option value="">Seçiniz</option>
+                            <option value="istanbul">İstanbul</option>
+                            <option value="ankara">Ankara</option>
+                            <option value="izmir">İzmir</option>
+                            <option value="bursa">Bursa</option>
+                            <option value="antalya">Antalya</option>
+                            <option value="adana">Adana</option>
+                            <option value="konya">Konya</option>
+                            <option value="gaziantep">Gaziantep</option>
+                            <option value="samsun">Samsun</option>
+                            <option value="trabzon">Trabzon</option>
+                            <option value="diyarbakir">Diyarbakır</option>
+                            <option value="eskisehir">Eskişehir</option>
+                            <option value="mersin">Mersin</option>
+                            <option value="kayseri">Kayseri</option>
+                            <option value="malatya">Malatya</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">İlçe <span class="required">*</span></label>
+                        <input type="text" class="form-input" id="district" placeholder="İlçe">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Posta Kodu</label>
+                    <input type="text" class="form-input" id="zipCode" placeholder="34000">
+                </div>
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <!-- Ödeme Yöntemi -->
+            <div class="form-section">
+                <h3 class="form-section-title">
+                    <span class="step-num">2</span>
+                    Ödeme Yöntemi
+                </h3>
+
+                <div class="payment-methods-list">
+                    <label class="payment-method-item active" onclick="selectPayment(this, 'card')">
+                        <input type="radio" name="payment" value="card" checked>
+                        <span class="payment-icon">💳</span>
+                        <div class="payment-method-info">
+                            <strong>Kredi / Banka Kartı</strong>
+                            <span>Güvenli ödeme altyapısı</span>
+                        </div>
+                    </label>
+
+                    <label class="payment-method-item" onclick="selectPayment(this, 'havale')">
+                        <input type="radio" name="payment" value="havale">
+                        <span class="payment-icon">🏦</span>
+                        <div class="payment-method-info">
+                            <strong>Havale / EFT</strong>
+                            <span>Banka havalesi ile ödeme</span>
+                        </div>
+                    </label>
+
+                    <label class="payment-method-item" onclick="selectPayment(this, 'kapida')">
+                        <input type="radio" name="payment" value="kapida">
+                        <span class="payment-icon">🚪</span>
+                        <div class="payment-method-info">
+                            <strong>Kapıda Ödeme</strong>
+                            <span>Kapıda nakit veya kart ile ödeme</span>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Kart Bilgileri (sadece kart seçiliyken göster) -->
+                <div class="card-details show" id="cardDetails">
+                    <div class="form-group">
+                        <label class="form-label">Kart Üzerindeki İsim <span class="required">*</span></label>
+                        <input type="text" class="form-input" id="cardName" placeholder="AD SOYAD">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Kart Numarası <span class="required">*</span></label>
+                        <input type="text" class="form-input" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19">
+                    </div>
+                    <div class="card-row">
+                        <div class="form-group">
+                            <label class="form-label">Son Kullanma <span class="required">*</span></label>
+                            <input type="text" class="form-input" id="cardExpiry" placeholder="AA/YY" maxlength="5">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">CVV <span class="required">*</span></label>
+                            <input type="text" class="form-input" id="cardCvv" placeholder="123" maxlength="3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sağ: Sipariş Özeti -->
+        <div class="order-summary" id="orderSummary">
+            <h3 class="order-summary-title">
+                <span class="step-num">3</span>
+                Sipariş Özeti
+            </h3>
+
+            <!-- Kupon -->
+            <div class="coupon-section">
+                <input type="text" class="coupon-input" id="couponCode" placeholder="KUPON KODU">
+                <button class="coupon-btn" onclick="applyCoupon()">Uygula</button>
+            </div>
+            <div class="coupon-message" id="couponMessage"></div>
+
+            <!-- Ürünler -->
+            <div class="summary-items" id="summaryItems"></div>
+
+            <!-- Hesaplama -->
+            <div class="summary-divider"></div>
+            <div class="summary-row">
+                <span>Ara Toplam</span>
+                <span id="summarySubtotal">0 ₺</span>
+            </div>
+            <div class="summary-row">
+                <span>Kargo</span>
+                <span id="summaryShipping">Ücretsiz</span>
+            </div>
+            <div class="summary-row discount" id="discountRow" style="display: none;">
+                <span>İndirim</span>
+                <span id="summaryDiscount">-0 ₺</span>
+            </div>
+            <div class="summary-row total">
+                <span>Toplam</span>
+                <span id="summaryTotal">0 ₺</span>
+            </div>
+
+            <button class="place-order-btn" id="placeOrderBtn" onclick="placeOrder()">
+                🛒 Siparişi Tamamla
+            </button>
+
+            <div class="secure-badge">
+                <span>🔒</span>
+                <span>256-bit SSL ile güvenli ödeme</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Boş Sepet Mesajı -->
+    <div class="empty-cart-message" id="emptyCartMessage" style="display: none;">
+        <div class="icon">🛒</div>
+        <h3>Sepetiniz Boş</h3>
+        <p>Ödeme yapmak için sepetinize ürün ekleyin</p>
+        <a href="shop.html">Alışverişe Başla</a>
+    </div>
+</div>
+
+<!-- ================= BAŞARI MODALI ================= -->
+<div class="success-modal" id="successModal">
+    <div class="success-modal-overlay" onclick="closeSuccessModal()"></div>
+    <div class="success-modal-content">
+        <div class="success-icon">✓</div>
+        <h2>Siparişiniz Alındı!</h2>
+        <p>Siparişiniz başarıyla oluşturuldu. Sipariş detaylarınızı e-posta adresinize gönderdik.</p>
+        <div class="order-id" id="successOrderId">ORD-0000000000000</div>
+        <p style="font-size: 13px; color: #888;">Siparişinizi "Siparişlerim" sayfasından takip edebilirsiniz.</p>
+        <div class="success-actions">
+            <a href="profil.html#siparisler" class="success-btn primary">📦 Siparişlerim</a>
+            <a href="index.html" class="success-btn secondary">🏠 Ana Sayfa</a>
+        </div>
+    </div>
+</div>
+
+<script>
+
+let cart = JSON.parse(localStorage.getItem('kevra_cart')) || [];
+let currentCoupon = null;
+let discountAmount = 0;
+
+function formatPrice(price) {
+    return price.toLocaleString('tr-TR') + ' ₺';
+}
+
+// Sayfa yüklendiğinde
+function initCheckout() {
+    // Sepet boşsa
+    if (cart.length === 0) {
+        document.getElementById('checkoutContent').style.display = 'none';
+        document.getElementById('emptyCartMessage').style.display = 'block';
+        document.querySelector('.checkout-subtitle').style.display = 'none';
+        return;
+    }
+
+    renderSummary();
+    setupCardFormatting();
+    setupFormValidation();
+
+
+
+// Sipariş Özeti Render
+function renderSummary() {
+    const container = document.getElementById('summaryItems');
+
+    container.innerHTML = cart.map(item => `
+        <div class="summary-item">
+            <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/70?text=No+Image'">
+            <div class="summary-item-info">
+                <h4>${item.name}</h4>
+                <div class="summary-item-meta">
+                    ${item.size ? 'Beden: ' + item.size : ''} 
+                    ${item.color ? 'Renk: ' + item.color : ''} 
+                    Adet: ${item.quantity}
+                </div>
+                <div class="summary-item-price">${formatPrice(item.price * item.quantity)}</div>
+            </div>
+        </div>
+    `).join('');
+
+    calculateTotals();
+}
+
+// Toplam Hesaplama
+function calculateTotals() {
+    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    let shipping = 0;
+    let total = subtotal + shipping;
+
+    // İndirim uygula
+    if (currentCoupon) {
+        discountAmount = Math.round(subtotal * currentCoupon.discount);
+        total -= discountAmount;
+    } else {
+        discountAmount = 0;
+    }
+
+    document.getElementById('summarySubtotal').textContent = formatPrice(subtotal);
+    document.getElementById('summaryShipping').textContent = shipping === 0 ? 'Ücretsiz' : formatPrice(shipping);
+
+    const discountRow = document.getElementById('discountRow');
+    if (discountAmount > 0) {
+        discountRow.style.display = 'flex';
+        document.getElementById('summaryDiscount').textContent = '-' + formatPrice(discountAmount);
+    } else {
+        discountRow.style.display = 'none';
+    }
+
+    document.getElementById('summaryTotal').textContent = formatPrice(total);
+}
+
+// Ödeme Yöntemi Seçimi
+function selectPayment(element, method) {
+    document.querySelectorAll('.payment-method-item').forEach(el => el.classList.remove('active'));
+    element.classList.add('active');
+    element.querySelector('input').checked = true;
+
+    const cardDetails = document.getElementById('cardDetails');
+    if (method === 'card') {
+        cardDetails.classList.add('show');
+    } else {
+        cardDetails.classList.remove('show');
+    }
+}
+
+// Kart Formatlama
+function setupCardFormatting() {
+    const cardNumber = document.getElementById('cardNumber');
+    const cardExpiry = document.getElementById('cardExpiry');
+    const cardCvv = document.getElementById('cardCvv');
+
+    if (cardNumber) {
+        cardNumber.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.substring(0, 16);
+            e.target.value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+        });
+    }
+
+    if (cardExpiry) {
+        cardExpiry.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value;
+        });
+    }
+
+    if (cardCvv) {
+        cardCvv.addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/\D/g, '').substring(0, 3);
+        });
+    }
+
+    // Telefon formatlama
+    const phone = document.getElementById('phone');
+    if (phone) {
+        phone.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.startsWith('0')) value = value.substring(1);
+            if (value.length > 10) value = value.substring(0, 10);
+
+            if (value.length >= 7) {
+                value = '0' + value.replace(/(\d{3})(\d{3})(\d{2})(\d{2})/, '$1 $2 $3 $4');
+            } else if (value.length >= 4) {
+                value = '0' + value.replace(/(\d{3})(\d+)/, '$1 $2');
+            } else if (value.length > 0) {
+                value = '0' + value;
+            }
+            e.target.value = value;
+        });
+    }
+}
+
+// Kupon Uygula
+function applyCoupon() {
+    const code = document.getElementById('couponCode').value.trim().toUpperCase();
+    const messageEl = document.getElementById('couponMessage');
+
+    if (!code) {
+        showCouponMessage('Lütfen kupon kodu girin', 'error');
+        return;
+    }
+
+    // Demo kuponlar
+    const coupons = {
+        'KEVRA10': { discount: 0.10, name: '%10 İndirim' },
+        'KEVRA20': { discount: 0.20, name: '%20 İndirim' },
+        'WELCOME': { discount: 0.15, name: 'Hoş Geldin %15' },
+        'VIP25': { discount: 0.25, name: 'VIP %25 İndirim' }
+    };
+
+    if (coupons[code]) {
+        currentCoupon = coupons[code];
+        showCouponMessage(`${currentCoupon.name} uygulandı!`, 'success');
+        calculateTotals();
+    } else {
+        currentCoupon = null;
+        showCouponMessage('Geçersiz kupon kodu', 'error');
+        calculateTotals();
+    }
+}
+
+function showCouponMessage(text, type) {
+    const el = document.getElementById('couponMessage');
+    el.textContent = text;
+    el.className = 'coupon-message ' + type;
+}
+
+// Form Doğrulama
+function setupFormValidation() {
+    const inputs = document.querySelectorAll('.form-input');
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            validateField(this);
+        });
+        input.addEventListener('input', function() {
+            this.classList.remove('error');
+        });
+    });
+}
+
+function validateField(field) {
+    const value = field.value.trim();
+    const id = field.id;
+
+    if (!value && field.closest('.form-group').querySelector('.required')) {
+        field.classList.add('error');
+        return false;
+    }
+
+    if (id === 'email' && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        field.classList.add('error');
+        return false;
+    }
+
+    if (id === 'phone' && value && value.replace(/\D/g, '').length < 10) {
+        field.classList.add('error');
+        return false;
+    }
+
+    field.classList.remove('error');
+    return true;
+}
+
+function validateForm() {
+    const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'district'];
+    let isValid = true;
+
+    requiredFields.forEach(id => {
+        const field = document.getElementById(id);
+        if (!field || !validateField(field)) {
+            isValid = false;
+            if (field) field.classList.add('error');
+        }
+    });
+
+    // Kart ödemesi seçiliyse kart alanlarını da kontrol et
+    const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+    if (paymentMethod === 'card') {
+        const cardFields = ['cardName', 'cardNumber', 'cardExpiry', 'cardCvv'];
+        cardFields.forEach(id => {
+            const field = document.getElementById(id);
+            if (!field || !field.value.trim()) {
+                isValid = false;
+                if (field) field.classList.add('error');
+            }
+        });
+    }
+
+    return isValid;
+}
+
+// Siparişi Tamamla
+function placeOrder() {
+    if (!validateForm()) {
+        showToast('Lütfen zorunlu alanları doldurun', 'error');
+        return;
+    }
+
+    const btn = document.getElementById('placeOrderBtn');
+    btn.disabled = true;
+    btn.innerHTML = '⏳ İşleniyor...';
+
+    // Sipariş verisi
+    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const total = subtotal - discountAmount;
+
+    const orderData = {
+        items: [...cart],
+        subtotal: subtotal,
+        discount: discountAmount,
+        shipping: 0,
+        total: total,
+        coupon: currentCoupon ? currentCoupon.name : null,
+        customer: {
+            firstName: document.getElementById('firstName').value,
+            lastName: document.getElementById('lastName').value,
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value,
+            address: document.getElementById('address').value,
+            city: document.getElementById('city').value,
+            district: document.getElementById('district').value,
+            zipCode: document.getElementById('zipCode').value
+        },
+        paymentMethod: document.querySelector('input[name="payment"]:checked').value
+    };
+
+    // Auth.js ile sipariş oluştur
+    let orderResult;
+    if (typeof KevraAuth !== 'undefined' && KevraAuth.createOrder) {
+        orderResult = KevraAuth.createOrder(orderData);
+    } else {
+        // Fallback - localStorage'a kaydet
+        const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+        const newOrder = {
+            id: 'ORD-' + Date.now(),
+            ...orderData,
+            status: 'pending',
+            statusText: 'Beklemede',
+            createdAt: new Date().toISOString()
+        };
+        orders.unshift(newOrder);
+        localStorage.setItem('kevra_orders', JSON.stringify(orders));
+        orderResult = { success: true, order: newOrder };
+    }
+
+    setTimeout(() => {
+        if (orderResult.success) {
+            // Sepeti temizle
+            localStorage.removeItem('kevra_cart');
+            cart = [];
+
+            // Başarı modalını göster
+            document.getElementById('successOrderId').textContent = orderResult.order.id;
+            document.getElementById('successModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            // Header'daki sepet sayısını güncelle
+            if (typeof updateCartUI === 'function') updateCartUI();
+        } else {
+            showToast('Sipariş oluşturulurken hata: ' + orderResult.message, 'error');
+            btn.disabled = false;
+            btn.innerHTML = '🛒 Siparişi Tamamla';
+        }
+    }, 1500);
+}
+
+function closeSuccessModal() {
+    document.getElementById('successModal').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Toast
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastText = document.getElementById('toastText');
+    if (!toast || !toastText) return;
+    toastText.textContent = message;
+    toast.className = `toast ${type} show`;
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// Sayfa yüklendiğinde
+window.addEventListener('DOMContentLoaded', function() {
+    initCheckout();
+
+    // Header scroll efekti
+    const header = document.getElementById('mainHeader');
+    if (header) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    }
+});
+</script>
+<script defer src="js/storage.js"></script>
+<script defer src="js/favorites.js"></script>
+<script defer src="js/cart.js"></script>
+<script defer src="js/main.js"></script>
+<script defer src="js/auth.js"></script>
+
+<!-- FOOTER -->
+<footer class="footer" id="footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <h3>KEVRA</h3>
+            <p>Premium kadın giyim koleksiyonları. Modern, zarif ve kaliteli.</p>
+            <div class="social-links">
+                <a href="#">📷</a>
+                <a href="#">📘</a>
+                <a href="#">🎵</a>
+                <a href="#">📌</a>
+            </div>
+        </div>
+        <div class="footer-links">
+            <h4>Hızlı Linkler</h4>
+            <a href="shop.html">Tüm Ürünler</a>
+            <a href="shop.html?category=indirim">İndirim</a>
+            <a href="shop.html?category=populer">Çok Satanlar</a>
+        </div>
+        <div class="footer-links">
+            <h4>Destek</h4>
+            <a href="siparistakibi.html">Sipariş Takibi</a>
+            <a href="iadekosullari.html">İade Koşulları</a>
+            <a href="kargobilgisi.html">Kargo Bilgisi</a>
+            <a href="sss.html">SSS</a>
+        </div>
+        <div class="footer-links">
+            <h4>İletişim</h4>
+            <a href="https://wa.me/905555555555">WhatsApp</a>
+            <a href="mailto:info@kevra.com">E-posta</a>
+            <p style="margin-top: 12px; color: #666; font-size: 13px;">Pzt-Cmt: 09:00 - 18:00</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 KEVRA. Tüm hakları saklıdır.</p>
+        <div class="payment-methods">
+            <span>💳</span>
+            <span>🏦</span>
+            <span>🚪</span>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
