@@ -61,13 +61,21 @@ const KevraDB = {
     getCurrentUser:  function() { const s = localStorage.getItem('kevra_current_user'); return s ? JSON.parse(s) : null; },
 
     getAllUsers: async function() {
+        const local = JSON.parse(localStorage.getItem('kevra_users') || '[]');
         if (window.KevraFirebase && window.KevraFirebase.ready()) {
             try {
                 const snap = await window.KevraFirebase.db.collection('users').get();
-                return snap.docs.map(d => d.data());
+                const fsData = snap.docs.map(d => d.data());
+                if (fsData.length > 0) return fsData;
+                // Firestore boş ama localStorage'da veri var → migrate
+                if (local.length > 0) {
+                    for (const u of local) {
+                        await window.KevraFirebase.db.collection('users').doc(u.id).set(u).catch(() => {});
+                    }
+                }
             } catch (e) { console.warn('Firestore okuma hatası:', e); }
         }
-        return JSON.parse(localStorage.getItem('kevra_users') || '[]');
+        return local;
     },
 
     // ===================== ÜRÜNLER =====================
@@ -154,13 +162,30 @@ const KevraDB = {
     },
 
     getAllOrders: async function() {
+        const local = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
         if (window.KevraFirebase && window.KevraFirebase.ready()) {
             try {
                 const snap = await window.KevraFirebase.db.collection('orders').orderBy('createdAt', 'desc').get();
-                return snap.docs.map(d => d.data());
+                const fsData = snap.docs.map(d => d.data());
+                if (fsData.length > 0) {
+                    // Firestore'da veri var — localStorage ile senkronize et
+                    localStorage.setItem('kevra_orders', JSON.stringify(fsData));
+                    return fsData;
+                }
+                // Firestore boş ama localStorage'da veri var → tek seferlik migrate
+                if (local.length > 0) {
+                    console.log('[KevraDB] Siparişler localStorage → Firestore migrate ediliyor...');
+                    const batch = window.KevraFirebase.db.batch();
+                    for (const order of local) {
+                        const ref = window.KevraFirebase.db.collection('orders').doc(String(order.id));
+                        batch.set(ref, order);
+                    }
+                    await batch.commit();
+                    console.log('[KevraDB] ✅ Migrate tamamlandı:', local.length, 'sipariş');
+                }
             } catch (e) { console.warn('Firestore sipariş okuma:', e); }
         }
-        return JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+        return local;
     },
 
     getUserOrders: async function() {
