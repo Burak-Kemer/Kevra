@@ -28,8 +28,8 @@ const ADMIN_CONFIG = {
 // ============================================================
 //  Firebase başlatma
 // ============================================================
-let db = null;
-let auth = null;
+let _db   = null;
+let _auth = null;
 let firebaseReady = false;
 
 function initFirebase() {
@@ -41,8 +41,8 @@ function initFirebase() {
         if (!firebase.apps.length) {
             firebase.initializeApp(FIREBASE_CONFIG);
         }
-        db   = firebase.firestore();
-        auth = firebase.auth();
+        _db   = firebase.firestore();
+        _auth = firebase.auth();
         firebaseReady = true;
         console.log('[KevraDB] ✅ Firebase bağlantısı kuruldu');
         return true;
@@ -62,9 +62,18 @@ const COLLECTIONS = {
     coupons:  'coupons'
 };
 
-window.FIREBASE_CONFIG  = FIREBASE_CONFIG;
-window.ADMIN_CONFIG     = ADMIN_CONFIG;
-window.KevraFirebase    = { db, auth, ready: () => firebaseReady, init: initFirebase, COLLECTIONS };
+window.FIREBASE_CONFIG = FIREBASE_CONFIG;
+window.ADMIN_CONFIG    = ADMIN_CONFIG;
+
+// Getter kullan — initFirebase() sonrası _db/_auth güncellenir,
+// window.KevraFirebase.db her erişimde güncel değeri döner
+window.KevraFirebase = {
+    get db()   { return _db; },
+    get auth() { return _auth; },
+    ready: () => firebaseReady,
+    init:  initFirebase,
+    COLLECTIONS
+};
 
 // Sayfa yüklendiğinde başlat
 document.addEventListener('DOMContentLoaded', initFirebase);
