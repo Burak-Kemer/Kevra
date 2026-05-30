@@ -952,49 +952,86 @@
         function handleInvoiceUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            
+
+            if (!file.type.startsWith('image/')) {
+                showToast('Lütfen bir görsel dosyası seçin (JPG, PNG).', 'error');
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = function(e) {
-                uploadedInvoice = {
-                    data: e.target.result,
-                    name: file.name,
-                    type: file.type
+                // Canvas ile sıkıştır — Firestore 1MB limitine sığdır
+                const img = new Image();
+                img.onload = function() {
+                    const MAX_W = 900, MAX_H = 1200;
+                    let w = img.width, h = img.height;
+                    if (w > MAX_W || h > MAX_H) {
+                        const ratio = Math.min(MAX_W / w, MAX_H / h);
+                        w = Math.round(w * ratio);
+                        h = Math.round(h * ratio);
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    const compressed = canvas.toDataURL('image/jpeg', 0.75);
+                    uploadedInvoice = { data: compressed, name: file.name };
+                    document.getElementById('invoiceImage').src = compressed;
+                    document.getElementById('invoicePreview').style.display = 'block';
                 };
-                
-                if (file.type.startsWith('image/')) {
-                    document.getElementById('invoiceImage').src = e.target.result;
-                } else {
-                    document.getElementById('invoiceImage').src = 'https://via.placeholder.com/400x300?text=PDF+Fatura';
-                }
-                document.getElementById('invoicePreview').style.display = 'block';
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
-        
+
         async function saveInvoice() {
             if (!uploadedInvoice) {
                 showToast('Lütfen önce fatura yükleyin!', 'error');
                 return;
             }
+
+            const invoiceNumber = 'INV-' + Date.now().toString().slice(-6);
+            const invoiceData   = { invoiceUrl: uploadedInvoice.data, invoiceNumber };
+
             try {
-                // Save invoice URL directly on the order in localStorage (and Firestore if available)
-                const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
-                const idx = orders.findIndex(o => o.id === currentOrderId);
-                if (idx !== -1) {
-                    orders[idx].invoiceUrl = uploadedInvoice.data;
-                    orders[idx].invoiceNumber = 'INV-' + Date.now().toString().slice(-6);
-                    localStorage.setItem('kevra_orders', JSON.stringify(orders));
-                }
-                // Firestore update if available
+                // 1) Firestore — birincil kaynak (müşteri her cihazdan görebilir)
+                let firestoreOk = false;
                 if (window.KevraFirebase && window.KevraFirebase.ready()) {
-                    await window.KevraFirebase.db.collection('orders').doc(currentOrderId).update({
-                        invoiceUrl: uploadedInvoice.data,
-                        invoiceNumber: orders[idx]?.invoiceNumber || ''
-                    });
+                    try {
+                        await window.KevraFirebase.db
+                            .collection('orders')
+                            .doc(currentOrderId)
+                            .update(invoiceData);
+                        firestoreOk = true;
+                    } catch(fsErr) {
+                        console.warn('Firestore fatura kayıt hatası:', fsErr.message);
+                    }
                 }
-                showToast('Fatura başarıyla yüklendi!', 'success');
+
+                // 2) localStorage — in-memory allOrders üzerinden güncelle (Firestore'dan yüklenmiş olabilir)
+                const localOrders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+                const localIdx    = localOrders.findIndex(o => o.id === currentOrderId);
+                if (localIdx !== -1) {
+                    Object.assign(localOrders[localIdx], invoiceData);
+                    localStorage.setItem('kevra_orders', JSON.stringify(localOrders));
+                } else {
+                    // localStorage'da yoksa allOrders'dan al ve ekle
+                    const memOrder = allOrders.find(o => o.id === currentOrderId);
+                    if (memOrder) {
+                        localOrders.push(Object.assign({}, memOrder, invoiceData));
+                        localStorage.setItem('kevra_orders', JSON.stringify(localOrders));
+                    }
+                }
+
+                // 3) in-memory allOrders'u da güncelle (renderOrders için)
+                const memIdx = allOrders.findIndex(o => o.id === currentOrderId);
+                if (memIdx !== -1) Object.assign(allOrders[memIdx], invoiceData);
+
+                const msg = firestoreOk
+                    ? 'Fatura başarıyla yüklendi! (Firestore ✓)'
+                    : 'Fatura kaydedildi. (Yalnızca yerel — Firestore bağlantısı yok)';
+                showToast(msg, 'success');
                 closeInvoiceModal();
-                await loadOrders();
+                renderOrders(allOrders);
             } catch(e) {
                 showToast('Fatura yükleme hatası: ' + e.message, 'error');
             }
