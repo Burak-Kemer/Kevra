@@ -1773,10 +1773,10 @@
                             <div class="order-total">Toplam: ${total.toLocaleString('tr-TR')} ₺</div>
                             <div class="order-actions">
                                 <button class="btn-sm btn-outline" onclick="showOrderDetail('${order.id}')">Detaylar</button>
-                                ${order.status === 'delivered' ? `<button class="btn-sm btn-primary" onclick="initiateReturn('${order.id}')">İade Talebi</button>` : ''}
-                                ${order.status === 'shipped' ? `<button class="btn-sm btn-outline" onclick="trackOrder('${order.id}')">Kargo Takip</button>` : ''}
-                                ${order.status === 'pending' || order.status === 'processing' ? `<a href="fatura.html?order=${order.id}" style="display:inline-block; padding:6px 12px; background:#f8f5f2; color:#c9a87c; border:1px solid #c9a87c; border-radius:8px; font-size:12px; text-decoration:none; margin-right:6px;">📄 Fatura</a>
-                            <button class="btn-sm btn-danger" onclick="cancelOrder('${order.id}')">İptal Et</button>` : ''}
+                                <a href="fatura.html?order=${order.id}" class="btn-sm btn-outline">📄 Fatura</a>
+                                ${['delivered','Teslim Edildi'].includes(order.status) ? `<button class="btn-sm btn-primary" onclick="initiateReturn('${order.id}')">İade Talebi</button>` : ''}
+                                ${['shipped','Kargoda'].includes(order.status) ? `<button class="btn-sm btn-outline" onclick="trackOrder('${order.id}')">Kargo Takip</button>` : ''}
+                                ${['pending','processing','Beklemede','Hazırlanıyor'].includes(order.status) ? `<button class="btn-sm btn-danger" onclick="cancelOrder('${order.id}')">İptal Et</button>` : ''}
                             </div>
                         </div>
                     </div>

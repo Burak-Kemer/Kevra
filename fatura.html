@@ -289,6 +289,27 @@
             .back-btn { width: 34px; height: 34px; font-size: 16px; }
             table th:nth-child(3), table td:nth-child(3) { display: none; }
         }
+
+        /* Loading / wrapper states */
+        #loadingMsg { text-align: center; padding: 60px 20px; color: #999; }
+        #loadingMsg .loading-icon { font-size: 32px; margin-bottom: 12px; }
+        #invoiceWrapper { display: none; }
+        .summary-address { text-align: right; }
+        .summary-items-block { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+        .summary-subtotal { margin-top: 15px; }
+        .summary-discount { color: #e74c3c; }
+        .summary-total { font-weight: 700; font-size: 16px; margin-top: 8px; padding-top: 8px; border-top: 2px solid #c9a87c; }
+        .invoice-status-ready { background: rgba(39,174,96,0.3) !important; }
+        .invoice-status-pending { background: rgba(201,168,124,0.2) !important; }
+
+        /* Invoice header subtext */
+        .invoice-brand-sub { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+        .invoice-header-right { text-align: right; }
+        .invoice-number-sub { margin-top: 6px; font-size: 13px; opacity: 0.8; }
+
+        /* Invoice preview / action states */
+        .invoice-preview-hidden { display: none; }
+        .action-buttons-hidden { display: none; }
     </style>
 </head>
 <body>
@@ -300,55 +321,67 @@
     </header>
     
     <main class="container">
-        <div class="page-header">
-            <h1>Fatura Görüntüle</h1>
-            <p id="orderInfo">Sipariş detayları ve fatura bilgileri</p>
+        <div id="loadingMsg">
+            <p class="loading-icon">⏳</p>
+            <p>Fatura yükleniyor...</p>
         </div>
-        
-        <div class="invoice-card">
-            <div class="invoice-header">
-                <h2>FATURA</h2>
-                <span class="invoice-status" id="invoiceStatus">Hazırlanıyor</span>
+
+        <div id="invoiceWrapper">
+            <div class="page-header">
+                <h1>Fatura</h1>
+                <p id="orderInfo">Sipariş detayları ve fatura bilgileri</p>
             </div>
-            
-            <div class="invoice-body">
-                <div class="invoice-info-grid">
-                    <div class="info-block">
-                        <h4>Sipariş No</h4>
-                        <p id="orderId">-</p>
+
+            <div class="invoice-card">
+                <div class="invoice-header">
+                    <div>
+                        <h2>KEVRA</h2>
+                        <p class="invoice-brand-sub">kevra.com.tr</p>
                     </div>
-                    <div class="info-block">
-                        <h4>Fatura Tarihi</h4>
-                        <p id="invoiceDate">-</p>
-                        <p class="small" id="orderDate">Sipariş: -</p>
-                    </div>
-                    <div class="info-block">
-                        <h4>Fatura No</h4>
-                        <p id="invoiceNumber">-</p>
+                    <div class="invoice-header-right">
+                        <span class="invoice-status" id="invoiceStatus">Hazırlanıyor</span>
+                        <p id="invoiceNumber" class="invoice-number-sub"></p>
                     </div>
                 </div>
-                
-                <div class="invoice-preview" id="invoicePreview">
-                    <div class="placeholder-icon">📄</div>
-                    <div class="placeholder-text">
-                        <h3>Fatura Henüz Hazır Değil</h3>
-                        <p>Faturanız hazır olduğunda burada görüntüleyebilirsiniz.</p>
+
+                <div class="invoice-body">
+                    <div class="invoice-info-grid">
+                        <div class="info-block">
+                            <h4>Sipariş No</h4>
+                            <p id="orderId">-</p>
+                        </div>
+                        <div class="info-block">
+                            <h4>Sipariş Tarihi</h4>
+                            <p id="orderDate">-</p>
+                        </div>
+                        <div class="info-block">
+                            <h4>Ödeme Yöntemi</h4>
+                            <p id="paymentMethod">-</p>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="action-buttons" id="actionButtons" style="display: none;">
-                    <a href="#" class="btn btn-success" id="downloadBtn" download>
-                        💾 Faturayı İndir
-                    </a>
-                    <button class="btn btn-secondary" onclick="window.print()">
-                        🖨️ Yazdır
-                    </button>
-                </div>
-                
-                <div class="order-summary" id="orderSummary">
-                    <h3>Sipariş Özeti</h3>
-                    <div id="summaryContent">
-                        <!-- Dinamik olarak doldurulacak -->
+
+                    <!-- Admin fatura yüklediyse görüntüle -->
+                    <div class="invoice-preview invoice-preview-hidden" id="invoicePreview">
+                        <img id="invoiceImage" src="" alt="Fatura" class="invoice-image">
+                    </div>
+
+                    <!-- Admin fatura yüklememişse bilgilendirme -->
+                    <div id="invoicePending" class="invoice-preview">
+                        <div class="placeholder-icon">📄</div>
+                        <div class="placeholder-text">
+                            <h3>Resmi Fatura Hazırlanıyor</h3>
+                            <p>Siparişiniz işleme alındı. Faturanız e-posta adresinize gönderilecektir.</p>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons action-buttons-hidden" id="actionButtons">
+                        <a href="#" class="btn btn-success" id="downloadBtn" download="fatura.jpg">💾 İndir</a>
+                        <button type="button" class="btn btn-secondary" onclick="window.print()">🖨️ Yazdır</button>
+                    </div>
+
+                    <div class="order-summary" id="orderSummary">
+                        <h3>Sipariş Özeti</h3>
+                        <div id="summaryContent"></div>
                     </div>
                 </div>
             </div>
@@ -364,98 +397,109 @@
     <script src="js/auth.js"></script>
     <script src="js/main.js"></script>
     <script>
-    // Sayfa yüklenince siparişi async yükle
     document.addEventListener('DOMContentLoaded', async function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const orderId   = urlParams.get('order');
+        const orderId = new URLSearchParams(window.location.search).get('order');
+        const loadingEl  = document.getElementById('loadingMsg');
+        const wrapperEl  = document.getElementById('invoiceWrapper');
 
-        if (!orderId) {
-            window.location.href = 'profil.html';
-            return;
-        }
+        if (!orderId) { window.location.href = 'profil.html'; return; }
 
-        // KevraDB veya localStorage'dan siparişi bul
+        // Siparişi bul — KevraDB (Firebase) önce, sonra localStorage
         let order = null;
         try {
             if (window.KevraDB) {
                 const all = await KevraDB.getAllOrders();
                 order = all.find(o => String(o.id) === String(orderId));
             }
-        } catch(e) {}
+        } catch(e) { /* firebase bağlantısı yoksa devam */ }
 
         if (!order) {
             const local = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
             order = local.find(o => String(o.id) === String(orderId));
         }
 
+        // Sipariş bulunamadı
         if (!order) {
-            document.getElementById('loadingMsg').innerHTML =
-                '<p style="color:#e74c3c; text-align:center;">Sipariş bulunamadı. <a href="profil.html" style="color:#c9a87c;">Profilinize dönün</a></p>';
+            loadingEl.innerHTML = '<p>Sipariş bulunamadı.</p><a href="profil.html">← Profilinize dönün</a>';
             return;
         }
 
-        // --- Müşteri bilgilerini normalize et (eski/yeni format) ---
-        const customer = order.customer || order.customerInfo || {};
-        const firstName = customer.firstName || '';
-        const lastName  = customer.lastName  || '';
-        const email     = customer.email     || '';
-        const phone     = customer.phone     || '';
-        const city      = customer.city      || (customer.address && customer.address.city) || '';
-        const address   = customer.address   || 
-                          (order.customer ? `${customer.address || ''} ${city}` : '');
-        const addressStr = typeof address === 'string' ? address :
-                           `${address.street || ''} ${address.district || ''} / ${address.city || ''}`;
+        // Müşteri bilgisi — hem yeni (customer) hem eski (customerInfo) format
+        const c         = order.customer || order.customerInfo || {};
+        const firstName = c.firstName || '';
+        const lastName  = c.lastName  || '';
+        const email     = c.email     || '';
+        const phone     = c.phone     || '';
+        const addrRaw   = c.address   || '';
+        const city      = c.city      || '';
+        const addressStr = typeof addrRaw === 'object'
+            ? [addrRaw.street, addrRaw.district, addrRaw.city].filter(Boolean).join(' / ')
+            : [addrRaw, city].filter(Boolean).join(', ');
 
-        // --- Fiyat totals normalize et ---
-        const totals  = order.totals  || {};
+        // Fiyat normalizasyonu
+        const totals   = order.totals || {};
         const subtotal = order.subtotal || totals.subtotal || 0;
-        const shipping = (order.shipping !== undefined ? order.shipping : totals.shipping) || 0;
+        const shipping = order.shipping !== undefined ? order.shipping : (totals.shipping || 0);
         const discount = order.discount || totals.discount || 0;
         const total    = order.total    || totals.total    || (subtotal - discount + shipping);
 
-        // Başlık
-        document.getElementById('orderId').textContent    = '#' + order.id;
-        document.getElementById('orderDate').textContent  = 'Sipariş: ' + 
-            new Date(order.createdAt).toLocaleDateString('tr-TR', {day:'numeric',month:'long',year:'numeric'});
+        // Ödeme yöntemi
+        const payLabels = { credit_card:'Kredi/Banka Kartı', bank_transfer:'Banka Havalesi', cash_on_delivery:'Kapıda Ödeme' };
+        const payLabel  = payLabels[order.paymentMethod] || order.paymentMethod || '-';
 
-        // Fatura durumu
-        if (order.invoice && order.invoice.url) {
-            document.getElementById('invoiceStatus').textContent = 'Hazır';
-            document.getElementById('invoiceStatus').style.background = 'rgba(39, 174, 96, 0.3)';
-            document.getElementById('invoiceDate').textContent   = new Date(order.invoice.uploadedAt).toLocaleDateString('tr-TR');
-            document.getElementById('invoiceNumber').textContent = order.invoice.number || '-';
-            document.getElementById('invoicePreview').innerHTML  = `<img src="${order.invoice.url}" alt="Fatura" class="invoice-image" id="invoiceImage">`;
-            document.getElementById('downloadBtn').href          = order.invoice.url;
-            document.getElementById('actionButtons').style.display = 'flex';
+        // Temel alanları doldur
+        document.getElementById('orderId').textContent      = '#' + order.id;
+        document.getElementById('orderDate').textContent    = order.createdAt
+            ? new Date(order.createdAt).toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'})
+            : '-';
+        document.getElementById('paymentMethod').textContent = payLabel;
+
+        // Fatura dosyası — admin iki farklı yerden kaydedebilir
+        const invoiceUrl    = (order.invoice && order.invoice.url) || order.invoiceUrl || null;
+        const invoiceNumber = (order.invoice && order.invoice.number) || order.invoiceNumber || null;
+        const uploadedAt    = (order.invoice && order.invoice.uploadedAt) || null;
+        const statusEl      = document.getElementById('invoiceStatus');
+
+        if (invoiceUrl) {
+            statusEl.textContent = 'Hazır';
+            statusEl.classList.add('invoice-status-ready');
+            document.getElementById('invoiceNumber').textContent = invoiceNumber ? 'No: ' + invoiceNumber : '';
+            document.getElementById('invoicePreview').innerHTML  = '<img src="' + invoiceUrl + '" alt="Fatura" class="invoice-image">';
+            document.getElementById('invoicePreview').classList.remove('invoice-preview-hidden');
+            document.getElementById('invoicePending').style.display = 'none';
+            document.getElementById('downloadBtn').href = invoiceUrl;
+            document.getElementById('actionButtons').classList.remove('action-buttons-hidden');
         } else {
-            document.getElementById('invoiceStatus').textContent = 'Hazırlanıyor';
-            document.getElementById('invoiceStatus').style.background = 'rgba(201,168,124,0.2)';
-            document.getElementById('invoiceDate').textContent   = '-';
-            document.getElementById('invoiceNumber').textContent = '-';
+            statusEl.textContent = 'Hazırlanıyor';
+            statusEl.classList.add('invoice-status-pending');
+            document.getElementById('invoiceNumber').textContent = '';
         }
 
         // Sipariş özeti
         const items = order.items || [];
-        document.getElementById('summaryContent').innerHTML = `
-            <div class="summary-row"><span>Müşteri</span><span>${firstName} ${lastName}</span></div>
-            <div class="summary-row"><span>E-posta</span><span>${email}</span></div>
-            <div class="summary-row"><span>Telefon</span><span>${phone}</span></div>
-            <div class="summary-row"><span>Adres</span><span style="text-align:right">${addressStr}</span></div>
-            <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
-                ${items.map(item => `
-                    <div class="summary-row">
-                        <span>${item.name || ''} x${item.quantity || 1}${item.size ? ' (' + item.size + ')' : ''}</span>
-                        <span>₺${((item.price || 0) * (item.quantity || 1)).toLocaleString('tr-TR')}</span>
-                    </div>
-                `).join('')}
-            </div>
-            <div class="summary-row" style="margin-top:15px"><span>Ara Toplam</span><span>₺${subtotal.toLocaleString('tr-TR')}</span></div>
-            <div class="summary-row"><span>Kargo</span><span>${shipping === 0 ? 'Ücretsiz' : '₺' + shipping.toLocaleString('tr-TR')}</span></div>
-            ${discount > 0 ? `<div class="summary-row"><span>İndirim</span><span style="color:#e74c3c">-₺${discount.toLocaleString('tr-TR')}</span></div>` : ''}
-            <div class="summary-row" style="font-weight:700;font-size:16px;margin-top:8px;padding-top:8px;border-top:2px solid #c9a87c">
-                <span>Toplam</span><span>₺${total.toLocaleString('tr-TR')}</span>
-            </div>
-        `;
+        document.getElementById('summaryContent').innerHTML =
+            '<div class="summary-row"><span>Müşteri</span><span>' + firstName + ' ' + lastName + '</span></div>' +
+            '<div class="summary-row"><span>E-posta</span><span>' + (email || '-') + '</span></div>' +
+            '<div class="summary-row"><span>Telefon</span><span>' + (phone || '-') + '</span></div>' +
+            '<div class="summary-row"><span>Adres</span><span class="summary-address">' + (addressStr || '-') + '</span></div>' +
+            '<div class="summary-items-block">' +
+                items.map(function(item) {
+                    return '<div class="summary-row"><span>' +
+                        (item.name || '') + ' x' + (item.quantity || 1) +
+                        (item.size ? ' (' + item.size + ')' : '') +
+                        '</span><span>₺' +
+                        ((item.price || 0) * (item.quantity || 1)).toLocaleString('tr-TR') +
+                        '</span></div>';
+                }).join('') +
+            '</div>' +
+            '<div class="summary-row summary-subtotal"><span>Ara Toplam</span><span>₺' + subtotal.toLocaleString('tr-TR') + '</span></div>' +
+            '<div class="summary-row"><span>Kargo</span><span>' + (shipping === 0 ? 'Ücretsiz' : '₺' + shipping.toLocaleString('tr-TR')) + '</span></div>' +
+            (discount > 0 ? '<div class="summary-row"><span>İndirim</span><span class="summary-discount">-₺' + discount.toLocaleString('tr-TR') + '</span></div>' : '') +
+            '<div class="summary-row summary-total"><span>Toplam</span><span>₺' + total.toLocaleString('tr-TR') + '</span></div>';
+
+        // Yükleme mesajını gizle, içeriği göster
+        loadingEl.style.display  = 'none';
+        wrapperEl.style.display  = 'block';
     });
     </script>
 </body>
