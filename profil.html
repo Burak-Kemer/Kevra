@@ -28,59 +28,50 @@
         /* ================= HEADER - index.html ile birebir aynı ================= */
         .header {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             height: 70px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
             padding: 0 40px;
+            gap: 20px;
             z-index: 9999;
-            transition: all 0.4s ease;
-            background: rgba(255, 255, 255, 0.98);
+            background: rgba(255,255,255,0.98);
             box-shadow: 0 2px 20px rgba(0,0,0,0.08);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(0,0,0,0.08);
+            transition: all 0.4s ease;
         }
         .header.scrolled {
-            background: rgba(255, 255, 255, 0.98);
+            background: rgba(255,255,255,0.98);
             box-shadow: 0 2px 20px rgba(0,0,0,0.1);
         }
         .header-left, .header-right {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 8px;
+            flex: 1;
         }
+        .header-right { justify-content: flex-end; }
         .header-center {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .header-btn {
-            padding: 10px 20px;
+            padding: 8px 14px;
             background: transparent;
             border: 1px solid rgba(0,0,0,0.1);
             color: #1a1a1a;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
+            font-size: 13px;
             font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+            white-space: nowrap;
             -webkit-tap-highlight-color: transparent;
         }
-        .header.scrolled .header-btn {
-            color: #1a1a1a;
-            border-color: rgba(0,0,0,0.1);
-        }
-        .header-btn:hover {
-            background: rgba(255,255,255,0.15);
-            transform: translateY(-2px);
-        }
-        .header.scrolled .header-btn:hover {
-            background: rgba(0,0,0,0.05);
-        }
+        .header-btn:hover { background: rgba(0,0,0,0.05); transform: translateY(-1px); }
         .brand-logo {
             display: flex;
             flex-direction: column;
@@ -90,73 +81,62 @@
             line-height: 1;
             transition: transform 0.3s ease;
         }
-        .header.scrolled .brand-logo {
-            color: #1a1a1a;
-        }
-        .brand-logo:hover {
-            transform: scale(1.05);
-        }
+        .brand-logo:hover { transform: scale(1.05); }
         .brand-arabic {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
-            margin-bottom: -6px;
+            margin-bottom: -4px;
         }
         .brand-text {
             font-family: 'Playfair Display', serif;
-            font-size: 28px;
+            font-size: 22px;
             font-weight: 600;
-            letter-spacing: 10px;
+            letter-spacing: 6px;
             margin-top: 2px;
         }
         .header-link {
             color: #1a1a1a;
             text-decoration: none;
-            font-size: 14px;
+            font-size: 13px;
             transition: color 0.3s;
+            display: none;
         }
-        .header.scrolled .header-link {
-            color: #1a1a1a;
+        @media (min-width: 769px) {
+            .header-link { display: inline; }
         }
         .header-icon {
             position: relative;
-            padding: 10px;
+            padding: 8px;
             background: transparent;
             border: 1px solid rgba(0,0,0,0.1);
             color: #1a1a1a;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 16px;
             transition: all 0.3s;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
+            min-width: 36px;
+            min-height: 36px;
+            justify-content: center;
             -webkit-tap-highlight-color: transparent;
         }
-        .header.scrolled .header-icon {
-            color: #1a1a1a;
-            border-color: rgba(0,0,0,0.1);
-        }
-        .header-icon:hover {
-            background: rgba(255,255,255,0.15);
-        }
-        .header.scrolled .header-icon:hover {
-            background: rgba(0,0,0,0.05);
-        }
+        .header-icon:hover { background: rgba(0,0,0,0.05); }
         #cartCount, #favCount {
             position: absolute;
-            top: -8px;
-            right: -8px;
+            top: -6px;
+            right: -6px;
             background: #e74c3c;
             color: white;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
-            width: 22px;
-            height: 22px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid rgba(255,255,255,0.3);
         }
 
         /* ================= DROPDOWN STILLERI style.css'TEN GELIYOR ================= */
