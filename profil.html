@@ -29,11 +29,11 @@
         .header {
             position: fixed;
             top: 0; left: 0; right: 0;
-            height: 70px;
+            height: 60px;
             display: flex;
             align-items: center;
-            padding: 0 40px;
-            gap: 20px;
+            justify-content: space-between;
+            padding: 0 15px;
             z-index: 9999;
             background: rgba(255,255,255,0.98);
             box-shadow: 0 2px 20px rgba(0,0,0,0.08);
@@ -144,59 +144,8 @@
         /* #userMenuContainer, .user-dropdown, .user-menu-btn, .user-dropdown-menu */
         /* gibi stiller artik style.css dosyasindan geliyor */
 
-        /* Side Menu */
-        .side-menu {
-            position: fixed;
-            top: 0;
-            left: -100%;
-            width: 320px;
-            max-width: 85vw;
-            height: 100vh;
-            background: white;
-            z-index: 10001;
-            transition: left 0.4s ease;
-            overflow-y: auto;
-            box-shadow: 5px 0 30px rgba(0,0,0,0.1);
-        }
-        .side-menu.active { left: 0; }
-        .menu-header {
-            padding: 30px;
-            background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
-            color: white;
-        }
-        .menu-header h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-        .menu-header p { font-size: 13px; opacity: 0.8; }
-        .menu-links { padding: 20px 0; }
-        .menu-link {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 16px 30px;
-            color: #333;
-            text-decoration: none;
-            font-size: 15px;
-            transition: all 0.3s;
-            border-bottom: 1px solid #f5f5f5;
-        }
-        .menu-link:hover {
-            background: #f8f5f2;
-            color: #c9a87c;
-            padding-left: 35px;
-        }
-        .menu-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 10000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-        }
-        .menu-overlay.active { opacity: 1; visibility: visible; }
+        /* Side Menu + Overlay — style.css'ten geliyor */
+        .menu-link--sale { color: #e74c3c; }
 
         /* Search Modal */
         .search-modal {
@@ -368,7 +317,7 @@
 
         /* PAGE CONTENT */
         .page-content {
-            margin-top: 90px;
+            margin-top: 80px;
             padding: 40px;
             max-width: 1200px;
             margin-left: auto;
@@ -1259,32 +1208,25 @@
     </header>
 
     <!-- SIDE MENU -->
-    <div class="menu-overlay" id="menuOverlay"></div>
     <div class="side-menu" id="sideMenu">
-        <div class="menu-header">
-            <h2>KEVRA</h2>
-            <p>Zarafetin adresi</p>
+        <div class="side-menu-header">
+            <h3>KEVRA</h3>
+            <button type="button" id="closeMenuBtn">✖</button>
         </div>
-        <div class="menu-links">
-            <a href="index.html" class="menu-link">🏠 Ana Sayfa</a>
-            <a href="shop.html" class="menu-link">🛍️ Tüm Ürünler</a>
-            <a href="shop.html?category=elbise" class="menu-link">👗 Elbiseler</a>
-            <a href="shop.html?category=ust" class="menu-link">👚 Üst Giyim</a>
-            <a href="shop.html?category=alt" class="menu-link">👖 Alt Giyim</a>
-            <a href="shop.html?category=triko" class="menu-link">🧶 Triko</a>
-            <a href="shop.html?category=dis" class="menu-link">🧥 Dış Giyim</a>
-            <a href="shop.html?category=aksesuar" class="menu-link">💎 Aksesuar</a>
-            <a href="shop.html?category=indirim" class="menu-link">🏷️ İndirimli Ürünler</a>
-            <a href="shop.html?category=yeni" class="menu-link">✨ Yeni Gelenler</a>
-            <div style="height: 1px; background: #eee; margin: 10px 0;"></div>
-            <a href="hakkimizda.html" class="menu-link">ℹ️ Hakkımızda</a>
-            <a href="iletisim.html" class="menu-link">📞 İletişim</a>
-            <a href="gizlilik.html" class="menu-link">🔒 Gizlilik Politikası</a>
-            <a href="iade-kosullari.html" class="menu-link">↩️ İade Koşulları</a>
-            <a href="kargo-bilgisi.html" class="menu-link">🚚 Kargo Bilgisi</a>
-            <a href="sss.html" class="menu-link">❓ Sıkça Sorulan Sorular</a>
+        <div class="side-menu-content">
+            <a href="index.html" class="menu-link">Ana Sayfa</a>
+            <a href="shop.html" class="menu-link">Tüm Ürünler</a>
+            <a href="shop.html?category=yeni" class="menu-link">Yeni Sezon</a>
+            <a href="shop.html?category=elbise" class="menu-link">Elbiseler</a>
+            <a href="shop.html?category=ust" class="menu-link">Üst Giyim</a>
+            <a href="shop.html?category=alt" class="menu-link">Alt Giyim</a>
+            <a href="shop.html?category=triko" class="menu-link">Triko</a>
+            <a href="shop.html?category=dis" class="menu-link">Dış Giyim</a>
+            <a href="shop.html?category=aksesuar" class="menu-link">Aksesuar</a>
+            <a href="shop.html?category=indirim" class="menu-link menu-link--sale">İndirim</a>
         </div>
     </div>
+    <div class="menu-overlay" id="menuOverlay"></div>
 
     <!-- SEARCH MODAL -->
     <div class="search-modal" id="searchModal">
