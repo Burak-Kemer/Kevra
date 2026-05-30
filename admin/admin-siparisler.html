@@ -259,29 +259,20 @@
             font-weight: 600;
         }
         
-        .status-badge.pending {
-            background: #fff3cd;
-            color: #856404;
+        .status-badge.pending, .status-badge.Beklemede {
+            background: #fff3cd; color: #856404;
         }
-        
-        .status-badge.processing {
-            background: #d1ecf1;
-            color: #0c5460;
+        .status-badge.processing, .status-badge.Hazırlanıyor {
+            background: #d1ecf1; color: #0c5460;
         }
-        
-        .status-badge.shipped {
-            background: #d4edda;
-            color: #155724;
+        .status-badge.shipped, .status-badge.Kargoda {
+            background: #cfe2ff; color: #084298;
         }
-        
-        .status-badge.delivered {
-            background: #d4edda;
-            color: #155724;
+        .status-badge.delivered, .status-badge.Teslim-Edildi {
+            background: #d4edda; color: #155724;
         }
-        
-        .status-badge.cancelled {
-            background: #f8d7da;
-            color: #721c24;
+        .status-badge.cancelled, .status-badge.İptal-Edildi {
+            background: #f8d7da; color: #721c24;
         }
         
         .order-total {
@@ -726,77 +717,132 @@
         let allOrders = [];
         let currentOrderId = null;
         let uploadedInvoice = null;
-        
+
+        /* ── Yardımcı: sipariş verisini normalize et ── */
+        function normalizeOrder(o) {
+            // customer bilgisi: KevraDB → o.customer, eski format → o.customerInfo
+            const c = o.customer || o.customerInfo || {};
+            const addr = c.address || {};
+            return {
+                id:             o.id,
+                createdAt:      o.createdAt,
+                status:         o.status         || 'Beklemede',
+                shippingStatus: o.shippingStatus  || 'Hazırlanıyor',
+                paymentMethod:  o.paymentMethod   || '-',
+                notes:          o.notes           || '',
+                invoiceUrl:     (o.invoice && o.invoice.url) || o.invoiceUrl || null,
+                total:          o.total           || (o.totals && o.totals.total) || 0,
+                subtotal:       o.subtotal        || (o.totals && o.totals.subtotal) || 0,
+                discount:       o.discount        || 0,
+                items:          o.items           || [],
+                customer: {
+                    firstName: c.firstName || '',
+                    lastName:  c.lastName  || '',
+                    email:     c.email     || '',
+                    phone:     c.phone     || '',
+                    address:   typeof addr === 'string' ? addr
+                               : [addr.street || c.address || '', addr.district || c.district || '', addr.city || c.city || ''].filter(Boolean).join(', '),
+                    city:      addr.city || c.city || ''
+                }
+            };
+        }
+
+        /* ── Durum metinleri ── */
+        const STATUS_LABELS = {
+            'pending':'Bekliyor','Beklemede':'Bekliyor',
+            'processing':'İşleniyor','Hazırlanıyor':'Hazırlanıyor',
+            'shipped':'Kargoda','Kargoda':'Kargoda',
+            'delivered':'Teslim Edildi','Teslim Edildi':'Teslim Edildi',
+            'cancelled':'İptal Edildi','İptal Edildi':'İptal Edildi'
+        };
+        const SHIP_LABELS = {
+            'preparing':'Hazırlanıyor','Hazırlanıyor':'Hazırlanıyor',
+            'shipped':'Yolda','Kargoya Verildi':'Yolda','Kargoda':'Yolda',
+            'delivered':'Teslim Edildi','Teslim Edildi':'Teslim Edildi'
+        };
+        function statusText(s)  { return STATUS_LABELS[s] || s || '-'; }
+        function shipText(s)    { return SHIP_LABELS[s]   || s || '-'; }
+        function statusClass(s) {
+            const map = {'pending':'pending','Beklemede':'pending','processing':'processing','Hazırlanıyor':'processing','shipped':'shipped','Kargoda':'shipped','delivered':'delivered','Teslim Edildi':'delivered','cancelled':'cancelled','İptal Edildi':'cancelled'};
+            return map[s] || 'pending';
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             loadOrders();
         });
-        
-        function loadOrders() {
-            allOrders = DB.getOrders();
+
+        async function loadOrders() {
+            try {
+                const raw = await KevraDB.getAllOrders();
+                allOrders = raw.map(normalizeOrder);
+            } catch(e) {
+                const raw = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+                allOrders = raw.map(normalizeOrder);
+            }
             updateStats();
             renderOrders(allOrders);
         }
-        
+
         function updateStats() {
-            const stats = DB.getStats();
-            document.getElementById('totalOrders').textContent = stats.totalOrders;
-            document.getElementById('pendingOrders').textContent = stats.pendingOrders;
-            document.getElementById('todayOrders').textContent = stats.todayOrders;
-            document.getElementById('totalRevenue').textContent = '₺' + stats.totalRevenue.toLocaleString();
+            const today = new Date().toISOString().split('T')[0];
+            const pending  = allOrders.filter(o => ['pending','Beklemede','processing','Hazırlanıyor'].includes(o.status)).length;
+            const todayOrd = allOrders.filter(o => (o.createdAt || '').startsWith(today)).length;
+            const revenue  = allOrders.filter(o => !['cancelled','İptal Edildi'].includes(o.status))
+                                      .reduce((s,o) => s + (o.total || 0), 0);
+            document.getElementById('totalOrders').textContent   = allOrders.length;
+            document.getElementById('pendingOrders').textContent = pending;
+            document.getElementById('todayOrders').textContent   = todayOrd;
+            document.getElementById('totalRevenue').textContent  = '₺' + revenue.toLocaleString('tr-TR');
         }
         
         function renderOrders(orders) {
             const tbody = document.getElementById('ordersTable');
-            
-            if (orders.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">Henüz sipariş bulunmuyor</td></tr>';
+            if (!orders || orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Henüz sipariş bulunmuyor</td></tr>';
                 return;
             }
-            
-            orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-            
-            tbody.innerHTML = orders.map(order => {
-                const date = new Date(order.createdAt).toLocaleDateString('tr-TR');
+            const sorted = [...orders].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+            tbody.innerHTML = sorted.map(order => {
+                const date = order.createdAt ? new Date(order.createdAt).toLocaleDateString('tr-TR') : '-';
+                const sc   = statusClass(order.status);
                 return `
                     <tr>
                         <td><span class="order-id">#${order.id}</span></td>
                         <td>
                             <div class="customer-info">
-                                <span class="customer-name">${order.customerInfo.firstName} ${order.customerInfo.lastName}</span>
-                                <span class="customer-contact">${order.customerInfo.phone}</span>
+                                <span class="customer-name">${order.customer.firstName} ${order.customer.lastName}</span>
+                                <span class="customer-contact">${order.customer.phone}</span>
                             </div>
                         </td>
                         <td>${date}</td>
-                        <td><span class="status-badge ${order.status}">${DB.getStatusText(order.status)}</span></td>
-                        <td><span style="font-size: 13px;">${DB.getShippingText(order.shippingStatus)}</span></td>
-                        <td class="order-total">₺${order.totals.total.toLocaleString()}</td>
+                        <td><span class="status-badge ${sc}">${statusText(order.status)}</span></td>
+                        <td><span style="font-size:13px;">${shipText(order.shippingStatus)}</span></td>
+                        <td class="order-total">₺${(order.total || 0).toLocaleString('tr-TR')}</td>
                         <td>
                             <div class="action-btns">
-                                <button class="action-btn view" onclick="viewOrder('${order.id}')" title="Detay">👁️</button>
-                                <button class="action-btn edit" onclick="editOrder('${order.id}')" title="Düzenle">✏️</button>
+                                <button class="action-btn view"    onclick="viewOrder('${order.id}')"    title="Detay">👁️</button>
+                                <button class="action-btn edit"    onclick="editOrder('${order.id}')"    title="Düzenle">✏️</button>
                                 <button class="action-btn invoice" onclick="uploadInvoice('${order.id}')" title="Fatura">📄</button>
                             </div>
                         </td>
-                    </tr>
-                `;
+                    </tr>`;
             }).join('');
         }
         
         function filterOrders() {
             const status = document.getElementById('statusFilter').value;
-            const date = document.getElementById('dateFilter').value;
+            const date   = document.getElementById('dateFilter').value;
             const search = document.getElementById('searchFilter').value.toLowerCase();
-            
+
             let filtered = allOrders;
-            
-            if (status !== 'all') filtered = filtered.filter(o => o.status === status);
-            if (date) filtered = filtered.filter(o => new Date(o.createdAt).toISOString().split('T')[0] === date);
+            if (status !== 'all') filtered = filtered.filter(o => statusClass(o.status) === status);
+            if (date) filtered = filtered.filter(o => (o.createdAt || '').startsWith(date));
             if (search) {
-                filtered = filtered.filter(o => 
-                    o.id.toLowerCase().includes(search) ||
-                    o.customerInfo.firstName.toLowerCase().includes(search) ||
-                    o.customerInfo.lastName.toLowerCase().includes(search) ||
-                    o.customerInfo.phone.includes(search)
+                filtered = filtered.filter(o =>
+                    (o.id || '').toLowerCase().includes(search) ||
+                    (o.customer.firstName || '').toLowerCase().includes(search) ||
+                    (o.customer.lastName  || '').toLowerCase().includes(search) ||
+                    (o.customer.phone     || '').includes(search)
                 );
             }
             
@@ -811,84 +857,88 @@
         }
         
         function viewOrder(orderId) {
-            const order = DB.getOrder(orderId);
+            const order = allOrders.find(o => o.id === orderId);
             if (!order) return;
-            
             currentOrderId = orderId;
             const modalBody = document.getElementById('orderModalBody');
-            
+            const payMap = { 'credit_card':'Kredi Kartı', 'bank_transfer':'Banka Havalesi', 'cash_on_delivery':'Kapıda Ödeme' };
             modalBody.innerHTML = `
                 <div class="order-detail-section">
                     <h4>📦 Sipariş Bilgileri</h4>
                     <div class="detail-row"><span class="detail-label">Sipariş No</span><span class="detail-value">#${order.id}</span></div>
-                    <div class="detail-row"><span class="detail-label">Tarih</span><span class="detail-value">${new Date(order.createdAt).toLocaleString('tr-TR')}</span></div>
-                    <div class="detail-row"><span class="detail-label">Durum</span><span class="detail-value">${DB.getStatusText(order.status)}</span></div>
-                    <div class="detail-row"><span class="detail-label">Kargo Durumu</span><span class="detail-value">${DB.getShippingText(order.shippingStatus)}</span></div>
+                    <div class="detail-row"><span class="detail-label">Tarih</span><span class="detail-value">${order.createdAt ? new Date(order.createdAt).toLocaleString('tr-TR') : '-'}</span></div>
+                    <div class="detail-row"><span class="detail-label">Durum</span><span class="detail-value">${statusText(order.status)}</span></div>
+                    <div class="detail-row"><span class="detail-label">Kargo Durumu</span><span class="detail-value">${shipText(order.shippingStatus)}</span></div>
+                    <div class="detail-row"><span class="detail-label">Ödeme Yöntemi</span><span class="detail-value">${payMap[order.paymentMethod] || order.paymentMethod || '-'}</span></div>
                 </div>
                 <div class="order-detail-section">
                     <h4>👤 Müşteri Bilgileri</h4>
-                    <div class="detail-row"><span class="detail-label">Ad Soyad</span><span class="detail-value">${order.customerInfo.firstName} ${order.customerInfo.lastName}</span></div>
-                    <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">${order.customerInfo.email}</span></div>
-                    <div class="detail-row"><span class="detail-label">Telefon</span><span class="detail-value">${order.customerInfo.phone}</span></div>
-                    <div class="detail-row"><span class="detail-label">Adres</span><span class="detail-value">${order.customerInfo.address.street}, ${order.customerInfo.address.district}/${order.customerInfo.address.city}</span></div>
+                    <div class="detail-row"><span class="detail-label">Ad Soyad</span><span class="detail-value">${order.customer.firstName} ${order.customer.lastName}</span></div>
+                    <div class="detail-row"><span class="detail-label">E-posta</span><span class="detail-value">${order.customer.email || '-'}</span></div>
+                    <div class="detail-row"><span class="detail-label">Telefon</span><span class="detail-value">${order.customer.phone || '-'}</span></div>
+                    <div class="detail-row"><span class="detail-label">Adres</span><span class="detail-value">${order.customer.address || '-'}</span></div>
                 </div>
                 <div class="order-detail-section">
                     <h4>🛍️ Ürünler</h4>
                     <div class="items-list">
-                        ${order.items.map(item => `
+                        ${(order.items || []).map(item => `
                             <div class="detail-item">
-                                <span>${item.name} x${item.quantity}</span>
-                                <span>₺${(item.price * item.quantity).toLocaleString()}</span>
-                            </div>
-                        `).join('')}
-                        <div class="detail-item" style="border-top: 2px solid var(--border); margin-top: 10px; padding-top: 15px; font-weight: 700;">
-                            <span>Toplam</span>
-                            <span>₺${order.totals.total.toLocaleString()}</span>
+                                <span>${item.name} ${item.size ? '('+item.size+')' : ''} x${item.quantity}</span>
+                                <span>₺${((item.price||0) * (item.quantity||1)).toLocaleString('tr-TR')}</span>
+                            </div>`).join('')}
+                        ${order.discount > 0 ? `<div class="detail-item"><span>İndirim</span><span style="color:#27ae60">-₺${order.discount.toLocaleString('tr-TR')}</span></div>` : ''}
+                        <div class="detail-item" style="border-top:2px solid var(--border);margin-top:10px;padding-top:15px;font-weight:700;">
+                            <span>Toplam</span><span>₺${(order.total||0).toLocaleString('tr-TR')}</span>
                         </div>
                     </div>
                 </div>
-                ${order.invoice.url ? `
+                ${order.invoiceUrl ? `
                     <div class="order-detail-section">
                         <h4>📄 Fatura</h4>
-                        <a href="${order.invoice.url}" target="_blank" class="btn btn-primary">Faturayı Görüntüle</a>
-                    </div>
-                ` : ''}
+                        <a href="${order.invoiceUrl}" target="_blank" class="btn btn-primary">Faturayı Görüntüle</a>
+                    </div>` : ''}
+                ${order.notes ? `<div class="order-detail-section"><h4>📝 Notlar</h4><p>${order.notes}</p></div>` : ''}
             `;
-            
             document.getElementById('orderModal').classList.add('active');
         }
-        
+
         function editOrder(orderId) {
-            const order = DB.getOrder(orderId);
+            const order = allOrders.find(o => o.id === orderId);
             if (!order) return;
-            
             currentOrderId = orderId;
-            document.getElementById('orderStatus').value = order.status;
-            document.getElementById('shippingStatus').value = order.shippingStatus || 'preparing';
-            document.getElementById('orderNotes').value = order.notes || '';
+            // Map stored status to select option value
+            const statusVal = statusClass(order.status);
+            const shipVal   = (['preparing','shipped','delivered'].includes(order.shippingStatus)) ? order.shippingStatus
+                              : ({'Hazırlanıyor':'preparing','Kargoya Verildi':'shipped','Kargoda':'shipped','Teslim Edildi':'delivered'}[order.shippingStatus] || 'preparing');
+            document.getElementById('orderStatus').value   = statusVal;
+            document.getElementById('shippingStatus').value = shipVal;
+            document.getElementById('orderNotes').value    = order.notes || '';
             document.getElementById('editModal').classList.add('active');
         }
-        
-        function saveOrderStatus() {
-            const status = document.getElementById('orderStatus').value;
-            const shippingStatus = document.getElementById('shippingStatus').value;
-            const notes = document.getElementById('orderNotes').value;
-            
-            const result = DB.updateOrderStatus(currentOrderId, status, shippingStatus);
-            
-            if (result.success) {
-                let orders = DB.getOrders();
-                const orderIndex = orders.findIndex(o => o.id === currentOrderId);
-                if (orderIndex !== -1) {
-                    orders[orderIndex].notes = notes;
-                    localStorage.setItem('kevra_orders', JSON.stringify(orders));
-                }
-                
+
+        async function saveOrderStatus() {
+            const statusVal  = document.getElementById('orderStatus').value;
+            const shipVal    = document.getElementById('shippingStatus').value;
+            const notes      = document.getElementById('orderNotes').value;
+
+            // Convert English code → Turkish label
+            const statusMap = { pending:'Beklemede', processing:'Hazırlanıyor', shipped:'Kargoda', delivered:'Teslim Edildi', cancelled:'İptal Edildi' };
+            const shipMap   = { preparing:'Hazırlanıyor', shipped:'Kargoya Verildi', delivered:'Teslim Edildi' };
+            const newStatus = statusMap[statusVal] || statusVal;
+            const newShip   = shipMap[shipVal]     || shipVal;
+
+            try {
+                await KevraDB.updateOrderStatus(currentOrderId, newStatus, newShip);
+                // Save notes separately in localStorage
+                const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+                const idx = orders.findIndex(o => o.id === currentOrderId);
+                if (idx !== -1) { orders[idx].notes = notes; localStorage.setItem('kevra_orders', JSON.stringify(orders)); }
+
                 showToast('Sipariş durumu güncellendi!', 'success');
                 closeEditModal();
-                loadOrders();
-            } else {
-                showToast(result.message, 'error');
+                await loadOrders();
+            } catch(e) {
+                showToast('Güncelleme hatası: ' + e.message, 'error');
             }
         }
         
@@ -921,25 +971,32 @@
             reader.readAsDataURL(file);
         }
         
-        function saveInvoice() {
+        async function saveInvoice() {
             if (!uploadedInvoice) {
                 showToast('Lütfen önce fatura yükleyin!', 'error');
                 return;
             }
-            
-            const invoiceData = {
-                number: 'INV-' + Date.now().toString().slice(-6),
-                url: uploadedInvoice.data
-            };
-            
-            const result = DB.uploadInvoice(currentOrderId, invoiceData);
-            
-            if (result.success) {
+            try {
+                // Save invoice URL directly on the order in localStorage (and Firestore if available)
+                const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+                const idx = orders.findIndex(o => o.id === currentOrderId);
+                if (idx !== -1) {
+                    orders[idx].invoiceUrl = uploadedInvoice.data;
+                    orders[idx].invoiceNumber = 'INV-' + Date.now().toString().slice(-6);
+                    localStorage.setItem('kevra_orders', JSON.stringify(orders));
+                }
+                // Firestore update if available
+                if (window.KevraFirebase && window.KevraFirebase.ready()) {
+                    await window.KevraFirebase.db.collection('orders').doc(currentOrderId).update({
+                        invoiceUrl: uploadedInvoice.data,
+                        invoiceNumber: orders[idx]?.invoiceNumber || ''
+                    });
+                }
                 showToast('Fatura başarıyla yüklendi!', 'success');
                 closeInvoiceModal();
-                loadOrders();
-            } else {
-                showToast(result.message, 'error');
+                await loadOrders();
+            } catch(e) {
+                showToast('Fatura yükleme hatası: ' + e.message, 'error');
             }
         }
         
@@ -961,8 +1018,8 @@
             document.getElementById('invoiceModal').classList.remove('active');
         }
         
-        function refreshOrders() {
-            loadOrders();
+        async function refreshOrders() {
+            await loadOrders();
             showToast('Sipariş listesi güncellendi!');
         }
         
