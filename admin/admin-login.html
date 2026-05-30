@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KEVRA Admin — Giriş</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            background: #141414;
+            border: 1px solid #242424;
+            border-radius: 20px;
+            padding: 52px 44px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+        }
+        .logo { text-align: center; margin-bottom: 40px; }
+        .logo h1 { font-size: 30px; font-weight: 800; letter-spacing: 5px; color: #fff; }
+        .logo span { font-size: 11px; color: #555; letter-spacing: 3px; text-transform: uppercase; display: block; margin-top: 4px; }
+        h2 { font-size: 20px; color: #fff; margin-bottom: 6px; }
+        .subtitle { font-size: 14px; color: #555; margin-bottom: 32px; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-size: 12px; color: #777; margin-bottom: 8px; letter-spacing: 0.8px; text-transform: uppercase; }
+        input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 14px 16px;
+            background: #0d0d0d;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+        input:focus { border-color: #c9a87c; }
+        input::placeholder { color: #3a3a3a; }
+        .error-msg {
+            display: none;
+            background: rgba(220,38,38,0.1);
+            border: 1px solid rgba(220,38,38,0.3);
+            color: #f87171;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+        .error-msg.show { display: block; }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: #c9a87c;
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 4px;
+        }
+        .btn:hover { background: #b8956a; }
+        .btn:active { transform: scale(0.98); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .footer-note { text-align: center; margin-top: 28px; font-size: 12px; color: #333; }
+        .firebase-badge {
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            margin-top: 20px; font-size: 11px; color: #444;
+        }
+        .firebase-badge .dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: #555; display: inline-block;
+        }
+        .firebase-badge .dot.connected { background: #22c55e; }
+        @media (max-width: 480px) {
+            body { padding: 16px; }
+            .login-card { padding: 36px 24px; border-radius: 16px; }
+            .logo h1 { font-size: 24px; letter-spacing: 4px; }
+            h2 { font-size: 18px; }
+        }
+        @media (max-width: 360px) {
+            .login-card { padding: 28px 18px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="logo">
+            <h1>KEVRA</h1>
+            <span>Admin Panel</span>
+        </div>
+
+        <h2>Giriş Yap</h2>
+        <p class="subtitle">Yönetim paneline erişmek için bilgilerinizi girin.</p>
+
+        <div class="error-msg" id="errorMsg"></div>
+
+        <div class="form-group">
+            <label>E-posta</label>
+            <input type="email" id="email" placeholder="admin@kevra.com.tr" autocomplete="email">
+        </div>
+        <div class="form-group">
+            <label>Şifre</label>
+            <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+        </div>
+
+        <button type="button" class="btn" id="loginBtn" onclick="handleLogin()">Giriş Yap</button>
+
+        <div class="firebase-badge">
+            <span class="dot" id="fbDot"></span>
+            <span id="fbStatus">Bağlantı kontrol ediliyor...</span>
+        </div>
+
+        <p class="footer-note">© 2026 KEVRA — Yetkisiz erişim yasaktır.</p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/kevra-db.js"></script>
+
+    <script>
+        setTimeout(function() {
+            const dot    = document.getElementById('fbDot');
+            const status = document.getElementById('fbStatus');
+            if (window.KevraFirebase && window.KevraFirebase.ready()) {
+                dot.classList.add('connected');
+                status.textContent = 'Firebase bağlı';
+            } else {
+                status.textContent = 'Yerel mod (Firebase config girilmedi)';
+            }
+        }, 1500);
+
+        if (localStorage.getItem('kevra_admin_logged_in')) {
+            window.location.replace('admin.html');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') handleLogin();
+        });
+
+        async function handleLogin() {
+            const email    = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+            const btn      = document.getElementById('loginBtn');
+
+            errorMsg.classList.remove('show');
+
+            if (!email || !password) {
+                errorMsg.textContent = 'E-posta ve şifre boş bırakılamaz.';
+                errorMsg.classList.add('show');
+                return;
+            }
+
+            btn.disabled    = true;
+            btn.textContent = 'Kontrol ediliyor...';
+
+            try {
+                const result = await KevraDB.adminLogin(email, password);
+                if (result.success) {
+                    window.location.replace('admin.html');
+                } else {
+                    errorMsg.textContent = result.message || 'Giriş başarısız.';
+                    errorMsg.classList.add('show');
+                    btn.disabled    = false;
+                    btn.textContent = 'Giriş Yap';
+                    document.getElementById('password').value = '';
+                    document.getElementById('password').focus();
+                }
+            } catch (e) {
+                errorMsg.textContent = 'Bir hata oluştu: ' + e.message;
+                errorMsg.classList.add('show');
+                btn.disabled    = false;
+                btn.textContent = 'Giriş Yap';
+            }
+        }
+    </script>
+</body>
+</html>

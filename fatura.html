@@ -271,29 +271,23 @@
         }
         
         @media (max-width: 768px) {
-            .header {
-                padding: 0 20px;
-            }
-            
-            .invoice-info-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .invoice-header {
-                flex-direction: column;
-                text-align: center;
-                gap: 15px;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
+            .header { padding: 0 16px; height: 60px; }
+            body { padding-top: 60px; }
+            .invoice-info-grid { grid-template-columns: 1fr; gap: 20px; }
+            .invoice-header { flex-direction: column; text-align: center; gap: 15px; }
+            .action-buttons { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
+            .container { padding: 20px 16px; }
+            .invoice-card { border-radius: 12px; }
+            .invoice-section { padding: 20px; }
+            table { font-size: 13px; }
+            th, td { padding: 10px 12px; }
+        }
+        @media (max-width: 480px) {
+            .header { padding: 0 12px; }
+            .logo { font-size: 20px; letter-spacing: 2px; }
+            .back-btn { width: 34px; height: 34px; font-size: 16px; }
+            table th:nth-child(3), table td:nth-child(3) { display: none; }
         }
     </style>
 </head>
@@ -361,94 +355,108 @@
         </div>
     </main>
     
-    <script src="db.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/kevra-db.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
     <script>
-        // URL'den sipariş ID'sini al
+    // Sayfa yüklenince siparişi async yükle
+    document.addEventListener('DOMContentLoaded', async function() {
         const urlParams = new URLSearchParams(window.location.search);
-        const orderId = urlParams.get('order');
-        
+        const orderId   = urlParams.get('order');
+
         if (!orderId) {
-            window.location.href = 'siparislerim.html';
+            window.location.href = 'profil.html';
+            return;
         }
-        
-        // Siparişi yükle
-        const order = DB.getOrder(orderId);
-        
+
+        // KevraDB veya localStorage'dan siparişi bul
+        let order = null;
+        try {
+            if (window.KevraDB) {
+                const all = await KevraDB.getAllOrders();
+                order = all.find(o => String(o.id) === String(orderId));
+            }
+        } catch(e) {}
+
         if (!order) {
-            window.location.href = 'siparislerim.html';
+            const local = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+            order = local.find(o => String(o.id) === String(orderId));
         }
-        
-        // Sayfa bilgilerini doldur
-        document.getElementById('orderId').textContent = '#' + order.id;
-        document.getElementById('orderDate').textContent = 'Sipariş: ' + new Date(order.createdAt).toLocaleDateString('tr-TR');
-        
-        // Fatura durumunu kontrol et
+
+        if (!order) {
+            document.getElementById('loadingMsg').innerHTML =
+                '<p style="color:#e74c3c; text-align:center;">Sipariş bulunamadı. <a href="profil.html" style="color:#c9a87c;">Profilinize dönün</a></p>';
+            return;
+        }
+
+        // --- Müşteri bilgilerini normalize et (eski/yeni format) ---
+        const customer = order.customer || order.customerInfo || {};
+        const firstName = customer.firstName || '';
+        const lastName  = customer.lastName  || '';
+        const email     = customer.email     || '';
+        const phone     = customer.phone     || '';
+        const city      = customer.city      || (customer.address && customer.address.city) || '';
+        const address   = customer.address   || 
+                          (order.customer ? `${customer.address || ''} ${city}` : '');
+        const addressStr = typeof address === 'string' ? address :
+                           `${address.street || ''} ${address.district || ''} / ${address.city || ''}`;
+
+        // --- Fiyat totals normalize et ---
+        const totals  = order.totals  || {};
+        const subtotal = order.subtotal || totals.subtotal || 0;
+        const shipping = (order.shipping !== undefined ? order.shipping : totals.shipping) || 0;
+        const discount = order.discount || totals.discount || 0;
+        const total    = order.total    || totals.total    || (subtotal - discount + shipping);
+
+        // Başlık
+        document.getElementById('orderId').textContent    = '#' + order.id;
+        document.getElementById('orderDate').textContent  = 'Sipariş: ' + 
+            new Date(order.createdAt).toLocaleDateString('tr-TR', {day:'numeric',month:'long',year:'numeric'});
+
+        // Fatura durumu
         if (order.invoice && order.invoice.url) {
             document.getElementById('invoiceStatus').textContent = 'Hazır';
             document.getElementById('invoiceStatus').style.background = 'rgba(39, 174, 96, 0.3)';
-            document.getElementById('invoiceDate').textContent = new Date(order.invoice.uploadedAt).toLocaleDateString('tr-TR');
-            document.getElementById('invoiceNumber').textContent = order.invoice.number;
-            
-            // Fatura görüntüsünü göster
-            document.getElementById('invoicePreview').innerHTML = `
-                <img src="${order.invoice.url}" alt="Fatura" class="invoice-image" id="invoiceImage">
-            `;
-            
-            // İndirme butonunu ayarla
-            document.getElementById('downloadBtn').href = order.invoice.url;
+            document.getElementById('invoiceDate').textContent   = new Date(order.invoice.uploadedAt).toLocaleDateString('tr-TR');
+            document.getElementById('invoiceNumber').textContent = order.invoice.number || '-';
+            document.getElementById('invoicePreview').innerHTML  = `<img src="${order.invoice.url}" alt="Fatura" class="invoice-image" id="invoiceImage">`;
+            document.getElementById('downloadBtn').href          = order.invoice.url;
             document.getElementById('actionButtons').style.display = 'flex';
         } else {
             document.getElementById('invoiceStatus').textContent = 'Hazırlanıyor';
-            document.getElementById('invoiceDate').textContent = '-';
+            document.getElementById('invoiceStatus').style.background = 'rgba(201,168,124,0.2)';
+            document.getElementById('invoiceDate').textContent   = '-';
             document.getElementById('invoiceNumber').textContent = '-';
         }
-        
-        // Sipariş özetini doldur
-        const summaryContent = document.getElementById('summaryContent');
-        summaryContent.innerHTML = `
-            <div class="summary-row">
-                <span>Müşteri</span>
-                <span>${order.customerInfo.firstName} ${order.customerInfo.lastName}</span>
-            </div>
-            <div class="summary-row">
-                <span>Email</span>
-                <span>${order.customerInfo.email}</span>
-            </div>
-            <div class="summary-row">
-                <span>Telefon</span>
-                <span>${order.customerInfo.phone}</span>
-            </div>
-            <div class="summary-row">
-                <span>Adres</span>
-                <span style="text-align: right;">${order.customerInfo.address.street}, ${order.customerInfo.address.district}/${order.customerInfo.address.city}</span>
-            </div>
-            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
-                ${order.items.map(item => `
+
+        // Sipariş özeti
+        const items = order.items || [];
+        document.getElementById('summaryContent').innerHTML = `
+            <div class="summary-row"><span>Müşteri</span><span>${firstName} ${lastName}</span></div>
+            <div class="summary-row"><span>E-posta</span><span>${email}</span></div>
+            <div class="summary-row"><span>Telefon</span><span>${phone}</span></div>
+            <div class="summary-row"><span>Adres</span><span style="text-align:right">${addressStr}</span></div>
+            <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
+                ${items.map(item => `
                     <div class="summary-row">
-                        <span>${item.name} x${item.quantity}</span>
-                        <span>₺${(item.price * item.quantity).toLocaleString()}</span>
+                        <span>${item.name || ''} x${item.quantity || 1}${item.size ? ' (' + item.size + ')' : ''}</span>
+                        <span>₺${((item.price || 0) * (item.quantity || 1)).toLocaleString('tr-TR')}</span>
                     </div>
                 `).join('')}
             </div>
-            <div class="summary-row" style="margin-top: 15px;">
-                <span>Ara Toplam</span>
-                <span>₺${order.totals.subtotal.toLocaleString()}</span>
-            </div>
-            <div class="summary-row">
-                <span>Kargo</span>
-                <span>${order.totals.shipping === 0 ? 'Ücretsiz' : '₺' + order.totals.shipping.toLocaleString()}</span>
-            </div>
-            ${order.totals.discount > 0 ? `
-                <div class="summary-row">
-                    <span>İndirim</span>
-                    <span style="color: var(--success);">-₺${order.totals.discount.toLocaleString()}</span>
-                </div>
-            ` : ''}
-            <div class="summary-row total">
-                <span>Toplam</span>
-                <span>₺${order.totals.total.toLocaleString()}</span>
+            <div class="summary-row" style="margin-top:15px"><span>Ara Toplam</span><span>₺${subtotal.toLocaleString('tr-TR')}</span></div>
+            <div class="summary-row"><span>Kargo</span><span>${shipping === 0 ? 'Ücretsiz' : '₺' + shipping.toLocaleString('tr-TR')}</span></div>
+            ${discount > 0 ? `<div class="summary-row"><span>İndirim</span><span style="color:#e74c3c">-₺${discount.toLocaleString('tr-TR')}</span></div>` : ''}
+            <div class="summary-row" style="font-weight:700;font-size:16px;margin-top:8px;padding-top:8px;border-top:2px solid #c9a87c">
+                <span>Toplam</span><span>₺${total.toLocaleString('tr-TR')}</span>
             </div>
         `;
+    });
     </script>
 </body>
 </html>

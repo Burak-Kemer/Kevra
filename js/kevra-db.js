@@ -1,187 +1,251 @@
-// KEVRA Database - LocalStorage Yönetimi
+// ============================================================
+//  KEVRA Database — Firebase + localStorage Hibrit
+//  Firebase varsa Firestore kullanır, yoksa localStorage'a düşer
+// ============================================================
+
 const KevraDB = {
-    // ========== KULLANICI İŞLEMLERİ ==========
-    
-    registerUser: function(userData) {
-        const users = this.getAllUsers();
-        
-        // Email kontrolü
+
+    // ===================== KULLANICI =====================
+
+    registerUser: async function(userData) {
+        const users = await this.getAllUsers();
         if (users.find(u => u.email === userData.email)) {
-            return { success: false, message: 'Bu email adresi zaten kayıtlı' };
+            return { success: false, message: 'Bu e-posta zaten kayıtlı' };
         }
-        
+
         const newUser = {
-            id: 'user_' + Date.now(),
-            firstName: userData.firstName,
-            lastName: userData.lastName,
-            email: userData.email,
-            password: this.hashPassword(userData.password),
-            phone: userData.phone,
-            address: userData.address,
-            city: userData.city,
-            zipCode: userData.zipCode || '',
+            id:           'user_' + Date.now(),
+            firstName:    userData.firstName,
+            lastName:     userData.lastName,
+            email:        userData.email,
+            password:     this._hash(userData.password),
+            phone:        userData.phone || '',
+            address:      userData.address || '',
+            city:         userData.city || '',
+            zipCode:      userData.zipCode || '',
             registerDate: new Date().toISOString(),
-            active: true
+            active:       true
         };
-        
-        users.push(newUser);
-        localStorage.setItem('kevra_users', JSON.stringify(users));
-        
+
+        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+            try {
+                await window.KevraFirebase.db.collection('users').doc(newUser.id).set(newUser);
+            } catch (e) { console.warn('Firestore yazma hatası:', e); }
+        }
+
+        // localStorage'a da yaz (hız + offline)
+        const local = JSON.parse(localStorage.getItem('kevra_users') || '[]');
+        local.push(newUser);
+        localStorage.setItem('kevra_users', JSON.stringify(local));
+
         return { success: true, user: newUser };
     },
-    
-    loginUser: function(email, password) {
-        const users = this.getAllUsers();
-        const user = users.find(u => u.email === email);
-        
-        if (!user) {
-            return { success: false, message: 'Kullanıcı bulunamadı' };
-        }
-        
-        if (user.password !== this.hashPassword(password)) {
-            return { success: false, message: 'Şifre hatalı' };
-        }
-        
-        const session = {
-            id: user.id,
-            email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            phone: user.phone,
-            address: user.address,
-            city: user.city,
-            loginTime: new Date().toISOString()
-        };
-        
+
+    loginUser: async function(email, password) {
+        const users = await this.getAllUsers();
+        const user  = users.find(u => u.email === email);
+        if (!user)                                       return { success: false, message: 'Kullanıcı bulunamadı' };
+        if (user.password !== this._hash(password))     return { success: false, message: 'Şifre hatalı' };
+
+        const session = { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, phone: user.phone, loginTime: new Date().toISOString() };
         localStorage.setItem('kevra_current_user', JSON.stringify(session));
         return { success: true, user: session };
     },
-    
+
     logout: function() {
         localStorage.removeItem('kevra_current_user');
         localStorage.removeItem('kevra_cart');
     },
-    
-    isLoggedIn: function() {
-        return !!localStorage.getItem('kevra_current_user');
-    },
-    
-    getCurrentUser: function() {
-        const session = localStorage.getItem('kevra_current_user');
-        return session ? JSON.parse(session) : null;
-    },
-    
-    getAllUsers: function() {
+
+    isLoggedIn:      function() { return !!localStorage.getItem('kevra_current_user'); },
+    getCurrentUser:  function() { const s = localStorage.getItem('kevra_current_user'); return s ? JSON.parse(s) : null; },
+
+    getAllUsers: async function() {
+        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+            try {
+                const snap = await window.KevraFirebase.db.collection('users').get();
+                return snap.docs.map(d => d.data());
+            } catch (e) { console.warn('Firestore okuma hatası:', e); }
+        }
         return JSON.parse(localStorage.getItem('kevra_users') || '[]');
     },
-    
-    // ========== ÜRÜN İŞLEMLERİ ==========
-    
-    getProducts: function() {
+
+    // ===================== ÜRÜNLER =====================
+
+    getProducts: async function() {
+        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+            try {
+                const snap = await window.KevraFirebase.db.collection('products').orderBy('createdAt', 'desc').get();
+                if (!snap.empty) {
+                    const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    localStorage.setItem('kevra_products', JSON.stringify(products)); // local cache
+                    return products;
+                }
+            } catch (e) { console.warn('Firestore ürün okuma hatası:', e); }
+        }
+        // localStorage fallback
         let products = JSON.parse(localStorage.getItem('kevra_products') || '[]');
         if (products.length === 0) {
-            products = this.getDefaultProducts();
+            products = this._defaultProducts();
             localStorage.setItem('kevra_products', JSON.stringify(products));
         }
         return products;
     },
-    
-    getDefaultProducts: function() {
-        return [
-            { id: 1, name: 'Siyah Midi Elbise', category: 'elbise', price: 1000, originalPrice: 2000, discount: 50, stock: 24, image: 'img/dress1.jpg', status: 'active', badge: 'İndirim', badgeType: 'indirim' },
-            { id: 2, name: 'Çiçekli Maxi Elbise', category: 'elbise', price: 749, stock: 18, image: 'img/dress2.jpg', status: 'new', badge: 'Yeni', badgeType: 'yeni' },
-            { id: 3, name: 'Ofis Elbisesi (Bej)', category: 'elbise', price: 1199, originalPrice: 1599, discount: 25, stock: 15, image: 'img/dress3.jpg', status: 'premium', badge: 'Premium', badgeType: 'premium' },
-            { id: 4, name: 'Kokteyl Elbisesi', category: 'elbise', price: 1599, originalPrice: 2299, discount: 30, stock: 8, image: 'img/dress4.jpg', status: 'indirim', badge: 'İndirim', badgeType: 'indirim' },
-            { id: 5, name: 'Günlük Tişört Elbise', category: 'elbise', price: 449, stock: 40, image: 'img/dress5.jpg', status: 'active' },
-            { id: 6, name: 'Dantel Detaylı Elbise', category: 'elbise', price: 999, originalPrice: 1399, discount: 29, stock: 12, image: 'img/dress6.jpg', status: 'new', badge: 'Yeni', badgeType: 'yeni' },
-            { id: 7, name: 'Kadife Elbise', category: 'elbise', price: 1299, originalPrice: 1799, discount: 28, stock: 10, image: 'img/dress7.jpg', status: 'premium', badge: 'Premium', badgeType: 'premium' },
-            { id: 8, name: 'Asimetrik Kesim Elbise', category: 'elbise', price: 899, stock: 20, image: 'img/dress8.jpg', status: 'active' }
-        ];
+
+    saveProduct: async function(productData) {
+        const id   = productData.id ? String(productData.id) : 'p_' + Date.now();
+        const data = { ...productData, id, updatedAt: new Date().toISOString(), createdAt: productData.createdAt || new Date().toISOString() };
+
+        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+            try {
+                await window.KevraFirebase.db.collection('products').doc(id).set(data, { merge: true });
+            } catch (e) { console.warn('Firestore ürün kayıt hatası:', e); }
+        }
+
+        // localStorage güncelle
+        const products = JSON.parse(localStorage.getItem('kevra_products') || '[]');
+        const idx = products.findIndex(p => String(p.id) === String(id));
+        if (idx >= 0) products[idx] = data; else products.push(data);
+        localStorage.setItem('kevra_products', JSON.stringify(products));
+        return { success: true, product: data };
     },
-    
-    // ========== SİPARİŞ İŞLEMLERİ ==========
-    
-    createOrder: function(orderData) {
-        const orders = this.getAllOrders();
+
+    deleteProduct: async function(productId) {
+        const id = String(productId);
+        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+            try { await window.KevraFirebase.db.collection('products').doc(id).delete(); } catch (e) {}
+        }
+        const products = JSON.parse(localStorage.getItem('kevra_products') || '[]').filter(p => String(p.id) !== id);
+        localStorage.setItem('kevra_products', JSON.stringify(products));
+        return { success: true };
+    },
+
+    // ===================== SİPARİŞLER =====================
+
+    createOrder: async function(orderData) {
         const currentUser = this.getCurrentUser();
-        
         const newOrder = {
-            id: 'ORD' + Date.now(),
-            userId: currentUser ? currentUser.id : 'guest',
-            customer: {
-                firstName: orderData.firstName,
-                lastName: orderData.lastName,
-                email: orderData.email,
-                phone: orderData.phone,
-                address: orderData.address
-            },
-            items: orderData.items,
-            subtotal: orderData.subtotal,
-            shipping: orderData.shipping,
-            discount: orderData.discount || 0,
-            total: orderData.total,
+            id:            'ORD' + Date.now(),
+            userId:        currentUser ? currentUser.id : 'guest',
+            customer:      { firstName: orderData.firstName, lastName: orderData.lastName, email: orderData.email, phone: orderData.phone, address: orderData.address, city: orderData.city, zipCode: orderData.zipCode },
+            items:         orderData.items,
+            subtotal:      orderData.subtotal,
+            shipping:      orderData.shipping,
+            discount:      orderData.discount || 0,
+            total:         orderData.total,
             paymentMethod: orderData.paymentMethod,
-            status: 'Beklemede',
-            shippingStatus: 'Hazırlanıyor',
-            createdAt: new Date().toISOString(),
-            notes: orderData.notes || ''
+            couponCode:    orderData.couponCode || null,
+            status:        'Beklemede',
+            shippingStatus:'Hazırlanıyor',
+            createdAt:     new Date().toISOString(),
+            notes:         orderData.notes || ''
         };
-        
+
+        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+            try {
+                await window.KevraFirebase.db.collection('orders').doc(newOrder.id).set(newOrder);
+            } catch (e) { console.warn('Firestore sipariş hatası:', e); }
+        }
+
+        const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
         orders.push(newOrder);
         localStorage.setItem('kevra_orders', JSON.stringify(orders));
-        
         return { success: true, order: newOrder };
     },
-    
-    getUserOrders: function() {
-        const currentUser = this.getCurrentUser();
-        if (!currentUser) return [];
-        
-        const orders = this.getAllOrders();
-        return orders.filter(o => o.userId === currentUser.id);
-    },
-    
-    getAllOrders: function() {
+
+    getAllOrders: async function() {
+        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+            try {
+                const snap = await window.KevraFirebase.db.collection('orders').orderBy('createdAt', 'desc').get();
+                return snap.docs.map(d => d.data());
+            } catch (e) { console.warn('Firestore sipariş okuma:', e); }
+        }
         return JSON.parse(localStorage.getItem('kevra_orders') || '[]');
     },
-    
-    updateOrderStatus: function(orderId, status, shippingStatus) {
-        const orders = this.getAllOrders();
-        const order = orders.find(o => o.id === orderId);
-        
+
+    getUserOrders: async function() {
+        const currentUser = this.getCurrentUser();
+        if (!currentUser) return [];
+        const all = await this.getAllOrders();
+        return all.filter(o => o.userId === currentUser.id);
+    },
+
+    updateOrderStatus: async function(orderId, status, shippingStatus) {
+        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+            try {
+                const update = { status };
+                if (shippingStatus) update.shippingStatus = shippingStatus;
+                await window.KevraFirebase.db.collection('orders').doc(orderId).update(update);
+            } catch (e) { console.warn('Firestore sipariş güncelleme:', e); }
+        }
+        const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+        const order  = orders.find(o => o.id === orderId);
         if (order) {
             order.status = status;
             if (shippingStatus) order.shippingStatus = shippingStatus;
             localStorage.setItem('kevra_orders', JSON.stringify(orders));
             return { success: true };
         }
-        
-        return { success: false, message: 'Sipariş bulunamadı' };
+        return { success: false };
     },
-    
-    // ========== YARDIMCI FONKSİYONLAR ==========
-    
-    hashPassword: function(password) {
-        let hash = 0;
-        for (let i = 0; i < password.length; i++) {
-            const char = password.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash;
+
+    // ===================== ADMIN AUTH =====================
+
+    adminLogin: async function(email, password) {
+        // Firebase Auth varsa
+        if (window.KevraFirebase && window.KevraFirebase.ready() && window.KevraFirebase.auth) {
+            try {
+                const cred = await window.KevraFirebase.auth.signInWithEmailAndPassword(email, password);
+                localStorage.setItem('kevra_admin_logged_in', 'true');
+                localStorage.setItem('kevra_admin_user', email);
+                localStorage.setItem('kevra_admin_uid', cred.user.uid);
+                return { success: true };
+            } catch (e) {
+                return { success: false, message: 'Firebase hata: ' + e.message };
+            }
         }
+        // Fallback: config'deki bilgilerle karşılaştır
+        const cfg = window.ADMIN_CONFIG || {};
+        if (email === cfg.email && password === cfg.password) {
+            localStorage.setItem('kevra_admin_logged_in', 'true');
+            localStorage.setItem('kevra_admin_user', email);
+            return { success: true };
+        }
+        return { success: false, message: 'Kullanıcı adı veya şifre hatalı' };
+    },
+
+    adminLogout: async function() {
+        if (window.KevraFirebase && window.KevraFirebase.ready() && window.KevraFirebase.auth) {
+            try { await window.KevraFirebase.auth.signOut(); } catch (e) {}
+        }
+        localStorage.removeItem('kevra_admin_logged_in');
+        localStorage.removeItem('kevra_admin_user');
+        localStorage.removeItem('kevra_admin_uid');
+        window.location.replace('admin-login.html');
+    },
+
+    isAdminLoggedIn: function() { return !!localStorage.getItem('kevra_admin_logged_in'); },
+
+    // ===================== YARDIMCI =====================
+
+    _hash: function(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCodeAt(i); hash = hash & hash; }
         return hash.toString();
     },
-    
+
+    _defaultProducts: function() {
+        return [
+            { id: 1, name: 'Siyah Midi Elbise',   category: 'elbise', price: 1000, originalPrice: 2000, discount: true, stock: 24, image: 'img/dress1.jpg', badge: 'indirim',  badgeType: 'indirim',  sizes: ['S','M','L','XL'],  colors: ['Siyah','Bordo'] },
+            { id: 2, name: 'Çiçekli Maxi Elbise', category: 'elbise', price: 749,  originalPrice: 749,  discount: false, stock: 18, image: 'img/dress2.jpg', badge: 'yeni',     badgeType: 'yeni',     sizes: ['XS','S','M','L'],  colors: ['Krem','Pembe'] },
+            { id: 3, name: 'Ofis Elbisesi (Bej)', category: 'elbise', price: 1199, originalPrice: 1599, discount: true, stock: 15, image: 'img/dress3.jpg', badge: 'popular',  badgeType: 'popular',  sizes: ['S','M','L','XL'],  colors: ['Bej','Siyah'] }
+        ];
+    },
+
     clearAll: function() {
-        localStorage.removeItem('kevra_users');
-        localStorage.removeItem('kevra_orders');
-        localStorage.removeItem('kevra_current_user');
-        localStorage.removeItem('kevra_cart');
-        localStorage.removeItem('kevra_products');
+        ['kevra_users','kevra_orders','kevra_current_user','kevra_cart','kevra_products'].forEach(k => localStorage.removeItem(k));
     }
 };
 
-// Global olarak erişilebilir yap
 window.KevraDB = KevraDB;
-
-// Eski DB referansı için alias (geriye uyumluluk)
-window.DB = KevraDB;
+window.DB      = KevraDB;  // geriye uyumluluk

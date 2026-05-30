@@ -45,62 +45,14 @@
             padding-top: 70px;
         }
 
-        /* ===== HEADER (index.html ile aynı) ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        .header {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 15px;
-            z-index: 9999;
-            transition: all 0.4s ease;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0,0,0,0.08);
-            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+        /* Ödeme sayfasında header her zaman beyaz (hero yok) */
+        .header, .header.scrolled {
+            background: rgba(255, 255, 255, 0.98) !important;
+            border-bottom: 1px solid rgba(0,0,0,0.08) !important;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.06) !important;
         }
-        .header.scrolled {
-            background: rgba(255,255,255,0.98);
-            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-        }
-        .header-left, .header-right { display: flex; align-items: center; gap: 8px; flex: 1; }
-        .header-right { justify-content: flex-end; }
-        .header-center { display: flex; align-items: center; justify-content: center; }
-        .header-btn {
-            padding: 8px 14px;
-            background: transparent;
-            border: 1px solid rgba(0,0,0,0.1);
-            color: #1a1a1a;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.3s;
-            font-family: 'Inter', sans-serif;
-            white-space: nowrap;
-        }
-        .brand-logo { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #1a1a1a; line-height: 1; }
-        .brand-arabic { font-size: 20px; font-weight: bold; margin-bottom: -4px; }
-        .brand-text { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; letter-spacing: 6px; margin-top: 2px; }
-        .header-link { color: #1a1a1a; text-decoration: none; font-size: 13px; transition: color 0.3s; display: none; }
-        .header-icon {
-            position: relative; padding: 8px;
-            background: transparent;
-            border: 1px solid rgba(0,0,0,0.1);
-            color: #1a1a1a;
-            border-radius: 8px; cursor: pointer; font-size: 16px;
-            transition: all 0.3s; display: flex; align-items: center; gap: 4px;
-            min-width: 36px; min-height: 36px; justify-content: center;
-        }
-        #cartCount, #favCount {
-            position: absolute; top: -6px; right: -6px;
-            background: #e74c3c; color: white; font-size: 10px; font-weight: 700;
-            width: 18px; height: 18px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-        }
+        .brand-logo { color: #1a1a1a !important; }
+        .header-btn, .header-link, .header-icon { color: #1a1a1a !important; border-color: rgba(0,0,0,0.1) !important; }
 
         .checkout-page {
             max-width: 1200px;
@@ -920,7 +872,7 @@
 <body>
 
 <!-- ================= HEADER (index.html ile BİREBİR AYNI) ================= -->
-<header class="header" id="mainHeader">
+<header class="header scrolled" id="mainHeader">
     <div class="header-left">
         <button class="header-btn" id="openMenuBtn"><span class="btn-icon">☰</span><span class="btn-text">Menü</span></button>
         <button class="header-btn" id="openSearch"><span class="btn-icon">🔍</span><span class="btn-text">Ara</span></button>
@@ -1234,7 +1186,7 @@
 
 <script>
 
-let cart = JSON.parse(localStorage.getItem('kevra_cart')) || [];
+let checkoutCart = JSON.parse(localStorage.getItem('kevra_cart')) || [];
 let currentCoupon = null;
 let discountAmount = 0;
 
@@ -1245,7 +1197,7 @@ function formatPrice(price) {
 // Sayfa yüklendiğinde
 function initCheckout() {
     // Sepet boşsa
-    if (cart.length === 0) {
+    if (checkoutCart.length === 0) {
         document.getElementById('checkoutContent').style.display = 'none';
         document.getElementById('emptyCartMessage').style.display = 'block';
         document.querySelector('.checkout-subtitle').style.display = 'none';
@@ -1255,14 +1207,13 @@ function initCheckout() {
     renderSummary();
     setupCardFormatting();
     setupFormValidation();
-
-
+}
 
 // Sipariş Özeti Render
 function renderSummary() {
     const container = document.getElementById('summaryItems');
 
-    container.innerHTML = cart.map(item => `
+    container.innerHTML = checkoutCart.map(item => `
         <div class="summary-item">
             <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/70?text=No+Image'">
             <div class="summary-item-info">
@@ -1282,7 +1233,7 @@ function renderSummary() {
 
 // Toplam Hesaplama
 function calculateTotals() {
-    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const subtotal = checkoutCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     let shipping = 0;
     let total = subtotal + shipping;
 
@@ -1472,7 +1423,7 @@ function validateForm() {
 }
 
 // Siparişi Tamamla
-function placeOrder() {
+async function placeOrder() {
     if (!validateForm()) {
         showToast('Lütfen zorunlu alanları doldurun', 'error');
         return;
@@ -1482,68 +1433,57 @@ function placeOrder() {
     btn.disabled = true;
     btn.innerHTML = '⏳ İşleniyor...';
 
-    // Sipariş verisi
-    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const total = subtotal - discountAmount;
+    const subtotal = checkoutCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const total    = subtotal - discountAmount;
 
     const orderData = {
-        items: [...cart],
-        subtotal: subtotal,
-        discount: discountAmount,
-        shipping: 0,
-        total: total,
-        coupon: currentCoupon ? currentCoupon.name : null,
-        customer: {
-            firstName: document.getElementById('firstName').value,
-            lastName: document.getElementById('lastName').value,
-            email: document.getElementById('email').value,
-            phone: document.getElementById('phone').value,
-            address: document.getElementById('address').value,
-            city: document.getElementById('city').value,
-            district: document.getElementById('district').value,
-            zipCode: document.getElementById('zipCode').value
-        },
+        items:         [...checkoutCart],
+        subtotal:      subtotal,
+        discount:      discountAmount,
+        shipping:      0,
+        total:         total,
+        couponCode:    currentCoupon ? currentCoupon.code : null,
+        firstName:     document.getElementById('firstName').value,
+        lastName:      document.getElementById('lastName').value,
+        email:         document.getElementById('email').value,
+        phone:         document.getElementById('phone').value,
+        address:       document.getElementById('address').value,
+        city:          document.getElementById('city').value,
+        district:      document.getElementById('district').value,
+        zipCode:       document.getElementById('zipCode').value,
         paymentMethod: document.querySelector('input[name="payment"]:checked').value
     };
 
-    // Auth.js ile sipariş oluştur
-    let orderResult;
-    if (typeof KevraAuth !== 'undefined' && KevraAuth.createOrder) {
-        orderResult = KevraAuth.createOrder(orderData);
-    } else {
-        // Fallback - localStorage'a kaydet
-        const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
-        const newOrder = {
-            id: 'ORD-' + Date.now(),
-            ...orderData,
-            status: 'pending',
-            statusText: 'Beklemede',
-            createdAt: new Date().toISOString()
-        };
-        orders.unshift(newOrder);
-        localStorage.setItem('kevra_orders', JSON.stringify(orders));
-        orderResult = { success: true, order: newOrder };
-    }
+    try {
+        // KevraDB.createOrder → Firebase veya localStorage
+        let orderResult;
+        if (window.KevraDB) {
+            orderResult = await KevraDB.createOrder(orderData);
+        } else {
+            const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+            const newOrder = { id: 'ORD-' + Date.now(), ...orderData, status: 'Beklemede', createdAt: new Date().toISOString() };
+            orders.unshift(newOrder);
+            localStorage.setItem('kevra_orders', JSON.stringify(orders));
+            orderResult = { success: true, order: newOrder };
+        }
 
-    setTimeout(() => {
         if (orderResult.success) {
-            // Sepeti temizle
             localStorage.removeItem('kevra_cart');
-            cart = [];
-
-            // Başarı modalını göster
+            checkoutCart = [];
             document.getElementById('successOrderId').textContent = orderResult.order.id;
             document.getElementById('successModal').classList.add('active');
             document.body.style.overflow = 'hidden';
-
-            // Header'daki sepet sayısını güncelle
             if (typeof updateCartUI === 'function') updateCartUI();
         } else {
-            showToast('Sipariş oluşturulurken hata: ' + orderResult.message, 'error');
+            showToast('Sipariş hatası: ' + (orderResult.message || 'Bilinmeyen hata'), 'error');
             btn.disabled = false;
             btn.innerHTML = '🛒 Siparişi Tamamla';
         }
-    }, 1500);
+    } catch (e) {
+        showToast('Bağlantı hatası, lütfen tekrar deneyin.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '🛒 Siparişi Tamamla';
+    }
 }
 
 function closeSuccessModal() {
@@ -1565,24 +1505,69 @@ function showToast(message, type = 'success') {
 window.addEventListener('DOMContentLoaded', function() {
     initCheckout();
 
-    // Header scroll efekti
+    // Header scroll — ödeme sayfasında her zaman scrolled kalır
     const header = document.getElementById('mainHeader');
     if (header) {
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
-        });
+        header.classList.add('scrolled');
+        window.addEventListener('scroll', () => { header.classList.add('scrolled'); });
     }
 });
+
+// ============ HEADER BUTON FAİLSAFE ============
+// main.js yüklenmese bile butonlar çalışsın
+window.addEventListener('DOMContentLoaded', function() {
+    // Sepet drawer
+    var cartBtn    = document.getElementById('cartBtn');
+    var cartDrawer = document.getElementById('cartDrawer');
+    var cartOvr    = document.getElementById('cartOverlay');
+    var closeCart  = document.getElementById('closeCartBtn');
+    function openCartDrawer()  { if(cartDrawer){cartDrawer.classList.add('open'); if(cartOvr)cartOvr.classList.add('active'); document.body.style.overflow='hidden';} }
+    function closeCartDrawer() { if(cartDrawer){cartDrawer.classList.remove('open'); if(cartOvr)cartOvr.classList.remove('active'); document.body.style.overflow='';} }
+    if(cartBtn)   cartBtn.onclick   = openCartDrawer;
+    if(closeCart) closeCart.onclick = closeCartDrawer;
+    if(cartOvr)   cartOvr.onclick   = closeCartDrawer;
+
+    // Favori drawer
+    var favBtn    = document.getElementById('favBtn');
+    var favDrawer = document.getElementById('favDrawer');
+    var favOvr    = document.getElementById('favOverlay');
+    var closeFav  = document.getElementById('closeFavBtn');
+    function openFavDrawer()  { if(favDrawer){favDrawer.classList.add('open'); if(favOvr)favOvr.classList.add('active'); document.body.style.overflow='hidden';} }
+    function closeFavDrawer() { if(favDrawer){favDrawer.classList.remove('open'); if(favOvr)favOvr.classList.remove('active'); document.body.style.overflow='';} }
+    if(favBtn)   favBtn.onclick   = openFavDrawer;
+    if(closeFav) closeFav.onclick = closeFavDrawer;
+    if(favOvr)   favOvr.onclick   = closeFavDrawer;
+
+    // Arama modalı
+    var searchBtn    = document.getElementById('openSearch');
+    var searchModal  = document.getElementById('searchModal');
+    var closeSearchB = document.getElementById('closeSearch');
+    if(searchBtn)    searchBtn.onclick   = function(){ if(searchModal){searchModal.classList.add('active'); document.body.style.overflow='hidden';} };
+    if(closeSearchB) closeSearchB.onclick = function(){ if(searchModal){searchModal.classList.remove('active'); document.body.style.overflow='';} };
+    if(searchModal)  searchModal.onclick  = function(e){ if(e.target===searchModal){searchModal.classList.remove('active'); document.body.style.overflow='';} };
+
+    // Yan menü
+    var menuBtn   = document.getElementById('openMenuBtn');
+    var sideMenu  = document.getElementById('sideMenu');
+    var closeMenu = document.getElementById('closeMenuBtn');
+    var menuOvr   = document.getElementById('menuOverlay');
+    function openSideMenu()  { if(sideMenu){sideMenu.classList.add('active'); if(menuOvr)menuOvr.classList.add('active'); document.body.style.overflow='hidden';} }
+    function closeSideMenu() { if(sideMenu){sideMenu.classList.remove('active'); if(menuOvr)menuOvr.classList.remove('active'); document.body.style.overflow='';} }
+    if(menuBtn)   menuBtn.onclick   = openSideMenu;
+    if(closeMenu) closeMenu.onclick = closeSideMenu;
+    if(menuOvr)   menuOvr.onclick   = closeSideMenu;
+});
+
 </script>
-<script defer src="js/storage.js"></script>
-<script defer src="js/favorites.js"></script>
-<script defer src="js/cart.js"></script>
-<script defer src="js/main.js"></script>
-<script defer src="js/auth.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/kevra-db.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
 
 <!-- FOOTER -->
 <footer class="footer" id="footer">

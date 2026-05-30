@@ -1571,6 +1571,11 @@
     </div>
 
     <!-- SCRIPTS -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/kevra-db.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/main.js"></script>
@@ -1679,9 +1684,9 @@
             updateStats();
         }
 
-        function updateStats() {
+        async function updateStats() {
             const user = KevraAuth.getCurrentUser();
-            const orders = user?.orders || [];
+            const orders = (typeof KevraDB !== 'undefined') ? await KevraDB.getUserOrders() : (user?.orders || []);
             const favs = JSON.parse(localStorage.getItem('kevra_favorites') || '[]');
             const userReturns = returns.filter(r => r.userId === (user?.id || ''));
 
@@ -1777,9 +1782,14 @@
 
         // ================= SİPARİŞLER =================
 
-        function renderOrders() {
+        async function renderOrders() {
             const user = KevraAuth.getCurrentUser();
-            const orders = user?.orders || [];
+            let orders = [];
+            if (typeof KevraDB !== 'undefined') {
+                orders = await KevraDB.getUserOrders();
+            } else {
+                orders = user?.orders || [];
+            }
             const container = document.getElementById('ordersList');
 
             if (orders.length === 0) {
@@ -1797,11 +1807,16 @@
             }
 
             const statusMap = {
-                'pending': { class: 'status-pending', text: 'Beklemede' },
+                'pending':    { class: 'status-pending',    text: 'Beklemede' },
+                'Beklemede':  { class: 'status-pending',    text: 'Beklemede' },
                 'processing': { class: 'status-processing', text: 'Hazırlanıyor' },
-                'shipped': { class: 'status-shipped', text: 'Kargoda' },
-                'delivered': { class: 'status-delivered', text: 'Teslim Edildi' },
-                'cancelled': { class: 'status-cancelled', text: 'İptal Edildi' }
+                'Hazırlanıyor':{ class: 'status-processing',text: 'Hazırlanıyor' },
+                'shipped':    { class: 'status-shipped',    text: 'Kargoda' },
+                'Kargoda':    { class: 'status-shipped',    text: 'Kargoda' },
+                'delivered':  { class: 'status-delivered',  text: 'Teslim Edildi' },
+                'Teslim Edildi':{ class: 'status-delivered',text: 'Teslim Edildi' },
+                'cancelled':  { class: 'status-cancelled',  text: 'İptal Edildi' },
+                'İptal Edildi':{ class: 'status-cancelled', text: 'İptal Edildi' }
             };
 
             container.innerHTML = orders.map(order => {
@@ -1810,7 +1825,7 @@
                     day: 'numeric', month: 'long', year: 'numeric'
                 });
                 const items = order.items || [];
-                const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const total = order.total || items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
                 return `
                     <div class="order-card">
@@ -1838,7 +1853,8 @@
                                 <button class="btn-sm btn-outline" onclick="showOrderDetail('${order.id}')">Detaylar</button>
                                 ${order.status === 'delivered' ? `<button class="btn-sm btn-primary" onclick="initiateReturn('${order.id}')">İade Talebi</button>` : ''}
                                 ${order.status === 'shipped' ? `<button class="btn-sm btn-outline" onclick="trackOrder('${order.id}')">Kargo Takip</button>` : ''}
-                                ${order.status === 'pending' || order.status === 'processing' ? `<button class="btn-sm btn-danger" onclick="cancelOrder('${order.id}')">İptal Et</button>` : ''}
+                                ${order.status === 'pending' || order.status === 'processing' ? `<a href="fatura.html?order=${order.id}" style="display:inline-block; padding:6px 12px; background:#f8f5f2; color:#c9a87c; border:1px solid #c9a87c; border-radius:8px; font-size:12px; text-decoration:none; margin-right:6px;">📄 Fatura</a>
+                            <button class="btn-sm btn-danger" onclick="cancelOrder('${order.id}')">İptal Et</button>` : ''}
                             </div>
                         </div>
                     </div>
@@ -1862,27 +1878,20 @@
             window.open(`siparistakibi.html?order=${orderNumber}`, '_blank');
         }
 
-        function cancelOrder(orderNumber) {
+        async function cancelOrder(orderNumber) {
             if (!confirm('Siparişi iptal etmek istediğinize emin misiniz?')) return;
 
-            const user = KevraAuth.getCurrentUser();
-            const users = KevraAuth.getUsers();
-            const userIndex = users.findIndex(u => u.id === user.id);
-            
-            if (userIndex === -1) return;
+            if (typeof KevraDB !== 'undefined') {
+                await KevraDB.updateOrderStatus(orderNumber, 'İptal Edildi', 'İptal Edildi');
+            } else {
+                const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+                const o = orders.find(ord => ord.id === orderNumber);
+                if (o) { o.status = 'İptal Edildi'; o.shippingStatus = 'İptal Edildi'; }
+                localStorage.setItem('kevra_orders', JSON.stringify(orders));
+            }
 
-            const orderIndex = users[userIndex].orders.findIndex(o => o.id === orderNumber);
-            if (orderIndex === -1) return;
-
-            users[userIndex].orders[orderIndex].status = 'cancelled';
-            users[userIndex].orders[orderIndex].statusText = 'İptal Edildi';
-            users[userIndex].orders[orderIndex].updatedAt = new Date().toISOString();
-
-            KevraStorage.set('kevra_users', users);
-            localStorage.setItem('kevra_current_user', JSON.stringify(users[userIndex]));
-
-            renderOrders();
-            updateStats();
+            await renderOrders();
+            await updateStats();
             showToast('Sipariş iptal edildi');
         }
 
@@ -2144,16 +2153,17 @@
 
         // ================= SAYFA YÜKLENİNCE =================
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             // Kullanıcı verilerini yükle
             loadUserData();
-            
+
             // Siparişleri render et
-            renderOrders();
-            
+            await renderOrders();
+            await updateStats();
+
             // İade geçmişini render et
             renderReturns();
-            
+
             // Adresleri render et
             renderAddresses();
 
