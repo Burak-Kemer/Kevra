@@ -568,18 +568,24 @@
         
         .quick-view-btn {
             position: absolute;
-            bottom: 10px;
+            bottom: 15px;
             left: 50%;
-            transform: translateX(-50%);
-            padding: 8px 16px;
+            transform: translateX(-50%) translateY(20px);
+            padding: 12px 24px;
             background: white;
             border: none;
-            border-radius: 20px;
+            border-radius: 25px;
             cursor: pointer;
             font-size: 12px;
             font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            opacity: 0.9;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .product-card:hover .quick-view-btn {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
         
         .product-info {
@@ -1399,38 +1405,60 @@
         }
         
         .qv-size-btn {
-            min-width: 44px;
-            height: 44px;
-            border: 2px solid #e0e0e0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            min-width: 48px;
+            border: 1.5px solid #e0e0e0;
             background: white;
-            border-radius: 10px;
+            border-radius: 30px;
             cursor: pointer;
             font-weight: 600;
             font-size: 13px;
-            transition: all 0.3s;
+            font-family: inherit;
+            color: #1a1a1a;
+            transition: all 0.2s;
         }
-        
+
         .qv-size-btn:hover { border-color: #1a1a1a; }
-        
+
         .qv-size-btn.selected {
             border-color: #1a1a1a;
             background: #1a1a1a;
             color: white;
         }
-        
+
         .qv-color-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 3px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 30px;
+            border: 1.5px solid #e0e0e0;
+            background: white;
             cursor: pointer;
-            transition: all 0.3s;
+            font-size: 13px;
+            font-family: inherit;
+            color: #1a1a1a;
+            transition: all 0.2s;
+            font-weight: 500;
         }
-        
+
+        .qv-color-btn .color-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
         .qv-color-btn.selected {
             border-color: #1a1a1a;
-            box-shadow: 0 0 0 2px white, 0 0 0 4px #1a1a1a;
+            background: #f5f5f5;
+            font-weight: 700;
         }
+
+        .qv-color-btn:hover { border-color: #1a1a1a; }
         
         .qv-error {
             color: #e74c3c;
