@@ -269,6 +269,54 @@ const KevraDB = {
         ];
     },
 
+    // ===================== İADE TALEPLERİ =====================
+
+    saveReturnRequest: async function(returnData) {
+        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+            try {
+                await window.KevraFirebase.db.collection('returns').doc(returnData.id).set(returnData);
+            } catch (e) { console.warn('Firestore iade kaydetme:', e); }
+        }
+        const returns = JSON.parse(localStorage.getItem('kevra_returns') || '[]');
+        const idx = returns.findIndex(r => r.id === returnData.id);
+        if (idx !== -1) returns[idx] = returnData; else returns.push(returnData);
+        localStorage.setItem('kevra_returns', JSON.stringify(returns));
+        return { success: true };
+    },
+
+    getAllReturnRequests: async function() {
+        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+            try {
+                const snap = await window.KevraFirebase.db.collection('returns').get();
+                const returns = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                localStorage.setItem('kevra_returns', JSON.stringify(returns));
+                return returns;
+            } catch (e) { console.warn('Firestore iadeler:', e); }
+        }
+        return JSON.parse(localStorage.getItem('kevra_returns') || '[]');
+    },
+
+    getUserReturnRequests: async function() {
+        const user = this.getCurrentUser();
+        if (!user) return [];
+        const all = await this.getAllReturnRequests();
+        return all.filter(r => r.userId === user.id);
+    },
+
+    updateReturnStatus: async function(returnId, status, statusText) {
+        const now = new Date().toISOString();
+        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+            try {
+                await window.KevraFirebase.db.collection('returns').doc(returnId).update({ status, statusText, updatedAt: now });
+            } catch (e) { console.warn('Firestore iade güncelleme:', e); }
+        }
+        const returns = JSON.parse(localStorage.getItem('kevra_returns') || '[]');
+        const ret = returns.find(r => r.id === returnId);
+        if (ret) { ret.status = status; ret.statusText = statusText; ret.updatedAt = now; }
+        localStorage.setItem('kevra_returns', JSON.stringify(returns));
+        return { success: true };
+    },
+
     clearAll: function() {
         ['kevra_users','kevra_orders','kevra_current_user','kevra_cart','kevra_products'].forEach(k => localStorage.removeItem(k));
     }

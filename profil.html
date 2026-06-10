@@ -1644,7 +1644,9 @@
             const user = KevraAuth.getCurrentUser();
             const orders = (typeof KevraDB !== 'undefined') ? await KevraDB.getUserOrders() : (user?.orders || []);
             const favs = JSON.parse(localStorage.getItem('kevra_favorites') || '[]');
-            const userReturns = returns.filter(r => r.userId === (user?.id || ''));
+            const userReturns = (typeof KevraDB !== 'undefined')
+                ? await KevraDB.getUserReturnRequests()
+                : JSON.parse(localStorage.getItem('kevra_returns') || '[]').filter(r => r.userId === (user?.id || ''));
 
             document.getElementById('orderCount').textContent = orders.length;
             document.getElementById('favCountStat').textContent = favs.length;
@@ -1905,27 +1907,28 @@
 
         // ================= İADE TALEPLERİ =================
 
-        function updateReturnOrderSelect() {
-            const user = KevraAuth.getCurrentUser();
-            const orders = user?.orders?.filter(o => o.status === 'delivered') || [];
+        async function updateReturnOrderSelect() {
+            const orders = await getOrders();
+            const delivered = orders.filter(o => ['delivered', 'Teslim Edildi'].includes(o.status));
             const select = document.getElementById('returnOrderSelect');
-            
             select.innerHTML = '<option value="">Sipariş seçin</option>' +
-                orders.map(o => {
+                delivered.map(o => {
                     const item = o.items?.[0];
-                    return `<option value="${o.id}">${o.id} - ${item?.name || 'Ürün'}</option>`;
+                    return `<option value="${o.id}">${o.id} — ${item?.name || 'Ürün'}</option>`;
                 }).join('');
         }
 
-        function submitReturn(e) {
+        async function submitReturn(e) {
             e.preventDefault();
-            
-            const orderId = document.getElementById('returnOrderSelect').value;
-            const reason = document.getElementById('returnReason').value;
-            const reasonText = document.getElementById('returnReason').options[document.getElementById('returnReason').selectedIndex].text;
-            const method = document.getElementById('returnMethod').value;
-            const methodText = document.getElementById('returnMethod').options[document.getElementById('returnMethod').selectedIndex].text;
-            const desc = document.getElementById('returnDesc').value;
+
+            const orderId    = document.getElementById('returnOrderSelect').value;
+            const reason     = document.getElementById('returnReason').value;
+            const reasonSel  = document.getElementById('returnReason');
+            const reasonText = reasonSel.options[reasonSel.selectedIndex].text;
+            const method     = document.getElementById('returnMethod').value;
+            const methodSel  = document.getElementById('returnMethod');
+            const methodText = methodSel.options[methodSel.selectedIndex].text;
+            const desc       = document.getElementById('returnDesc').value;
 
             if (!orderId || !reason || !method) {
                 showToast('Lütfen tüm zorunlu alanları doldurun', 'error');
@@ -1934,31 +1937,41 @@
 
             const user = KevraAuth.getCurrentUser();
             const newReturn = {
-                id: 'RET-' + Date.now(),
-                userId: user.id,
-                orderId: orderId,
-                reason: reason,
-                reasonText: reasonText,
-                method: method,
-                methodText: methodText,
+                id:          'RET-' + Date.now(),
+                userId:      user.id,
+                userEmail:   user.email || '',
+                userName:    (user.firstName || '') + ' ' + (user.lastName || ''),
+                orderId,
+                reason,
+                reasonText,
+                method,
+                methodText,
                 description: desc,
-                status: 'pending',
-                statusText: 'İnceleniyor',
-                createdAt: new Date().toISOString()
+                status:      'pending',
+                statusText:  'İnceleniyor',
+                createdAt:   new Date().toISOString()
             };
 
-            returns.push(newReturn);
-            localStorage.setItem('kevra_returns', JSON.stringify(returns));
+            if (typeof KevraDB !== 'undefined') {
+                await KevraDB.saveReturnRequest(newReturn);
+            } else {
+                const arr = JSON.parse(localStorage.getItem('kevra_returns') || '[]');
+                arr.push(newReturn);
+                localStorage.setItem('kevra_returns', JSON.stringify(arr));
+            }
 
             document.getElementById('returnForm').reset();
-            renderReturns();
-            updateStats();
+            await renderReturns();
+            await updateStats();
             showToast('İade talebiniz alındı! En kısa sürede size dönüş yapılacak.');
         }
 
-        function renderReturns() {
+        async function renderReturns() {
             const user = KevraAuth.getCurrentUser();
-            const userReturns = returns.filter(r => r.userId === (user?.id || ''));
+            const userReturns = (typeof KevraDB !== 'undefined')
+                ? await KevraDB.getUserReturnRequests()
+                : JSON.parse(localStorage.getItem('kevra_returns') || '[]').filter(r => r.userId === (user?.id || ''));
+
             const container = document.getElementById('returnsList');
 
             if (userReturns.length === 0) {
@@ -1973,24 +1986,24 @@
             }
 
             const statusClassMap = {
-                'pending': 'return-status-pending',
+                'pending':  'return-status-pending',
                 'approved': 'return-status-approved',
                 'rejected': 'return-status-rejected'
             };
 
-            container.innerHTML = userReturns.map(ret => {
-                const date = new Date(ret.createdAt).toLocaleDateString('tr-TR');
+            container.innerHTML = [...userReturns].reverse().map(ret => {
+                const date = new Date(ret.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
                 return `
                     <div class="return-item">
                         <div class="return-item-header">
-                            <div class="return-item-title">İade #${ret.id} | Sipariş #${ret.orderId}</div>
+                            <div class="return-item-title">${ret.id} · Sipariş #${ret.orderId}</div>
                             <span class="return-item-status ${statusClassMap[ret.status] || 'return-status-pending'}">${ret.statusText}</span>
                         </div>
                         <div class="return-item-meta">
                             <strong>Neden:</strong> ${ret.reasonText}<br>
-                            <strong>Yöntem:</strong> ${ret.methodText}<br>
-                            <strong>Tarih:</strong> ${date}<br>
-                            ${ret.description ? `<strong>Açıklama:</strong> ${ret.description}<br>` : ''}
+                            <strong>İade Yöntemi:</strong> ${ret.methodText}<br>
+                            <strong>Tarih:</strong> ${date}
+                            ${ret.description ? `<br><strong>Açıklama:</strong> ${ret.description}` : ''}
                         </div>
                     </div>
                 `;
@@ -2170,7 +2183,7 @@
             await updateStats();
 
             // İade geçmişini render et
-            renderReturns();
+            await renderReturns();
 
             // Adresleri render et
             renderAddresses();
