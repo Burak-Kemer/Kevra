@@ -189,10 +189,11 @@ function openQuickView(productId) {
         
         colorsContainer.innerHTML = product.colors.map((color) => {
             const bgColor = colorMap[color] || color.toLowerCase();
-            const borderStyle = (color === 'Beyaz' || color === 'Krem' || color === 'Bej') ? 'border: 2px solid #ddd;' : '';
-            return `<button class="qv-color-btn" 
-                    style="background: ${bgColor}; ${borderStyle}"
-                    title="${color}" onclick="selectQVColor(this, '${color}')"></button>`;
+            const dotBorder = (color === 'Beyaz' || color === 'Krem' || color === 'Bej') ? 'border: 1px solid #ddd;' : '';
+            return `<button class="qv-color-btn" onclick="selectQVColor(this, '${color}')">
+                <span class="color-dot" style="background: ${bgColor}; ${dotBorder}"></span>
+                ${color}
+            </button>`;
         }).join('');
     }
     
