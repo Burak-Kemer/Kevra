@@ -182,9 +182,10 @@ function openQuickView(productId) {
         const colorMap = {
             'Siyah': '#000000', 'Beyaz': '#ffffff', 'Krem': '#f5f5dc', 'Bej': '#f5f5dc',
             'Gri': '#808080', 'Lacivert': '#000080', 'Bordo': '#800020', 'Kırmızı': '#ff0000',
-            'Pembe': '#ffc0cb', 'Mavi': '#0000ff', 'Sarı': '#ffff00', 'Yeşil': '#008000',
+            'Pembe': '#ffc0cb', 'Mavi': '#1a56db', 'Sarı': '#f5c518', 'Yeşil': '#008000',
             'Haki': '#c3b091', 'Pudra': '#ffd1dc', 'Altın': '#ffd700', 'Gümüş': '#c0c0c0',
-            'Ten': '#f5deb3'
+            'Ten': '#f5deb3', 'Mürdüm': '#4a0e2e', 'Acı Kahve': '#4e2c0e',
+            'Bebe Mavisi': '#aed6f1', 'Haki Yeşil': '#6b7c3a', 'Vizon': '#c4a882'
         };
         
         colorsContainer.innerHTML = product.colors.map((color) => {
