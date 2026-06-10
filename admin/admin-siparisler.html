@@ -667,6 +667,21 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label>Kargo Firması</label>
+                    <select id="cargoCompany">
+                        <option value="">— Seçiniz —</option>
+                        <option value="yurtici">Yurtiçi Kargo</option>
+                        <option value="aras">Aras Kargo</option>
+                        <option value="mng">MNG Kargo</option>
+                        <option value="surat">Sürat Kargo</option>
+                        <option value="ptt">PTT Kargo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Kargo Takip Numarası</label>
+                    <input type="text" id="trackingNumber" placeholder="Örn: 123456789" style="width:100%; padding:10px; border:1px solid #e0e0e0; border-radius:8px; box-sizing:border-box;">
+                </div>
+                <div class="form-group">
                     <label>Notlar</label>
                     <textarea id="orderNotes" rows="3" placeholder="Sipariş hakkında notlar..."></textarea>
                 </div>
@@ -910,30 +925,32 @@
             const statusVal = statusClass(order.status);
             const shipVal   = (['preparing','shipped','delivered'].includes(order.shippingStatus)) ? order.shippingStatus
                               : ({'Hazırlanıyor':'preparing','Kargoya Verildi':'shipped','Kargoda':'shipped','Teslim Edildi':'delivered'}[order.shippingStatus] || 'preparing');
-            document.getElementById('orderStatus').value   = statusVal;
+            document.getElementById('orderStatus').value    = statusVal;
             document.getElementById('shippingStatus').value = shipVal;
-            document.getElementById('orderNotes').value    = order.notes || '';
+            document.getElementById('cargoCompany').value   = order.cargoCompany || '';
+            document.getElementById('trackingNumber').value = order.trackingNumber || '';
+            document.getElementById('orderNotes').value     = order.notes || '';
             document.getElementById('editModal').classList.add('active');
         }
 
         async function saveOrderStatus() {
-            const statusVal  = document.getElementById('orderStatus').value;
-            const shipVal    = document.getElementById('shippingStatus').value;
-            const notes      = document.getElementById('orderNotes').value;
+            const statusVal      = document.getElementById('orderStatus').value;
+            const shipVal        = document.getElementById('shippingStatus').value;
+            const cargoCompany   = document.getElementById('cargoCompany').value;
+            const trackingNumber = document.getElementById('trackingNumber').value.trim();
+            const notes          = document.getElementById('orderNotes').value;
 
-            // Convert English code → Turkish label
             const statusMap = { pending:'Beklemede', processing:'Hazırlanıyor', shipped:'Kargoda', delivered:'Teslim Edildi', cancelled:'İptal Edildi' };
             const shipMap   = { preparing:'Hazırlanıyor', shipped:'Kargoya Verildi', delivered:'Teslim Edildi' };
             const newStatus = statusMap[statusVal] || statusVal;
             const newShip   = shipMap[shipVal]     || shipVal;
 
-            try {
-                await KevraDB.updateOrderStatus(currentOrderId, newStatus, newShip);
-                // Save notes separately in localStorage
-                const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
-                const idx = orders.findIndex(o => o.id === currentOrderId);
-                if (idx !== -1) { orders[idx].notes = notes; localStorage.setItem('kevra_orders', JSON.stringify(orders)); }
+            const extra = { notes };
+            if (cargoCompany)   extra.cargoCompany   = cargoCompany;
+            if (trackingNumber) extra.trackingNumber = trackingNumber;
 
+            try {
+                await KevraDB.updateOrderStatus(currentOrderId, newStatus, newShip, extra);
                 showToast('Sipariş durumu güncellendi!', 'success');
                 closeEditModal();
                 await loadOrders();

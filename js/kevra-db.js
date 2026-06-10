@@ -195,11 +195,12 @@ const KevraDB = {
         return all.filter(o => o.userId === currentUser.id);
     },
 
-    updateOrderStatus: async function(orderId, status, shippingStatus) {
+    updateOrderStatus: async function(orderId, status, shippingStatus, extra = {}) {
         if (window.KevraFirebase && window.KevraFirebase.ready()) {
             try {
                 const update = { status };
                 if (shippingStatus) update.shippingStatus = shippingStatus;
+                Object.assign(update, extra);
                 await window.KevraFirebase.db.collection('orders').doc(orderId).update(update);
             } catch (e) { console.warn('Firestore sipariş güncelleme:', e); }
         }
@@ -208,6 +209,7 @@ const KevraDB = {
         if (order) {
             order.status = status;
             if (shippingStatus) order.shippingStatus = shippingStatus;
+            Object.assign(order, extra);
             localStorage.setItem('kevra_orders', JSON.stringify(orders));
             return { success: true };
         }

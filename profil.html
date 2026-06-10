@@ -807,6 +807,21 @@
             font-size: 24px;
             cursor: pointer;
         }
+        #orderDetailModal .modal-box { max-width: 600px; position: relative; }
+        .od-title { font-family: 'Playfair Display', serif; margin-bottom: 4px; font-size: 22px; }
+        .od-subtitle { font-size: 13px; color: #888; margin-bottom: 20px; }
+        .od-items { margin-bottom: 16px; }
+        .od-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+        .od-item-img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
+        .od-item-info { flex: 1; }
+        .od-item-name { font-weight: 600; }
+        .od-item-meta { color: #888; font-size: 13px; margin-top: 2px; }
+        .od-item-price { font-weight: 600; white-space: nowrap; }
+        .od-total { display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; padding-top: 12px; }
+        .od-tracking { background: #f0fdf4; border: 1px solid #86efac; border-radius: 12px; padding: 16px; margin-top: 16px; }
+        .od-tracking-title { font-weight: 600; margin-bottom: 8px; }
+        .od-tracking-info { font-size: 14px; color: #555; margin-bottom: 4px; }
+        .od-track-link { display: inline-block; background: #1a1a1a; color: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; text-decoration: none; margin-top: 10px; }
 
         /* ================= MOBIL RESPONSIVE ================= */
         @media (max-width: 768px) {
@@ -1276,6 +1291,14 @@
             <button class="close-drawer" id="closeFavBtn">×</button>
         </div>
         <div class="drawer-body" id="favItems"></div>
+    </div>
+
+    <!-- ORDER DETAIL MODAL -->
+    <div class="modal-overlay" id="orderDetailModal" onclick="if(event.target===this)closeOrderDetail()">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeOrderDetail()">×</button>
+            <div id="orderDetailContent"></div>
+        </div>
     </div>
 
     <!-- ADDRESS MODAL -->
@@ -1784,20 +1807,72 @@
             }).join('');
         }
 
-        function showOrderDetail(orderId) {
-            const user = KevraAuth.getCurrentUser();
-            const order = user?.orders?.find(o => o.id === orderId);
+        const CARGO_NAMES = { yurtici:'Yurtiçi Kargo', aras:'Aras Kargo', mng:'MNG Kargo', surat:'Sürat Kargo', ptt:'PTT Kargo' };
+        const CARGO_URLS  = {
+            yurtici: 'https://kargotakip.yurticikargo.com/kargo-takip?code=',
+            aras:    'https://kargotakip.araskargo.com.tr/?trackingNumber=',
+            mng:     'https://www.mngkargo.com.tr/gonderi-takip?barcode=',
+            surat:   'https://www.suratkargo.com.tr/KargoSorgulama?kod=',
+            ptt:     'https://gonderitakip.ptt.gov.tr/Track/Verify?q='
+        };
+
+        async function getOrders() {
+            if (typeof KevraDB !== 'undefined') return await KevraDB.getUserOrders();
+            return KevraAuth.getCurrentUser()?.orders || [];
+        }
+
+        async function showOrderDetail(orderId) {
+            const orders = await getOrders();
+            const order  = orders.find(o => o.id === orderId);
             if (!order) return;
 
             const items = order.items || [];
-            const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const date = new Date(order.createdAt).toLocaleDateString('tr-TR');
+            const total = order.total || items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+            const date  = new Date(order.createdAt).toLocaleDateString('tr-TR', { day:'numeric', month:'long', year:'numeric' });
 
-            alert(`Sipariş Detayı #${orderId}\n\nTarih: ${date}\nDurum: ${order.statusText || order.status}\n\nÜrünler:\n${items.map(i => `- ${i.name} (${i.quantity} adet) - ${i.price.toLocaleString('tr-TR')} ₺`).join('\n')}\n\nToplam: ${total.toLocaleString('tr-TR')} ₺`);
+            const trackingHtml = (order.trackingNumber && order.cargoCompany) ? `
+                <div class="od-tracking">
+                    <div class="od-tracking-title">Kargo Bilgisi</div>
+                    <div class="od-tracking-info">${CARGO_NAMES[order.cargoCompany] || order.cargoCompany}</div>
+                    <div class="od-tracking-info">Takip No: <strong>${order.trackingNumber}</strong></div>
+                    <a href="${CARGO_URLS[order.cargoCompany]}${order.trackingNumber}" target="_blank" class="od-track-link">Kargoyu Takip Et →</a>
+                </div>` : '';
+
+            document.getElementById('orderDetailContent').innerHTML = `
+                <h2 class="od-title">Sipariş Detayı</h2>
+                <p class="od-subtitle">#${order.id} · ${date}</p>
+                <div class="od-items">
+                    ${items.map(item => `
+                        <div class="od-item">
+                            <img src="${item.image}" alt="${item.name}" class="od-item-img" onerror="this.src='https://via.placeholder.com/60?text=?'">
+                            <div class="od-item-info">
+                                <div class="od-item-name">${item.name}</div>
+                                <div class="od-item-meta">Beden: ${item.size||'-'} | Renk: ${item.color||'-'} | Adet: ${item.quantity}</div>
+                            </div>
+                            <div class="od-item-price">${(item.price * item.quantity).toLocaleString('tr-TR')} ₺</div>
+                        </div>`).join('')}
+                </div>
+                <div class="od-total">
+                    <span>Toplam</span>
+                    <span>${total.toLocaleString('tr-TR')} ₺</span>
+                </div>
+                ${trackingHtml}
+            `;
+            document.getElementById('orderDetailModal').classList.add('active');
         }
 
-        function trackOrder(orderNumber) {
-            window.open(`siparistakibi.html?order=${orderNumber}`, '_blank');
+        function closeOrderDetail() {
+            document.getElementById('orderDetailModal').classList.remove('active');
+        }
+
+        async function trackOrder(orderId) {
+            const orders = await getOrders();
+            const order  = orders.find(o => o.id === orderId);
+            if (order?.trackingNumber && order?.cargoCompany && CARGO_URLS[order.cargoCompany]) {
+                window.open(CARGO_URLS[order.cargoCompany] + order.trackingNumber, '_blank');
+            } else {
+                showToast('Kargo takip bilgisi henüz eklenmedi', 'warning');
+            }
         }
 
         async function cancelOrder(orderNumber) {
