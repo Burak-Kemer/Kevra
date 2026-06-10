@@ -180,12 +180,13 @@ function openQuickView(productId) {
     const colorsContainer = document.getElementById('qvColors');
     if (colorsContainer && product.colors) {
         const colorMap = {
-            'Siyah': '#000000', 'Beyaz': '#ffffff', 'Krem': '#f5f5dc', 'Bej': '#f5f5dc',
-            'Gri': '#808080', 'Lacivert': '#000080', 'Bordo': '#800020', 'Kırmızı': '#ff0000',
-            'Pembe': '#ffc0cb', 'Mavi': '#1a56db', 'Sarı': '#f5c518', 'Yeşil': '#008000',
-            'Haki': '#c3b091', 'Pudra': '#ffd1dc', 'Altın': '#ffd700', 'Gümüş': '#c0c0c0',
-            'Ten': '#f5deb3', 'Mürdüm': '#4a0e2e', 'Acı Kahve': '#4e2c0e',
-            'Bebe Mavisi': '#aed6f1', 'Haki Yeşil': '#6b7c3a', 'Vizon': '#c4a882'
+            'Beyaz': '#ffffff', 'Siyah': '#000000', 'Pembe': '#f4a0b5',
+            'Mavi': '#1a56db', 'Haki': '#8b8c5e', 'Mürdüm': '#4a0e2e',
+            'Bordo': '#800020', 'Acı Kahve': '#4e2c0e', 'Sarı': '#f5c518',
+            'Vizon': '#c4a882', 'Bej': '#e8d5b7', 'Lacivert': '#000080',
+            'Yağ Yeşili': '#4a5240', 'Kahverengi': '#6b3a2a', 'Krem': '#f5f0e0',
+            'Antrasit': '#3b3b3b', 'Gri': '#808080', 'Taş': '#b0a898',
+            'Küf Yeşili': '#7a8c6e', 'Hardal': '#c49a22'
         };
         
         colorsContainer.innerHTML = product.colors.map((color) => {
