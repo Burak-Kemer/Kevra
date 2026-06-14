@@ -1466,9 +1466,13 @@ function validateForm() {
 
     requiredFields.forEach(id => {
         const field = document.getElementById(id);
-        if (!field || !validateField(field)) {
+        if (!field) { isValid = false; return; }
+        const value = field.value ? field.value.trim() : '';
+        if (!value) {
             isValid = false;
-            if (field) field.classList.add('error');
+            field.classList.add('error');
+        } else {
+            field.classList.remove('error');
         }
     });
 
