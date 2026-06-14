@@ -1472,19 +1472,6 @@ function validateForm() {
         }
     });
 
-    // Kart ödemesi seçiliyse kart alanlarını da kontrol et
-    const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
-    if (paymentMethod === 'card') {
-        const cardFields = ['cardName', 'cardNumber', 'cardExpiry', 'cardCvv'];
-        cardFields.forEach(id => {
-            const field = document.getElementById(id);
-            if (!field || !field.value.trim()) {
-                isValid = false;
-                if (field) field.classList.add('error');
-            }
-        });
-    }
-
     return isValid;
 }
 
