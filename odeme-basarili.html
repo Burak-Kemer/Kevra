@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Ödeme Başarılı</title>
+</head>
+<body>
+<script>
+    // PayTR iFrame içinde yüklendi — parent sayfaya bildir
+    try {
+        window.parent.postMessage({ paytr: 'success' }, 'https://kevra.com.tr');
+    } catch(e) {}
+</script>
+</body>
+</html>
