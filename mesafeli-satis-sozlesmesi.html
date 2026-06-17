@@ -107,7 +107,8 @@
         .policy-box li { margin-bottom: 10px; font-size: 15px; }
         .highlight-box { background: #f8f5f2; padding: 22px 25px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #c9a87c; }
         .highlight-box p { margin: 0; color: #555; }
-        .info-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 14px 0 20px; }
+        .table-wrap { overflow-x: auto; }
+        .info-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 14px 0 20px; min-width: 340px; }
         .info-table td { padding: 11px 16px; border: 1px solid #e8e8e8; color: #555; vertical-align: top; }
         .info-table td:first-child { font-weight: 600; color: #1a1a1a; background: #fafafa; width: 32%; white-space: nowrap; }
         .policy-link { color: #c9a87c; text-decoration: none; }
@@ -249,13 +250,15 @@
 
         <h2>Madde 1 — Taraflar</h2>
         <p><strong>SATICI:</strong></p>
-        <table class="info-table">
-            <tr><td>Unvan</td><td>KEVRA Premium Kadın Giyim</td></tr>
-            <tr><td>Adres</td><td>Nişantaşı Mahallesi, Şişli, İstanbul</td></tr>
-            <tr><td>Telefon</td><td>+90 531 960 13 03</td></tr>
-            <tr><td>E-posta</td><td>info@kevra.com.tr</td></tr>
-            <tr><td>Web Sitesi</td><td>https://kevra.com.tr</td></tr>
-        </table>
+        <div class="table-wrap">
+            <table class="info-table">
+                <tr><td>Unvan</td><td>KEVRA Premium Kadın Giyim</td></tr>
+                <tr><td>Adres</td><td>Nişantaşı Mahallesi, Şişli, İstanbul</td></tr>
+                <tr><td>Telefon</td><td>+90 531 960 13 03</td></tr>
+                <tr><td>E-posta</td><td>info@kevra.com.tr</td></tr>
+                <tr><td>Web Sitesi</td><td>https://kevra.com.tr</td></tr>
+            </table>
+        </div>
         <p><strong>ALICI:</strong> Sipariş esnasında kayıt formunda belirtilen ad, adres ve iletişim bilgilerine sahip kişidir.</p>
 
         <h2>Madde 2 — Sözleşmenin Konusu</h2>
