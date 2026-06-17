@@ -2,245 +2,393 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="KEVRA Mesafeli Satış Sözleşmesi - Tüketici hakları ve satış koşulları">
     <title>Mesafeli Satış Sözleşmesi | KEVRA</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
     <style>
-        .page-hero {
-            background: #1a1a1a;
-            color: #fff;
-            padding: 100px 40px 60px;
-            text-align: center;
-        }
-        .page-hero h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 36px;
-            letter-spacing: 2px;
-            margin-bottom: 12px;
-        }
-        .page-hero p {
-            color: #aaa;
-            font-size: 14px;
-        }
-        .legal-content {
-            max-width: 860px;
-            margin: 60px auto;
-            padding: 0 24px 80px;
-        }
-        .legal-section {
-            margin-bottom: 36px;
-        }
-        .legal-section h2 {
-            font-size: 16px;
-            font-weight: 700;
-            color: #1a1a1a;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-left: 3px solid #c9a87c;
-            padding-left: 12px;
-            margin-bottom: 14px;
-        }
-        .legal-section p, .legal-section li {
-            font-size: 14px;
-            color: #444;
-            line-height: 1.85;
-            margin-bottom: 8px;
-        }
-        .legal-section ul, .legal-section ol {
-            padding-left: 20px;
-        }
-        .info-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
-        .info-table td {
-            padding: 10px 14px;
-            border: 1px solid #e5e5e5;
-            color: #444;
-            vertical-align: top;
-        }
-        .info-table td:first-child {
-            font-weight: 600;
-            color: #1a1a1a;
-            background: #fafafa;
-            width: 35%;
-            white-space: nowrap;
-        }
-        .highlight-box {
-            background: #f8f5f2;
-            border-left: 4px solid #c9a87c;
-            padding: 16px 20px;
-            border-radius: 0 8px 8px 0;
-            margin: 16px 0;
-        }
-        .highlight-box p {
-            margin: 0;
-            font-size: 14px;
-            color: #555;
-        }
-        .update-date {
-            text-align: center;
-            color: #999;
-            font-size: 13px;
-            margin-top: 60px;
-            padding-top: 24px;
-            border-top: 1px solid #eee;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8f5f2; color: #1a1a1a; line-height: 1.8; -webkit-font-smoothing: antialiased; }
+
+        .header { position: fixed; top: 0; left: 0; right: 0; height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 9999; transition: all 0.4s ease; background: rgba(255,255,255,0.98); box-shadow: 0 2px 20px rgba(0,0,0,0.08); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); }
+        .header.scrolled { background: rgba(255,255,255,0.98); box-shadow: 0 2px 20px rgba(0,0,0,0.1); }
+        .header-left, .header-right { display: flex; align-items: center; gap: 15px; }
+        .header-center { position: absolute; left: 50%; transform: translateX(-50%); }
+        .header-btn { padding: 10px 20px; background: transparent; border: 1px solid rgba(0,0,0,0.1); color: #1a1a1a; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+        .header-btn:hover { background: rgba(0,0,0,0.05); transform: translateY(-2px); }
+        .brand-logo { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #1a1a1a; line-height: 1; transition: transform 0.3s ease; }
+        .brand-logo:hover { transform: scale(1.05); }
+        .brand-arabic { font-size: 24px; font-weight: bold; margin-bottom: -6px; }
+        .brand-text { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 600; letter-spacing: 10px; margin-top: 2px; }
+        .header-link { color: #1a1a1a; text-decoration: none; font-size: 14px; transition: color 0.3s; padding: 8px 12px; border-radius: 6px; }
+        .header-link:hover { color: #c9a87c; }
+        .header-icon { position: relative; padding: 10px; background: transparent; border: 1px solid rgba(0,0,0,0.1); color: #1a1a1a; border-radius: 8px; cursor: pointer; font-size: 18px; transition: all 0.3s; display: flex; align-items: center; gap: 5px; }
+        .header-icon:hover { background: rgba(0,0,0,0.05); }
+        #cartCount, #favCount { position: absolute; top: -8px; right: -8px; background: #e74c3c; color: white; font-size: 11px; font-weight: 700; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
+
+        .user-dropdown { position: relative; }
+        .user-menu-btn { display: flex; align-items: center; gap: 8px; background: transparent; border: 1px solid rgba(0,0,0,0.1); color: #1a1a1a; padding: 8px 16px; border-radius: 25px; cursor: pointer; font-size: 14px; font-family: 'Inter', sans-serif; transition: all 0.3s ease; }
+        .user-menu-btn:hover { background: rgba(0,0,0,0.05); }
+        .user-avatar { width: 28px; height: 28px; background: #c9a87c; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px; }
+        .user-dropdown-menu { position: absolute; right: 0; top: 55px; width: 220px; background: white; border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); display: none; z-index: 10000; overflow: hidden; border: 1px solid rgba(0,0,0,0.05); }
+        .user-dropdown-menu.show { display: block; }
+        .dropdown-user-info { display: flex; gap: 12px; padding: 16px; align-items: center; border-bottom: 1px solid #f5f5f5; }
+        .dropdown-avatar { width: 40px; height: 40px; background: #c9a87c; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+        .dropdown-name { font-size: 14px; font-weight: 600; }
+        .dropdown-email { font-size: 12px; color: #888; }
+        .dropdown-item { display: flex; align-items: center; gap: 12px; padding: 14px 18px; font-size: 14px; color: #333; text-decoration: none; transition: all 0.2s ease; border-bottom: 1px solid rgba(0,0,0,0.03); }
+        .dropdown-item:hover { background: #f8f5f2; color: #c9a87c; }
+        .dropdown-item.logout { color: #e74c3c; width: 100%; text-align: left; cursor: pointer; border: none; background: none; font-family: inherit; }
+        .dropdown-divider { height: 1px; background: #eee; margin: 8px 0; }
+
+        .search-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; align-items: flex-start; justify-content: center; padding-top: 80px; backdrop-filter: blur(10px); }
+        .search-modal.active { display: flex; }
+        .search-box { background: white; width: 90%; max-width: 700px; border-radius: 24px; padding: 35px; box-shadow: 0 25px 80px rgba(0,0,0,0.4); max-height: 80vh; display: flex; flex-direction: column; }
+        .search-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0; }
+        .search-title { font-family: 'Playfair Display', serif; font-size: 28px; color: #1a1a1a; }
+        .search-close-btn { background: #f5f5f5; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 20px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
+        .search-close-btn:hover { background: #e74c3c; color: white; }
+        .search-input-wrapper input { width: 100%; padding: 20px 25px; border: 2px solid #e8e8e8; border-radius: 16px; font-size: 16px; outline: none; font-family: 'Inter', sans-serif; background: #fafafa; }
+        .search-input-wrapper input:focus { border-color: #c9a87c; background: white; }
+        .search-results { max-height: 450px; overflow-y: auto; margin-top: 15px; }
+
+        .side-menu { position: fixed; top: 0; left: -400px; width: 400px; height: 100vh; background: white; z-index: 10001; transition: left 0.4s ease; box-shadow: 5px 0 30px rgba(0,0,0,0.1); }
+        .side-menu.active { left: 0; }
+        .side-menu-header { display: flex; justify-content: space-between; align-items: center; padding: 30px; border-bottom: 1px solid #eee; }
+        .side-menu-header h3 { font-family: 'Playfair Display', serif; font-size: 24px; letter-spacing: 3px; }
+        .side-menu-header button { background: none; border: none; font-size: 24px; cursor: pointer; }
+        .side-menu-content { padding: 20px; }
+        .menu-link { display: block; padding: 15px 20px; color: #1a1a1a; text-decoration: none; font-size: 16px; border-radius: 10px; transition: all 0.3s; margin-bottom: 5px; }
+        .menu-link:hover { background: #f5f5f5; padding-left: 25px; }
+        .menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10000; }
+        .menu-overlay.active { display: block; }
+
+        .cart-drawer { position: fixed; top: 0; right: -450px; width: 450px; height: 100vh; background: white; z-index: 10002; transition: right 0.4s ease; box-shadow: -5px 0 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        .cart-drawer.open { right: 0; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; padding: 25px; border-bottom: 1px solid #eee; }
+        .cart-header h3 { font-family: 'Playfair Display', serif; font-size: 20px; }
+        .cart-close-btn { background: none; border: none; font-size: 24px; cursor: pointer; }
+        .cart-items { flex: 1; overflow-y: auto; padding: 20px; }
+        .cart-footer { padding: 25px; border-top: 1px solid #eee; background: #f9f9f9; }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
+        .cart-total { display: flex; justify-content: space-between; font-size: 20px; font-weight: 700; padding-top: 15px; border-top: 2px solid #ddd; margin-top: 15px; }
+        .cart-actions { display: flex; flex-direction: column; gap: 10px; }
+        .checkout-btn, .go-to-cart-btn, .continue-btn { width: 100%; padding: 16px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .checkout-btn { background: #27ae60; color: white; }
+        .go-to-cart-btn { background: #1a1a1a; color: white; }
+        .continue-btn { background: transparent; color: #666; border: 1px solid #ddd; }
+        .cart-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10001; }
+        .cart-overlay.active { display: block; }
+
+        .fav-drawer { position: fixed; top: 0; right: -450px; width: 450px; height: 100vh; background: white; z-index: 10002; transition: right 0.4s ease; box-shadow: -5px 0 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        .fav-drawer.open { right: 0; }
+        .fav-header { display: flex; justify-content: space-between; align-items: center; padding: 25px; border-bottom: 1px solid #eee; }
+        .fav-items { flex: 1; overflow-y: auto; padding: 20px; }
+        .fav-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10001; }
+        .fav-overlay.active { display: block; }
+
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1a1a1a; color: white; padding: 16px 28px; border-radius: 12px; font-size: 14px; opacity: 0; transition: all 0.4s; z-index: 10005; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast.success { background: #27ae60; }
+        .toast.error { background: #e74c3c; }
+
+        .page-header { background: linear-gradient(135deg, #1a1a1a 0%, #333 100%); color: white; padding: 140px 40px 80px; text-align: center; }
+        .page-header h1 { font-family: 'Playfair Display', serif; font-size: 48px; margin-bottom: 15px; }
+        .page-header p { color: #aaa; font-size: 15px; }
+        .breadcrumb { display: flex; justify-content: center; gap: 10px; margin-top: 20px; font-size: 14px; }
+        .breadcrumb a { color: #c9a87c; text-decoration: none; }
+
+        .content-section { padding: 60px 40px; max-width: 900px; margin: 0 auto; }
+        .policy-box { background: white; padding: 50px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .policy-box h2 { font-family: 'Playfair Display', serif; font-size: 24px; margin: 40px 0 16px; color: #1a1a1a; padding-bottom: 12px; border-bottom: 2px solid #f0f0f0; }
+        .policy-box h2:first-child { margin-top: 0; }
+        .policy-box p { margin-bottom: 14px; color: #555; font-size: 15px; line-height: 1.85; }
+        .policy-box ul, .policy-box ol { margin: 14px 0 14px 28px; color: #555; }
+        .policy-box li { margin-bottom: 10px; font-size: 15px; }
+        .highlight-box { background: #f8f5f2; padding: 22px 25px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #c9a87c; }
+        .highlight-box p { margin: 0; color: #555; }
+        .info-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 14px 0 20px; }
+        .info-table td { padding: 11px 16px; border: 1px solid #e8e8e8; color: #555; vertical-align: top; }
+        .info-table td:first-child { font-weight: 600; color: #1a1a1a; background: #fafafa; width: 32%; white-space: nowrap; }
+        .policy-link { color: #c9a87c; text-decoration: none; }
+        .policy-link:hover { text-decoration: underline; }
+
+        .footer { background: #1a1a1a; color: white; padding: 60px 40px 100px; }
+        .footer-inner { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; max-width: 1400px; margin: 0 auto; }
+        .footer-brand h3 { font-family: 'Playfair Display', serif; font-size: 28px; margin-bottom: 15px; letter-spacing: 3px; }
+        .footer-brand p { color: #999; margin-bottom: 20px; }
+        .social-links { display: flex; gap: 15px; }
+        .social-links a { width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; color: white; font-size: 18px; transition: all 0.3s; }
+        .social-links a:hover { background: #c9a87c; }
+        .footer-links h4 { font-size: 16px; margin-bottom: 20px; }
+        .footer-links a { display: block; color: #999; text-decoration: none; margin-bottom: 12px; transition: color 0.3s; }
+        .footer-links a:hover { color: white; }
+        .footer-bottom { border-top: 1px solid #333; margin-top: 40px; padding-top: 30px; display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin-left: auto; margin-right: auto; }
+
+        @media (max-width: 1024px) { .header { padding: 0 20px; } .side-menu { width: 100%; left: -100%; } .cart-drawer, .fav-drawer { width: 100%; right: -100%; } }
+        @media (max-width: 768px) {
+            .header { height: 60px; padding: 0 15px; }
+            .brand-text { font-size: 22px; letter-spacing: 6px; }
+            .brand-arabic { font-size: 20px; }
+            .header-btn { padding: 8px 12px; font-size: 13px; }
+            .header-link { display: none; }
+            .page-header { padding: 100px 20px 50px; }
+            .page-header h1 { font-size: 32px; }
+            .content-section { padding: 30px 16px; }
+            .policy-box { padding: 24px 20px; }
+            .footer-inner { grid-template-columns: 1fr; gap: 30px; }
+            .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
         }
     </style>
 </head>
 <body>
 
-    <!-- HEADER -->
-    <header class="header" id="mainHeader">
-        <div class="header-left">
-            <button class="menu-toggle" onclick="toggleMenu()">☰ Menü</button>
-            <button class="search-toggle" onclick="toggleSearch()">🔍 Ara</button>
+<!-- HEADER -->
+<header class="header" id="mainHeader">
+    <div class="header-left">
+        <button class="header-btn" id="openMenuBtn">☰ Menü</button>
+        <button class="header-btn" id="openSearch">🔍 Ara</button>
+    </div>
+    <div class="header-center">
+        <a href="index.html" class="brand-logo">
+            <span class="brand-arabic">ك</span>
+            <span class="brand-text">KEVRA</span>
+        </a>
+    </div>
+    <div class="header-right">
+        <a href="hakkimizda.html" class="header-link">Hakkımızda</a>
+        <a href="iletisim.html" class="header-link">İletişim</a>
+        <button class="header-icon" id="favBtn">♡ <span id="favCount">0</span></button>
+        <button class="header-icon" id="cartBtn">👜 <span id="cartCount">0</span></button>
+        <div id="userMenuContainer"></div>
+    </div>
+</header>
+
+<!-- SEARCH MODAL -->
+<div class="search-modal" id="searchModal">
+    <div class="search-box">
+        <div class="search-head">
+            <h2 class="search-title">🔍 Ürün Ara</h2>
+            <button class="search-close-btn" id="closeSearch">✖</button>
         </div>
-        <div class="header-logo">
-            <a href="index.html">
-                <svg width="28" height="28" viewBox="0 0 100 100" fill="none">
-                    <path d="M50 10 L90 30 L90 70 L50 90 L10 70 L10 30 Z" stroke="#1a1a1a" stroke-width="3" fill="none"/>
-                    <path d="M50 25 L75 40 L75 65 L50 80 L25 65 L25 40 Z" fill="#1a1a1a"/>
-                </svg>
-                <span>K E V R A</span>
-            </a>
+        <div class="search-input-wrapper">
+            <input type="text" id="searchInput" placeholder="Ürün adı yaz..." autocomplete="off">
         </div>
-        <div class="header-right">
+        <div class="search-results" id="searchResults"></div>
+    </div>
+</div>
+
+<!-- SIDE MENU -->
+<div class="side-menu" id="sideMenu">
+    <div class="side-menu-header">
+        <h3>KEVRA</h3>
+        <button id="closeMenuBtn">✖</button>
+    </div>
+    <div class="side-menu-content">
+        <a href="index.html" class="menu-link">Ana Sayfa</a>
+        <a href="shop.html" class="menu-link">Tüm Ürünler</a>
+        <a href="shop.html?category=yeni" class="menu-link">Yeni Sezon</a>
+        <a href="shop.html?category=elbise" class="menu-link">Elbiseler</a>
+        <a href="shop.html?category=ust" class="menu-link">Üst Giyim</a>
+        <a href="shop.html?category=alt" class="menu-link">Alt Giyim</a>
+        <a href="shop.html?category=triko" class="menu-link">Triko</a>
+        <a href="shop.html?category=dis" class="menu-link">Dış Giyim</a>
+        <a href="shop.html?category=aksesuar" class="menu-link">Aksesuar</a>
+    </div>
+</div>
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<!-- CART DRAWER -->
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-header">
+        <h3>Sepetim (<span id="cartDrawerCount">0</span>)</h3>
+        <button class="cart-close-btn" id="closeCartBtn">✖</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer" id="cartFooter">
+        <div class="cart-summary">
+            <div class="summary-row"><span>Ara Toplam</span><span id="subTotal">0 ₺</span></div>
+            <div class="summary-row"><span>Kargo</span><span id="shippingCost">Ücretsiz</span></div>
+            <div class="cart-total"><span>Toplam</span><span id="cartTotal">0 ₺</span></div>
+        </div>
+        <div class="cart-actions">
+            <button class="go-to-cart-btn" onclick="location.href='sepetim.html'">🛒 Sepetime Git</button>
+            <button class="continue-btn" id="continueBtn">Alışverişe Devam Et</button>
+        </div>
+    </div>
+</div>
+<div class="cart-overlay" id="cartOverlay"></div>
+
+<!-- FAVORITES DRAWER -->
+<div class="fav-drawer" id="favDrawer">
+    <div class="fav-header">
+        <h3>Favorilerim (<span id="favDrawerCount">0</span>)</h3>
+        <button class="cart-close-btn" id="closeFavBtn">✖</button>
+    </div>
+    <div class="fav-items" id="favItems"></div>
+</div>
+<div class="fav-overlay" id="favOverlay"></div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span id="toastText"></span></div>
+
+<!-- PAGE HEADER -->
+<section class="page-header">
+    <h1>Mesafeli Satış Sözleşmesi</h1>
+    <p>6502 Sayılı Tüketicinin Korunması Hakkında Kanun kapsamında</p>
+    <div class="breadcrumb">
+        <a href="index.html">Ana Sayfa</a>
+        <span>/</span>
+        <span>Mesafeli Satış Sözleşmesi</span>
+    </div>
+</section>
+
+<!-- CONTENT -->
+<section class="content-section">
+    <div class="policy-box">
+
+        <h2>Madde 1 — Taraflar</h2>
+        <p><strong>SATICI:</strong></p>
+        <table class="info-table">
+            <tr><td>Unvan</td><td>KEVRA Premium Kadın Giyim</td></tr>
+            <tr><td>Adres</td><td>Nişantaşı Mahallesi, Şişli, İstanbul</td></tr>
+            <tr><td>Telefon</td><td>+90 531 960 13 03</td></tr>
+            <tr><td>E-posta</td><td>info@kevra.com.tr</td></tr>
+            <tr><td>Web Sitesi</td><td>https://kevra.com.tr</td></tr>
+        </table>
+        <p><strong>ALICI:</strong> Sipariş esnasında kayıt formunda belirtilen ad, adres ve iletişim bilgilerine sahip kişidir.</p>
+
+        <h2>Madde 2 — Sözleşmenin Konusu</h2>
+        <p>
+            İşbu sözleşme, ALICI'nın SATICI'ya ait <strong>kevra.com.tr</strong> adresindeki web sitesinden elektronik ortamda siparişini verdiği ürünlerin satışı ve teslimi ile ilgili olarak 6502 Sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği hükümleri gereğince tarafların hak ve yükümlülüklerini düzenler.
+        </p>
+
+        <h2>Madde 3 — Ürün Bilgileri</h2>
+        <p>
+            Ürünün temel nitelikleri (türü, miktarı, rengi, bedeni, satış bedeli) ALICI tarafından onaylanan sipariş özetinde ve sipariş onay e-postasında yer almaktadır. Ürüne ilişkin tüm bilgiler web sitesindeki ürün sayfalarında ayrıntılı biçimde sunulmuştur.
+        </p>
+
+        <h2>Madde 4 — Satış Bedeli ve Ödeme</h2>
+        <p>Ürünün KDV dahil satış fiyatı sipariş ekranında ve sipariş onay e-postasında belirtilmektedir.</p>
+        <ul>
+            <li>Ödeme, kredi kartı / banka kartı ile PayTR altyapısı üzerinden <strong>3D Secure</strong> güvencesiyle gerçekleştirilir.</li>
+            <li>Taksitli alımlarda ilgili banka kuralları geçerlidir.</li>
+            <li>Ödeme onaylanmadan sipariş işleme alınmaz.</li>
+        </ul>
+
+        <h2>Madde 5 — Teslimat</h2>
+        <ul>
+            <li>Ürünler, ALICI'nın belirttiği teslimat adresine kargo aracılığıyla gönderilir.</li>
+            <li>Stokta bulunan ürünler, ödeme onayından itibaren <strong>1–5 iş günü</strong> içinde kargoya verilir.</li>
+            <li>Kargo süresi ortalama <strong>2–4 iş günüdür</strong>.</li>
+            <li>Kargo takip numarası, kargoya verildikten sonra e-posta ile iletilir.</li>
+            <li>Yasal azami teslimat süresi 30 gündür. Bu süre aşılırsa ALICI sözleşmeyi feshedebilir.</li>
+        </ul>
+
+        <h2>Madde 6 — Cayma Hakkı</h2>
+        <div class="highlight-box">
+            <p>ALICI, ürünü teslim aldığı tarihten itibaren <strong>14 gün içinde</strong> herhangi bir gerekçe göstermeksizin ve cezai şart ödemeksizin cayma hakkını kullanabilir.</p>
+        </div>
+        <p>Cayma bildirimi <a href="mailto:info@kevra.com.tr" class="policy-link">info@kevra.com.tr</a> adresine e-posta veya <strong>+90 531 960 13 03</strong> numarasına WhatsApp/çağrı yoluyla yapılabilir.</p>
+        <p>Cayma hakkı kullanımında ürünün kullanılmamış, yıkanmamış ve orijinal etiketlerinin yerinde olması gerekmektedir.</p>
+        <p><strong>Cayma hakkı kullanılamayacak haller (Yönetmelik Md. 15):</strong></p>
+        <ul>
+            <li>Teslimden sonra ambalajı açılmış iç çamaşırı, mayo gibi sağlık ve hijyene duyarlı ürünler</li>
+            <li>ALICI'nın özel isteğiyle kişiselleştirilen veya değiştirilen ürünler</li>
+        </ul>
+
+        <h2>Madde 7 — İade Prosedürü</h2>
+        <ol>
+            <li>Cayma bildirimi yapıldıktan sonra ürün <strong>10 gün içinde</strong> SATICI'ya iade edilmelidir.</li>
+            <li>İade kargo bedeli ALICI'ya aittir; ilk teslimat ücretsizse sipariş koşullarında belirtilir.</li>
+            <li>Ürün SATICI'ya ulaştıktan sonra ödeme iadesi <strong>14 gün içinde</strong> aynı ödeme yöntemiyle yapılır.</li>
+            <li>Detaylar için <a href="iadekosullari.html" class="policy-link">İade Koşulları</a> sayfamızı inceleyiniz.</li>
+        </ol>
+
+        <h2>Madde 8 — Garanti</h2>
+        <p>Satışa sunulan ürünler kalite kontrol sürecinden geçirilmiş olup Türk mevzuatına uygundur. Teslimat kaynaklı hasar ya da eksik/yanlış ürün gönderimi durumunda SATICI gerekli düzeltmeyi ücretsiz yapar.</p>
+
+        <h2>Madde 9 — Kişisel Verilerin Korunması</h2>
+        <p>
+            ALICI'nın paylaştığı kişisel veriler, 6698 Sayılı KVKK kapsamında işlenmekte ve yalnızca siparişin yerine getirilmesi amacıyla kullanılmaktadır. Detaylar için <a href="gizlilik.html" class="policy-link">Gizlilik Politikası</a> sayfamızı inceleyiniz.
+        </p>
+
+        <h2>Madde 10 — Uyuşmazlık Çözümü</h2>
+        <p>
+            İşbu sözleşmeden doğan uyuşmazlıklarda, T.C. Ticaret Bakanlığı tarafından ilan edilen parasal sınırlar dahilinde ALICI'nın yerleşim yerindeki <strong>Tüketici Hakem Heyeti</strong>; bu sınırı aşan uyuşmazlıklarda ise <strong>Tüketici Mahkemeleri</strong> yetkilidir.
+        </p>
+
+        <h2>Madde 11 — Sözleşmenin Kurulması</h2>
+        <p>
+            ALICI, sipariş onay ekranında bu sözleşmeyi okuduğunu ve kabul ettiğini beyan ederek siparişini tamamlar. Elektronik ortamda verilen onay, ıslak imza ile aynı hukuki geçerliliğe sahiptir.
+        </p>
+
+        <div class="highlight-box" style="margin-top: 36px;">
+            <p><strong>Son Güncelleme:</strong> Haziran 2026 &nbsp;|&nbsp; <strong>Mağaza No:</strong> 713189</p>
+        </div>
+
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <h3>KEVRA</h3>
+            <p>Premium kadın giyim koleksiyonları.</p>
+            <div class="social-links">
+                <a href="#">📷</a>
+                <a href="#">📘</a>
+                <a href="#">🎵</a>
+            </div>
+        </div>
+        <div class="footer-links">
+            <h4>Hızlı Linkler</h4>
+            <a href="shop.html">Tüm Ürünler</a>
             <a href="hakkimizda.html">Hakkımızda</a>
             <a href="iletisim.html">İletişim</a>
-            <a href="favoriler.html" class="icon-btn">♡ <span id="favCount">0</span></a>
-            <a href="sepetim.html" class="icon-btn">🛍 <span id="cartCount">0</span></a>
-            <a href="giris.html" id="authLink">Giriş Yap</a>
         </div>
-    </header>
-
-    <div class="page-hero">
-        <h1>Mesafeli Satış Sözleşmesi</h1>
-        <p>Son güncelleme: Haziran 2026</p>
+        <div class="footer-links">
+            <h4>Destek</h4>
+            <a href="siparistakibi.html">Sipariş Takibi</a>
+            <a href="iadekosullari.html">İade Koşulları</a>
+            <a href="kargobilgisi.html">Kargo Bilgisi</a>
+            <a href="mesafeli-satis-sozlesmesi.html" style="color: #c9a87c;">Mesafeli Satış Sözleşmesi</a>
+            <a href="sss.html">SSS</a>
+        </div>
+        <div class="footer-links">
+            <h4>İletişim</h4>
+            <a href="https://wa.me/905319601303">WhatsApp</a>
+            <a href="mailto:info@kevra.com.tr">E-posta</a>
+            <p style="margin-top: 12px; color: #666; font-size: 13px;">Pzt-Cmt: 09:00 - 18:00</p>
+        </div>
     </div>
-
-    <div class="legal-content">
-
-        <div class="legal-section">
-            <h2>Madde 1 — Taraflar</h2>
-            <p><strong>SATICI:</strong></p>
-            <table class="info-table">
-                <tr><td>Unvan</td><td>KEVRA Premium Kadın Giyim</td></tr>
-                <tr><td>Adres</td><td>Nişantaşı Mahallesi, Şişli, İstanbul</td></tr>
-                <tr><td>Telefon</td><td>+90 531 960 13 03</td></tr>
-                <tr><td>E-posta</td><td>info@kevra.com.tr</td></tr>
-                <tr><td>Web Sitesi</td><td>https://kevra.com.tr</td></tr>
-            </table>
-            <p><strong>ALICI:</strong> Sipariş esnasında kayıt formunda belirtilen ad, adres ve iletişim bilgilerine sahip kişidir.</p>
-        </div>
-
-        <div class="legal-section">
-            <h2>Madde 2 — Sözleşmenin Konusu</h2>
-            <p>
-                İşbu sözleşme, ALICI'nın SATICI'ya ait <strong>kevra.com.tr</strong> adresindeki web sitesinden elektronik ortamda siparişini verdiği, sözleşmede belirtilen niteliklere sahip ürünün/ürünlerin satışı ve teslimi ile ilgili olarak 6502 Sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği hükümleri gereğince tarafların hak ve yükümlülüklerini düzenler.
-            </p>
-        </div>
-
-        <div class="legal-section">
-            <h2>Madde 3 — Sözleşme Konusu Ürün Bilgileri</h2>
-            <p>
-                Ürünün temel nitelikleri (türü, miktarı, marka/modeli, rengi, adedi, satış bedeli) ALICI tarafından onaylanan sipariş özetinde ve sipariş onay e-postasında yer almaktadır. Ürüne ilişkin bilgiler web sitesinde ürün sayfalarında ayrıntılı biçimde sunulmuştur.
-            </p>
-        </div>
-
-        <div class="legal-section">
-            <h2>Madde 4 — Satış Bedeli ve Ödeme</h2>
-            <p>Ürünün KDV dahil satış fiyatı sipariş ekranında ve sipariş onay e-postasında belirtilmektedir.</p>
-            <ul>
-                <li>Ödeme, kredi kartı / banka kartı ile PayTR altyapısı üzerinden 3D Secure güvencesiyle gerçekleştirilir.</li>
-                <li>Taksitli alımlarda ilgili banka kuralları geçerlidir.</li>
-                <li>Sipariş tamamlandığında ödeme tahsil edilir; ödeme onaylanmadan sipariş işleme alınmaz.</li>
-            </ul>
-        </div>
-
-        <div class="legal-section">
-            <h2>Madde 5 — Teslimat Bilgileri</h2>
-            <ul>
-                <li>Ürünler, ALICI'nın sipariş sırasında belirttiği teslimat adresine kargo aracılığıyla gönderilir.</li>
-                <li>Stokta bulunan ürünler, ödeme onayından itibaren <strong>1–5 iş günü</strong> içinde kargoya verilir.</li>
-                <li>Kargo süresi, teslimat bölgesine göre değişmekle birlikte ortalama <strong>2–4 iş günüdür</strong>.</li>
-                <li>Kargo takip numarası, sipariş kargoya verildikten sonra e-posta ile ALICI'ya iletilir.</li>
-                <li>Yasal azami teslimat süresi 30 gündür. Bu süre aşılırsa ALICI sözleşmeyi feshedebilir.</li>
-            </ul>
-        </div>
-
-        <div class="legal-section">
-            <h2>Madde 6 — Cayma Hakkı</h2>
-            <div class="highlight-box">
-                <p>ALICI, ürünü teslim aldığı tarihten itibaren <strong>14 gün içinde</strong> herhangi bir gerekçe göstermeksizin ve cezai şart ödemeksizin cayma hakkını kullanabilir.</p>
-            </div>
-            <p>Cayma hakkı bildirimi info@kevra.com.tr adresine e-posta veya +90 531 960 13 03 numarasına WhatsApp/çağrı yoluyla yapılabilir.</p>
-            <p>Cayma hakkının kullanımında ürünün kullanılmamış, yıkanmamış ve orijinal etiketlerinin yerinde olması gerekmektedir.</p>
-            <p><strong>Cayma hakkı kullanılamayacak haller (Mesafeli Sözleşmeler Yönetmeliği Md. 15):</strong></p>
-            <ul>
-                <li>Teslimden sonra ambalajı açılmış iç çamaşırı, mayo gibi sağlık ve hijyene duyarlı ürünler</li>
-                <li>ALICI'nın özel isteğiyle kişiselleştirilen veya değiştirilen ürünler</li>
-            </ul>
-        </div>
-
-        <div class="legal-section">
-            <h2>Madde 7 — İade Prosedürü</h2>
-            <ol>
-                <li>Cayma bildirimi yapıldıktan sonra ürün, <strong>10 gün içinde</strong> SATICI'ya iade edilmelidir.</li>
-                <li>İade kargo bedeli, ilk teslimat kargo bedeli ücretsizse ALICI'ya aittir; aksi durum sipariş koşullarında belirtilir.</li>
-                <li>Ürün SATICI'ya ulaştıktan ve kontrol edildikten sonra ödeme iadesi <strong>14 gün içinde</strong> aynı ödeme yöntemiyle yapılır.</li>
-                <li>İade süreci için <a href="iadekosullari.html">İade Koşulları</a> sayfamızı incelemenizi öneririz.</li>
-            </ol>
-        </div>
-
-        <div class="legal-section">
-            <h2>Madde 8 — Garanti ve Sorumluluk</h2>
-            <p>
-                Satışa sunulan ürünler, SATICI tarafından kalite kontrol sürecinden geçirilmiş olup Türk Standartları ve yasal mevzuata uygundur. Ürünlerde teslimat kaynaklı hasar ya da eksik/yanlış ürün gönderimi durumunda SATICI gerekli düzeltmeyi ücretsiz yapar.
-            </p>
-        </div>
-
-        <div class="legal-section">
-            <h2>Madde 9 — Kişisel Verilerin Korunması</h2>
-            <p>
-                ALICI'nın sipariş ve üyelik sürecinde paylaştığı kişisel veriler, 6698 Sayılı KVKK kapsamında işlenmekte ve yalnızca siparişin yerine getirilmesi ile yasal yükümlülüklerin karşılanması amacıyla kullanılmaktadır. Detaylar için <a href="gizlilik.html">Gizlilik Politikası</a> sayfamızı inceleyiniz.
-            </p>
-        </div>
-
-        <div class="legal-section">
-            <h2>Madde 10 — Uyuşmazlık Çözümü</h2>
-            <p>
-                İşbu sözleşmeden doğan uyuşmazlıklarda, T.C. Ticaret Bakanlığı tarafından ilan edilen parasal sınırlar dahilinde ALICI'nın yerleşim yerindeki veya tüketici işleminin yapıldığı yerdeki <strong>Tüketici Hakem Heyeti</strong>; bu sınırı aşan uyuşmazlıklarda ise <strong>Tüketici Mahkemeleri</strong> yetkilidir.
-            </p>
-        </div>
-
-        <div class="legal-section">
-            <h2>Madde 11 — Sözleşmenin Kurulması</h2>
-            <p>
-                ALICI, sipariş onay ekranında bu sözleşmeyi okuduğunu ve kabul ettiğini beyan ederek siparişini tamamlar. Elektronik ortamda verilen onay, ıslak imza ile aynı hukuki geçerliliğe sahiptir.
-            </p>
-        </div>
-
-        <p class="update-date">Bu sözleşme Haziran 2026 tarihinde güncellenmiştir. © 2026 KEVRA</p>
+    <div class="footer-bottom">
+        <p>© 2026 KEVRA. Tüm hakları saklıdır.</p>
+        <p style="color: #666; font-size: 13px;">6502 sayılı TKHK kapsamında korunmaktadır.</p>
     </div>
+</footer>
 
-    <script src="js/firebase-config.js"></script>
-    <script src="js/kevradb.js"></script>
-    <script>
-        // Header cart/fav counts
-        document.addEventListener('DOMContentLoaded', () => {
-            try {
-                const cart = JSON.parse(localStorage.getItem('kevra_cart') || '[]');
-                document.getElementById('cartCount').textContent = cart.reduce((s,i) => s + (i.quantity||1), 0);
-                const favs = JSON.parse(localStorage.getItem('kevra_favorites') || '[]');
-                document.getElementById('favCount').textContent = favs.length;
-            } catch(e) {}
-        });
-        function toggleMenu() { document.querySelector('.side-menu')?.classList.toggle('active'); document.querySelector('.menu-overlay')?.classList.toggle('active'); }
-        function toggleSearch() { document.querySelector('.search-overlay')?.classList.toggle('active'); }
-    </script>
+<script src="js/storage.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/main.js"></script>
+<script>
+window.addEventListener('scroll', () => {
+    const header = document.getElementById('mainHeader');
+    if (window.scrollY > 50) header.classList.add('scrolled');
+    else header.classList.remove('scrolled');
+});
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        document.getElementById('searchModal').classList.remove('active');
+        document.getElementById('sideMenu').classList.remove('active');
+        document.getElementById('menuOverlay').classList.remove('active');
+        document.getElementById('cartDrawer').classList.remove('open');
+        document.getElementById('cartOverlay').classList.remove('active');
+        document.getElementById('favDrawer').classList.remove('open');
+        document.getElementById('favOverlay').classList.remove('active');
+    }
+});
+</script>
 </body>
 </html>
