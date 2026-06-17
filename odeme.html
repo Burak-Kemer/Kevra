@@ -265,19 +265,18 @@
             inset: 0;
             background: rgba(0,0,0,0.7);
             z-index: 9999;
-            align-items: center;
-            justify-content: center;
+            overflow-y: auto;
+            padding: 30px 0;
         }
-        .paytr-overlay.active { display: flex; }
+        .paytr-overlay.active { display: block; }
         .paytr-overlay-inner {
             position: relative;
             background: #fff;
             border-radius: 14px;
-            overflow-y: auto;
-            overflow-x: hidden;
+            overflow: hidden;
             width: 90%;
             max-width: 500px;
-            max-height: 92vh;
+            margin: 0 auto;
         }
         .paytr-close-btn {
             position: absolute;
@@ -311,7 +310,7 @@
             margin: 0 auto 16px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        #paytrIframe { width: 100%; min-height: 400px; display: block; border: none; }
+        #paytrIframe { width: 100%; min-height: 700px; display: block; border: none; }
 
         @keyframes slideDown {
             from { opacity: 0; transform: translateY(-10px); }
