@@ -273,10 +273,11 @@
             position: relative;
             background: #fff;
             border-radius: 14px;
-            overflow: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
             width: 90%;
             max-width: 500px;
-            max-height: 90vh;
+            max-height: 92vh;
         }
         .paytr-close-btn {
             position: absolute;
@@ -310,7 +311,7 @@
             margin: 0 auto 16px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        #paytrIframe { width: 100%; height: 600px; display: block; }
+        #paytrIframe { width: 100%; min-height: 400px; display: block; border: none; }
 
         @keyframes slideDown {
             from { opacity: 0; transform: translateY(-10px); }
@@ -934,6 +935,7 @@
             }
         }
         </style>
+    <script src="https://www.paytr.com/js/iframeResizer.min.js"></script>
 </head>
 <body>
 
@@ -1229,8 +1231,7 @@
             <div class="paytr-spinner"></div>
             <p>Ödeme sayfası yükleniyor...</p>
         </div>
-        <iframe id="paytrIframe" src="" frameborder="0" scrolling="no"
-                onload="document.getElementById('paytrLoading').style.display='none'"></iframe>
+        <iframe id="paytrIframe" src="" frameborder="0" scrolling="no"></iframe>
     </div>
 </div>
 
@@ -1570,6 +1571,10 @@ function openPaytrIframe(token, orderId) {
     overlay.classList.add('active');
     document.body.style.overflow = 'hidden';
     overlay._pendingOrderId = orderId;
+    iframe.onload = function() {
+        loading.style.display = 'none';
+        if (window.iFrameResize) iFrameResize({}, '#paytrIframe');
+    };
 }
 
 function closePaytrIframe() {
