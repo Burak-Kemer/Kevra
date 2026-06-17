@@ -740,15 +740,26 @@
 
         /* ── Yardımcı: sipariş verisini normalize et ── */
         function normalizeOrder(o) {
-            // customer bilgisi: KevraDB → o.customer, eski format → o.customerInfo
+            // Desteklenen formatlar:
+            // 1) KevraDB.createOrder → {customer: {firstName, ...}}
+            // 2) Firebase Function (PayTR) → flat: {firstName, lastName, email, ...}
             const c = o.customer || o.customerInfo || {};
             const addr = c.address || {};
+
+            // Firestore Timestamp → ISO string
+            let createdAt = o.createdAt;
+            if (createdAt && typeof createdAt.toDate === 'function') {
+                createdAt = createdAt.toDate().toISOString();
+            } else if (createdAt && createdAt._seconds) {
+                createdAt = new Date(createdAt._seconds * 1000).toISOString();
+            }
+
             return {
                 id:             o.id,
-                createdAt:      o.createdAt,
+                createdAt:      createdAt || '',
                 status:         o.status         || 'Beklemede',
                 shippingStatus: o.shippingStatus  || 'Hazırlanıyor',
-                paymentMethod:  o.paymentMethod   || '-',
+                paymentMethod:  o.paymentMethod   || o.paymentStatus || '-',
                 notes:          o.notes           || '',
                 invoiceUrl:     (o.invoice && o.invoice.url) || o.invoiceUrl || null,
                 total:          o.total           || (o.totals && o.totals.total) || 0,
@@ -756,13 +767,13 @@
                 discount:       o.discount        || 0,
                 items:          o.items           || [],
                 customer: {
-                    firstName: c.firstName || '',
-                    lastName:  c.lastName  || '',
-                    email:     c.email     || '',
-                    phone:     c.phone     || '',
+                    firstName: c.firstName || o.firstName || '',
+                    lastName:  c.lastName  || o.lastName  || '',
+                    email:     c.email     || o.email     || '',
+                    phone:     c.phone     || o.phone     || '',
                     address:   typeof addr === 'string' ? addr
-                               : [addr.street || c.address || '', addr.district || c.district || '', addr.city || c.city || ''].filter(Boolean).join(', '),
-                    city:      addr.city || c.city || ''
+                               : [addr.street || c.address || o.address || '', addr.district || c.district || o.district || '', addr.city || c.city || o.city || ''].filter(Boolean).join(', '),
+                    city:      addr.city || c.city || o.city || ''
                 }
             };
         }

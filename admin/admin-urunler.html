@@ -9,81 +9,139 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #f5f5f5; color: #333; }
         .admin-container { display: flex; min-height: 100vh; }
-        .sidebar { width: 260px; background: #1a1a1a; color: #fff; position: fixed; height: 100vh; overflow-y: auto; }
+
+        .sidebar { width: 260px; background: #1a1a1a; color: #fff; position: fixed; height: 100vh; overflow-y: auto; padding-bottom: 110px; }
         .sidebar-header { padding: 30px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .sidebar-header h1 { font-size: 24px; font-weight: 600; letter-spacing: 2px; }
         .sidebar-header p { font-size: 12px; opacity: 0.6; margin-top: 5px; }
         .nav-menu { padding: 20px 0; }
         .nav-item { padding: 15px 25px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 12px; border-left: 3px solid transparent; text-decoration: none; color: #fff; }
         .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.05); border-left-color: #c9a87c; }
-        .nav-item.active { background: rgba(201, 168, 124, 0.1); }
+        .nav-item.active { background: rgba(201,168,124,0.1); }
         .nav-icon { font-size: 20px; }
+        .nav-logout-wrap { position: absolute; bottom: 0; left: 0; right: 0; padding: 16px; border-top: 1px solid rgba(255,255,255,0.08); background: #141414; }
+        .nav-logout-btn { width: 100%; padding: 12px 16px; background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.2); color: #f87171; border-radius: 10px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 10px; transition: all 0.2s; font-family: inherit; }
+        .nav-logout-btn:hover { background: rgba(220,38,38,0.2); border-color: rgba(220,38,38,0.4); }
+        .nav-admin-user { display: flex; align-items: center; gap: 8px; padding: 8px 4px; font-size: 12px; color: #555; overflow: hidden; }
+        .nav-admin-user span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
         .main-content { flex: 1; margin-left: 260px; padding: 30px; }
         .header { background: #fff; padding: 20px 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
         .header h2 { font-size: 24px; font-weight: 600; }
-        .btn { padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; background: #1a1a1a; color: #fff; }
-        .btn:hover { background: #333; transform: translateY(-2px); }
+
+        .btn { padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+        .btn-primary { background: #1a1a1a; color: #fff; }
+        .btn-primary:hover { background: #333; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .btn-success { background: #27ae60; color: #fff; }
+        .btn-success:hover { background: #229954; }
+        .btn-danger { background: #e74c3c; color: #fff; }
+        .btn-secondary { background: #f0f0f0; color: #333; }
+
         .content-card { background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden; }
         .card-header { padding: 25px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .card-header h3 { font-size: 18px; font-weight: 600; }
         .search-box input { padding: 10px 15px; border: 1px solid #ddd; border-radius: 8px; width: 250px; font-size: 14px; }
-        .table-container { overflow-x: auto; padding: 20px; }
+        .search-box input:focus { outline: none; border-color: #c9a87c; }
+        .table-container { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 15px 20px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background: #f9f9f9; font-weight: 600; font-size: 13px; text-transform: uppercase; color: #666; }
+        th { background: #f9f9f9; font-weight: 600; font-size: 13px; text-transform: uppercase; color: #666; letter-spacing: 0.5px; }
+        tr:hover { background: #f9f9f9; }
         .product-img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; }
+        .product-name { font-weight: 500; color: #1a1a1a; }
+        .product-category { font-size: 13px; color: #666; }
+        .price { font-weight: 600; color: #27ae60; }
+        .original-price { text-decoration: line-through; color: #999; font-size: 13px; margin-left: 8px; }
         .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
         .badge-popular { background: #c9a87c; color: #fff; }
         .badge-yeni { background: #27ae60; color: #fff; }
         .badge-indirim { background: #e74c3c; color: #fff; }
+        .badge-premium { background: #1a1a1a; color: #fff; }
+        .stock { font-weight: 500; }
         .stock-low { color: #e74c3c; }
+        .stock-ok { color: #27ae60; }
+        .actions { display: flex; gap: 8px; }
         .btn-icon { width: 35px; height: 35px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
         .btn-edit { background: #f0f0f0; color: #333; }
         .btn-edit:hover { background: #1a1a1a; color: #fff; }
-        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
-        @media (max-width: 768px) { .sidebar { transform: translateX(-100%); } .main-content { margin-left: 0; } }
-    
-        /* ===== MOBİL ADMİN ===== */
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-        }
+        .btn-del { background: #fee; color: #e74c3c; }
+        .btn-del:hover { background: #e74c3c; color: #fff; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+        .modal.active { display: flex; }
+        .modal-content { background: #fff; border-radius: 16px; width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-header { padding: 25px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 20px; font-weight: 600; }
+        .modal-close { width: 40px; height: 40px; border-radius: 50%; border: none; background: #f0f0f0; cursor: pointer; font-size: 20px; transition: all 0.3s; }
+        .modal-close:hover { background: #e74c3c; color: #fff; }
+        .modal-body { padding: 25px; }
+        .modal-footer { padding: 20px 25px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; transition: all 0.3s; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #c9a87c; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .checkbox-group { display: flex; gap: 20px; flex-wrap: wrap; }
+        .checkbox-item { display: flex; align-items: center; gap: 8px; }
+        .checkbox-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #1a1a1a; }
+
+        .margin-info { background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #166534; display: none; }
+
+        /* File Upload */
+        .file-upload-area { border: 2px dashed #ddd; border-radius: 12px; padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; }
+        .file-upload-area:hover { border-color: #c9a87c; background: #fafafa; }
+        .file-upload-area.dragover { border-color: #27ae60; background: #f0fff4; }
+        .file-upload-area.has-image { padding: 0; border-style: solid; border-color: #27ae60; }
+        .file-upload-input { position: absolute; inset: 0; opacity: 0; cursor: pointer; z-index: 10; }
+        .upload-placeholder { pointer-events: none; }
+        .upload-icon { font-size: 48px; margin-bottom: 15px; color: #999; }
+        .upload-text { color: #666; font-size: 14px; margin-bottom: 8px; }
+        .upload-hint { color: #999; font-size: 12px; }
+        .image-preview-container { position: relative; width: 100%; height: 250px; display: none; }
+        .file-upload-area.has-image .image-preview-container { display: block; }
+        .file-upload-area.has-image .upload-placeholder { display: none; }
+        .image-preview-container img { width: 100%; height: 100%; object-fit: cover; }
+        .remove-image-btn { position: absolute; top: 10px; right: 10px; width: 35px; height: 35px; border-radius: 50%; background: rgba(231,76,60,0.9); color: #fff; border: none; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; z-index: 20; }
+        .remove-image-btn:hover { background: #c0392b; transform: scale(1.1); }
+        .image-info { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.7); color: #fff; padding: 10px; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* Toast */
+        .toast { position: fixed; bottom: 30px; right: 30px; background: #1a1a1a; color: #fff; padding: 16px 24px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: none; align-items: center; gap: 10px; z-index: 2000; }
+        .toast.show { display: flex; }
+        .toast.success { background: #27ae60; }
+        .toast.error { background: #e74c3c; }
+
+        /* Empty State */
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state-icon { font-size: 64px; margin-bottom: 20px; opacity: 0.3; }
+        .empty-state h4 { font-size: 20px; margin-bottom: 10px; color: #666; }
+        .empty-state p { color: #999; margin-bottom: 25px; }
+        .product-cell { display: flex; align-items: center; gap: 12px; }
+
+        /* Mobile */
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
         .sidebar-overlay.active { display: block; }
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 22px;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 8px;
-            color: #333;
-            margin-right: 10px;
-        }
+        .mobile-menu-btn { display: none; background: none; border: none; font-size: 22px; cursor: pointer; padding: 4px 8px; border-radius: 8px; color: #333; margin-right: 10px; }
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%) !important;
-                transition: transform 0.3s ease;
-                z-index: 1000;
-            }
+            .sidebar { transform: translateX(-100%) !important; transition: transform 0.3s ease; z-index: 1000; }
             .sidebar.open { transform: translateX(0) !important; }
             .main-content { margin-left: 0 !important; padding: 15px !important; }
             .mobile-menu-btn { display: inline-flex !important; align-items: center; }
-            .stats-grid { grid-template-columns: repeat(2,1fr) !important; gap: 12px !important; }
             .header { padding: 15px !important; flex-wrap: wrap; gap: 10px; }
             .table-container { overflow-x: auto; }
-            table { min-width: 500px; }
+            table { min-width: 600px; }
             .form-row { grid-template-columns: 1fr !important; }
             .card-header { flex-direction: column; align-items: flex-start; gap: 12px; }
         }
         @media (max-width: 480px) {
-            .stats-grid { grid-template-columns: 1fr !important; }
             .header h2 { font-size: 18px; }
             .main-content { padding: 10px !important; }
         }
-        </style>
+    </style>
 </head>
 <body>
     <div class="admin-container">
@@ -93,109 +151,523 @@
                 <p>Admin Panel v2.0</p>
             </div>
             <nav class="nav-menu">
-    <a href="admin.html" class="nav-item">
-        <span class="nav-icon">📊</span>
-        <span>Dashboard</span>
-    </a>
-    <a href="admin-siparisler.html" class="nav-item">
-        <span class="nav-icon">📦</span>
-        <span>Siparişler</span>
-    </a>
-    <a href="admin-iadeler.html" class="nav-item">
-        <span class="nav-icon">↩️</span>
-        <span>İade Talepleri</span>
-    </a>
-    <a href="admin-musteriler.html" class="nav-item">
-        <span class="nav-icon">👥</span>
-        <span>Müşteriler</span>
-    </a>
-    <a href="admin-urunler.html" class="nav-item active">
-        <span class="nav-icon">👕</span>
-        <span>Ürünler</span>
-    </a>
-    <a href="admin-fatura.html" class="nav-item">
-        <span class="nav-icon">📄</span>
-        <span>Fatura Yükleme</span>
-    </a>
-    <a href="paytr-ayarlari.html" class="nav-item">
-        <span class="nav-icon">💳</span>
-        <span>PayTR Ayarları</span>
-    </a>
-    <a href="../index.html" class="nav-item">
-        <span class="nav-icon">🏠</span>
-        <span>Siteye Dön</span>
-    </a>
-</nav>
-        <div style="position:absolute;bottom:0;left:0;right:0;padding:16px;border-top:1px solid rgba(255,255,255,0.08);background:#141414">
-            <div style="display:flex;align-items:center;gap:8px;padding:8px 4px;font-size:12px;color:#555;overflow:hidden">
-                <span>👤</span><span id="adminUserEmail" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+                <a href="admin.html" class="nav-item"><span class="nav-icon">📊</span><span>Dashboard</span></a>
+                <a href="admin-siparisler.html" class="nav-item"><span class="nav-icon">📦</span><span>Siparişler</span></a>
+                <a href="admin-iadeler.html" class="nav-item"><span class="nav-icon">↩️</span><span>İade Talepleri</span></a>
+                <a href="admin-musteriler.html" class="nav-item"><span class="nav-icon">👥</span><span>Müşteriler</span></a>
+                <a href="admin-urunler.html" class="nav-item active"><span class="nav-icon">👕</span><span>Ürünler</span></a>
+                <a href="admin-fatura.html" class="nav-item"><span class="nav-icon">📄</span><span>Fatura Yükleme</span></a>
+                <a href="paytr-ayarlari.html" class="nav-item"><span class="nav-icon">💳</span><span>PayTR Ayarları</span></a>
+                <a href="../index.html" class="nav-item"><span class="nav-icon">🏠</span><span>Siteye Dön</span></a>
+            </nav>
+            <div class="nav-logout-wrap">
+                <div class="nav-admin-user">
+                    <span>👤</span>
+                    <span id="adminUserEmail"></span>
+                </div>
+                <button type="button" class="nav-logout-btn" onclick="KevraDB.adminLogout()">
+                    🚪 Çıkış Yap
+                </button>
             </div>
-            <button type="button" onclick="KevraDB.adminLogout()" style="width:100%;padding:12px 16px;background:rgba(220,38,38,0.1);border:1px solid rgba(220,38,38,0.2);color:#f87171;border-radius:10px;cursor:pointer;font-size:14px;display:flex;align-items:center;gap:10px;transition:all 0.2s;font-family:inherit">
-                &#x1F6AA; Çıkış Yap
-            </button>
-        </div>
         </aside>
         <div class="sidebar-overlay"></div>
+
         <main class="main-content">
             <div class="header">
-                <button type="button" class="mobile-menu-btn" title="Menü">☰</button><h2>Tüm Ürünler</h2>
-                <a href="admin.html" class="btn">+ Yeni Ürün Ekle</a>
+                <button type="button" class="mobile-menu-btn" title="Menü">☰</button>
+                <h2>Ürünler</h2>
+                <button type="button" class="btn btn-primary" onclick="openModal()">+ Yeni Ürün Ekle</button>
             </div>
             <div class="content-card">
                 <div class="card-header">
-                    <h3>Ürün Listesi</h3>
+                    <h3>Tüm Ürünler (<span id="productCount">0</span>)</h3>
                     <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="Ürün ara..." onkeyup="searchProducts()">
+                        <input type="text" id="searchInput" placeholder="Ürün ara..." oninput="searchProducts()">
                     </div>
                 </div>
-                <div class="table-container" id="productsTable">
-                    <div class="empty-state">Yükleniyor...</div>
+                <div class="table-container" id="productsTableContainer">
+                    <div class="empty-state"><p>Yükleniyor...</p></div>
                 </div>
             </div>
         </main>
     </div>
-        <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+
+    <!-- Add/Edit Product Modal -->
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Yeni Ürün Ekle</h3>
+                <button type="button" class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="productForm" onsubmit="return false">
+                    <input type="hidden" id="productId">
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ürün Adı *</label>
+                            <input type="text" id="productName" required placeholder="Örn: Siyah Midi Elbise">
+                        </div>
+                        <div class="form-group">
+                            <label>Kategori *</label>
+                            <select id="productCategory" required>
+                                <option value="elbise">Elbise</option>
+                                <option value="ust">Üst Giyim</option>
+                                <option value="alt">Alt Giyim</option>
+                                <option value="triko">Triko</option>
+                                <option value="dis">Dış Giyim</option>
+                                <option value="aksesuar">Aksesuar</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Alış Fiyatı (₺)</label>
+                            <input type="number" id="productCostPrice" min="0" placeholder="400" oninput="calcMargin()">
+                        </div>
+                        <div class="form-group">
+                            <label>Satış Fiyatı (₺) *</label>
+                            <input type="number" id="productPrice" required min="0" placeholder="899" oninput="calcMargin()">
+                        </div>
+                    </div>
+                    <div class="form-group margin-info" id="marginInfo">
+                        Kar: <strong id="marginAmount">0 ₺</strong> &nbsp;|&nbsp; Oran: <strong id="marginPercent">%0</strong>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>İndirimli Fiyat (₺) <small style="font-weight:400;color:#999">— eski fiyat (üstü çizgili gösterilir)</small></label>
+                            <input type="number" id="productOriginalPrice" min="0" placeholder="1299">
+                        </div>
+                        <div class="form-group"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ürün Açıklaması</label>
+                        <textarea id="productDescription" placeholder="Ürün hakkında detaylı bilgi..."></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Stok Adedi *</label>
+                            <input type="number" id="productStock" required min="0" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label>Badge (Etiket)</label>
+                            <select id="productBadge">
+                                <option value="">Yok</option>
+                                <option value="yeni">Yeni</option>
+                                <option value="popular">Popüler</option>
+                                <option value="indirim">İndirim</option>
+                                <option value="premium">Premium</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Bedenler</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="checkbox" value="S" class="size-checkbox"> S</label>
+                            <label class="checkbox-item"><input type="checkbox" value="M" class="size-checkbox"> M</label>
+                            <label class="checkbox-item"><input type="checkbox" value="L" class="size-checkbox"> L</label>
+                            <label class="checkbox-item"><input type="checkbox" value="XL" class="size-checkbox"> XL</label>
+                            <label class="checkbox-item"><input type="checkbox" value="1" class="size-checkbox"> 1</label>
+                            <label class="checkbox-item"><input type="checkbox" value="2" class="size-checkbox"> 2</label>
+                            <label class="checkbox-item"><input type="checkbox" value="36" class="size-checkbox"> 36</label>
+                            <label class="checkbox-item"><input type="checkbox" value="38" class="size-checkbox"> 38</label>
+                            <label class="checkbox-item"><input type="checkbox" value="40" class="size-checkbox"> 40</label>
+                            <label class="checkbox-item"><input type="checkbox" value="42" class="size-checkbox"> 42</label>
+                            <label class="checkbox-item"><input type="checkbox" value="44" class="size-checkbox"> 44</label>
+                            <label class="checkbox-item"><input type="checkbox" value="46" class="size-checkbox"> 46</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Standart" class="size-checkbox"> Standart</label>
+                            <label class="checkbox-item"><input type="checkbox" value="S/M" class="size-checkbox"> S/M</label>
+                            <label class="checkbox-item"><input type="checkbox" value="L/XL" class="size-checkbox"> L/XL</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Renkler</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="checkbox" value="Beyaz" class="color-checkbox"> Beyaz</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Siyah" class="color-checkbox"> Siyah</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Pembe" class="color-checkbox"> Pembe</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Mavi" class="color-checkbox"> Mavi</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Haki" class="color-checkbox"> Haki</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Mürdüm" class="color-checkbox"> Mürdüm</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Bordo" class="color-checkbox"> Bordo</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Acı Kahve" class="color-checkbox"> Acı Kahve</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Sarı" class="color-checkbox"> Sarı</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Vizon" class="color-checkbox"> Vizon</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Bej" class="color-checkbox"> Bej</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Lacivert" class="color-checkbox"> Lacivert</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Yağ Yeşili" class="color-checkbox"> Yağ Yeşili</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Kahverengi" class="color-checkbox"> Kahverengi</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Krem" class="color-checkbox"> Krem</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Antrasit" class="color-checkbox"> Antrasit</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Gri" class="color-checkbox"> Gri</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Taş" class="color-checkbox"> Taş</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Küf Yeşili" class="color-checkbox"> Küf Yeşili</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Hardal" class="color-checkbox"> Hardal</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ürün Görseli *</label>
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <input type="file" class="file-upload-input" id="productImage" accept="image/*" onchange="handleFileSelect(event)">
+                            <div class="upload-placeholder">
+                                <div class="upload-icon">📁</div>
+                                <div class="upload-text">Görsel yüklemek için tıklayın veya sürükleyin</div>
+                                <div class="upload-hint">PNG, JPG, WEBP (Max. 2MB)</div>
+                            </div>
+                            <div class="image-preview-container" id="imagePreviewContainer">
+                                <img id="imagePreview" src="" alt="Preview">
+                                <button type="button" class="remove-image-btn" onclick="removeImage(event)" title="Görseli Kaldır">×</button>
+                                <div class="image-info">
+                                    <span id="fileName">dosya.jpg</span>
+                                    <span id="fileSize">0 KB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="imageBase64">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">İptal</button>
+                <button type="button" class="btn btn-success" id="saveBtn" onclick="saveProduct()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span id="toastIcon">✓</span>
+        <span id="toastMessage">İşlem başarılı</span>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="../js/firebase-config.js"></script>
     <script src="../js/kevra-db.js"></script>
     <script>
-        if (!localStorage.getItem('kevra_admin_logged_in')) { window.location.replace('admin-login.html'); }
-    </script>
-    <script>
-        function loadProducts() {
-            const products = JSON.parse(localStorage.getItem('kevra_products') || '[]');
-            renderTable(products);
+        if (!localStorage.getItem('kevra_admin_logged_in')) {
+            window.location.replace('admin-login.html');
         }
+
+        let allProducts = [];
+        let editingId = null;
+        let currentImageBase64 = null;
+
+        const CAT_NAMES = {
+            elbise: 'Elbise', ust: 'Üst Giyim', alt: 'Alt Giyim',
+            triko: 'Triko', dis: 'Dış Giyim', aksesuar: 'Aksesuar'
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('adminUserEmail').textContent =
+                localStorage.getItem('kevra_admin_user') || '';
+            setupDragAndDrop();
+            loadProducts();
+        });
+
+        async function loadProducts() {
+            try {
+                allProducts = await KevraDB.getProducts();
+            } catch (e) {
+                console.error('Ürünler yüklenemedi:', e);
+                allProducts = JSON.parse(localStorage.getItem('kevra_products') || '[]');
+            }
+            renderTable(allProducts);
+        }
+
         function renderTable(products) {
-            const container = document.getElementById('productsTable');
+            document.getElementById('productCount').textContent = products.length;
+            const container = document.getElementById('productsTableContainer');
+
             if (products.length === 0) {
-                container.innerHTML = '<div class="empty-state"><h4>Ürün bulunamadı</h4></div>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👕</div>
+                        <h4>Ürün Bulunamadı</h4>
+                        <p>Henüz ürün eklenmemiş veya arama kriterine uygun ürün yok.</p>
+                        <button class="btn btn-primary" onclick="openModal()">+ İlk Ürünü Ekle</button>
+                    </div>`;
                 return;
             }
-            let html = `<table><thead><tr><th>Ürün</th><th>Kategori</th><th>Fiyat</th><th>Stok</th><th>Durum</th></tr></thead><tbody>`;
-            const catNames = { elbise: 'Elbise', ust: 'Üst Giyim', alt: 'Alt Giyim', triko: 'Triko', dis: 'Dış Giyim', aksesuar: 'Aksesuar' };
+
+            let html = `<table><thead><tr>
+                <th>Ürün</th><th>Kategori</th><th>Fiyat</th><th>Stok</th><th>Durum</th><th>İşlemler</th>
+            </tr></thead><tbody>`;
+
             products.forEach(p => {
-                const badgeClass = p.badge ? `badge-${p.badge}` : '';
-                const badgeText = p.badge ? p.badge.toUpperCase() : '-';
-                html += `<tr><td><div style="display:flex;align-items:center;gap:12px;"><img src="${p.image}" class="product-img" onerror="this.src='https://via.placeholder.com/50'"><div><div style="font-weight:600;">${p.name}</div></div></div></td><td>${catNames[p.category] || p.category}</td><td>₺${p.price}</td><td class="${p.stock < 10 ? 'stock-low' : ''}">${p.stock} adet</td><td><span class="badge ${badgeClass}">${badgeText}</span></td></tr>`;
+                const hasDiscount = p.discount && p.originalPrice > p.price;
+                const discPct = hasDiscount ? Math.round((1 - p.price / p.originalPrice) * 100) : 0;
+                const stockClass = p.stock < 10 ? 'stock-low' : 'stock-ok';
+                const badgeHtml = p.badge
+                    ? `<span class="badge badge-${p.badge}">${p.badge.toUpperCase()}</span>`
+                    : '-';
+                const imgSrc = p.image || 'https://via.placeholder.com/50?text=?';
+                const escapedId = String(p.id).replace(/'/g, "\\'");
+
+                html += `<tr>
+                    <td>
+                        <div class="product-cell">
+                            <img src="${imgSrc}" alt="${p.name}" class="product-img" onerror="this.src='https://via.placeholder.com/50?text=?'">
+                            <div>
+                                <div class="product-name">${p.name}</div>
+                                <div class="product-category">${CAT_NAMES[p.category] || p.category}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${CAT_NAMES[p.category] || p.category}</td>
+                    <td>
+                        <span class="price">₺${Number(p.price).toLocaleString('tr-TR')}</span>
+                        ${hasDiscount ? `<span class="original-price">₺${Number(p.originalPrice).toLocaleString('tr-TR')}</span>` : ''}
+                        ${hasDiscount ? `<div style="color:#e74c3c;font-size:12px">%${discPct} indirim</div>` : ''}
+                    </td>
+                    <td class="stock ${stockClass}">${p.stock} adet${p.stock < 10 ? ' ⚠️' : ''}</td>
+                    <td>${badgeHtml}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn-icon btn-edit" onclick="editProduct('${escapedId}')" title="Düzenle">✏️</button>
+                            <button class="btn-icon btn-del" onclick="deleteProduct('${escapedId}')" title="Sil">🗑️</button>
+                        </div>
+                    </td>
+                </tr>`;
             });
+
             html += '</tbody></table>';
             container.innerHTML = html;
         }
+
         function searchProducts() {
             const term = document.getElementById('searchInput').value.toLowerCase();
-            const products = JSON.parse(localStorage.getItem('kevra_products') || '[]');
-            const filtered = products.filter(p => p.name.toLowerCase().includes(term) || p.category.toLowerCase().includes(term));
+            const filtered = allProducts.filter(p =>
+                p.name.toLowerCase().includes(term) ||
+                (CAT_NAMES[p.category] || p.category).toLowerCase().includes(term)
+            );
             renderTable(filtered);
         }
-        document.addEventListener('DOMContentLoaded', loadProducts);
+
+        // ── Modal ──────────────────────────────────
+        function openModal(productId) {
+            document.getElementById('productForm').reset();
+            clearImagePreview();
+            document.querySelectorAll('.size-checkbox, .color-checkbox')
+                .forEach(cb => (cb.checked = false));
+
+            if (productId !== undefined) {
+                editingId = productId;
+                document.getElementById('modalTitle').textContent = 'Ürün Düzenle';
+                const p = allProducts.find(x => String(x.id) === String(productId));
+                if (p) fillForm(p);
+            } else {
+                editingId = null;
+                document.getElementById('modalTitle').textContent = 'Yeni Ürün Ekle';
+                document.getElementById('productStock').value = '10';
+            }
+
+            document.getElementById('productModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('productModal').classList.remove('active');
+            editingId = null;
+            currentImageBase64 = null;
+        }
+
+        function fillForm(p) {
+            document.getElementById('productId').value = p.id;
+            document.getElementById('productName').value = p.name;
+            document.getElementById('productCategory').value = p.category;
+            document.getElementById('productCostPrice').value = p.costPrice || '';
+            document.getElementById('productPrice').value = p.price;
+            document.getElementById('productOriginalPrice').value = p.originalPrice || '';
+            document.getElementById('productDescription').value = p.description || '';
+            document.getElementById('productStock').value = p.stock;
+            document.getElementById('productBadge').value = p.badge || '';
+            calcMargin();
+
+            if (p.image) {
+                currentImageBase64 = p.image;
+                showImagePreview('ürün-görseli.jpg', 0, p.image);
+            }
+            (p.sizes || []).forEach(v => {
+                const cb = document.querySelector(`.size-checkbox[value="${v}"]`);
+                if (cb) cb.checked = true;
+            });
+            (p.colors || []).forEach(v => {
+                const cb = document.querySelector(`.color-checkbox[value="${v}"]`);
+                if (cb) cb.checked = true;
+            });
+        }
+
+        function calcMargin() {
+            const cost  = parseFloat(document.getElementById('productCostPrice').value) || 0;
+            const price = parseFloat(document.getElementById('productPrice').value) || 0;
+            const info  = document.getElementById('marginInfo');
+            if (cost > 0 && price > 0) {
+                const margin = price - cost;
+                const pct = Math.round((margin / cost) * 100);
+                document.getElementById('marginAmount').textContent = margin.toLocaleString('tr-TR') + ' ₺';
+                document.getElementById('marginPercent').textContent = '%' + pct;
+                info.style.display = 'block';
+            } else {
+                info.style.display = 'none';
+            }
+        }
+
+        async function saveProduct() {
+            const name     = document.getElementById('productName').value.trim();
+            const category = document.getElementById('productCategory').value;
+            const price    = parseFloat(document.getElementById('productPrice').value);
+            const costPrice  = parseFloat(document.getElementById('productCostPrice').value) || 0;
+            const origPrice  = parseFloat(document.getElementById('productOriginalPrice').value) || 0;
+            const description = document.getElementById('productDescription').value.trim();
+            const stock    = parseInt(document.getElementById('productStock').value) || 0;
+            const badge    = document.getElementById('productBadge').value;
+            const imageB64 = document.getElementById('imageBase64').value;
+
+            if (!name || !category || !price) {
+                showToast('Lütfen zorunlu alanları doldurun!', 'error'); return;
+            }
+            if (!editingId && !imageB64) {
+                showToast('Lütfen bir ürün görseli yükleyin!', 'error'); return;
+            }
+
+            const sizes  = Array.from(document.querySelectorAll('.size-checkbox:checked')).map(c => c.value);
+            const colors = Array.from(document.querySelectorAll('.color-checkbox:checked')).map(c => c.value);
+            const existingImg = editingId
+                ? (allProducts.find(x => String(x.id) === String(editingId))?.image || '')
+                : '';
+
+            const productData = {
+                id:            editingId || String(Date.now()),
+                name, category, price, costPrice,
+                originalPrice: origPrice > price ? origPrice : price,
+                description, stock,
+                badge:         badge || null,
+                badgeType:     badge || null,
+                discount:      origPrice > price,
+                sizes:         sizes.length  > 0 ? sizes  : ['Tek Beden'],
+                colors:        colors.length > 0 ? colors : ['Tek Renk'],
+                image:         imageB64 || existingImg
+            };
+
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Kaydediliyor...';
+
+            try {
+                await KevraDB.saveProduct(productData);
+                showToast(editingId ? 'Ürün güncellendi!' : 'Yeni ürün eklendi!');
+                closeModal();
+                await loadProducts();
+            } catch (e) {
+                console.error('saveProduct error:', e);
+                showToast('Kayıt sırasında hata oluştu!', 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Kaydet';
+            }
+        }
+
+        function editProduct(id) { openModal(id); }
+
+        async function deleteProduct(id) {
+            if (!confirm('Bu ürünü silmek istediğinize emin misiniz?')) return;
+            try {
+                await KevraDB.deleteProduct(id);
+                showToast('Ürün silindi!');
+                await loadProducts();
+            } catch (e) {
+                console.error('deleteProduct error:', e);
+                showToast('Silme sırasında hata oluştu!', 'error');
+            }
+        }
+
+        // ── Image upload ───────────────────────────
+        function setupDragAndDrop() {
+            const area = document.getElementById('fileUploadArea');
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(ev =>
+                area.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); }));
+            ['dragenter', 'dragover'].forEach(ev =>
+                area.addEventListener(ev, () => area.classList.add('dragover')));
+            ['dragleave', 'drop'].forEach(ev =>
+                area.addEventListener(ev, () => area.classList.remove('dragover')));
+            area.addEventListener('drop', e => {
+                const f = e.dataTransfer.files[0];
+                if (f) handleFile(f);
+            });
+        }
+
+        function handleFileSelect(e) {
+            if (e.target.files[0]) handleFile(e.target.files[0]);
+        }
+
+        function handleFile(file) {
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('Dosya boyutu 2MB\'dan büyük olamaz!', 'error'); return;
+            }
+            if (!file.type.startsWith('image/')) {
+                showToast('Lütfen geçerli bir görsel dosyası seçin!', 'error'); return;
+            }
+            const reader = new FileReader();
+            reader.onload = e => {
+                currentImageBase64 = e.target.result;
+                showImagePreview(file.name, file.size, currentImageBase64);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function showImagePreview(name, size, base64) {
+            document.getElementById('imagePreview').src = base64;
+            document.getElementById('fileName').textContent = name;
+            document.getElementById('fileSize').textContent = size > 0 ? formatFileSize(size) : '';
+            document.getElementById('imageBase64').value = base64;
+            document.getElementById('fileUploadArea').classList.add('has-image');
+        }
+
+        function removeImage(e) {
+            e.preventDefault(); e.stopPropagation();
+            clearImagePreview();
+        }
+
+        function clearImagePreview() {
+            currentImageBase64 = null;
+            document.getElementById('fileUploadArea').classList.remove('has-image');
+            document.getElementById('productImage').value = '';
+            document.getElementById('imageBase64').value = '';
+            document.getElementById('imagePreview').src = '';
+        }
+
+        function formatFileSize(bytes) {
+            if (!bytes) return '';
+            const sizes = ['Bytes', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(1024));
+            return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // ── Toast ──────────────────────────────────
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = msg;
+            document.getElementById('toastIcon').textContent = type === 'error' ? '✕' : '✓';
+            t.className = 'toast show ' + type;
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // ESC / backdrop close
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+        document.getElementById('productModal').addEventListener('click', e => {
+            if (e.target.id === 'productModal') closeModal();
+        });
     </script>
 
     <script>
         (function() {
-            var emailEl = document.getElementById('adminUserEmail');
-            if (emailEl) emailEl.textContent = localStorage.getItem('kevra_admin_user') || '';
             var btn = document.querySelector('.mobile-menu-btn');
             var sidebar = document.querySelector('.sidebar');
             var overlay = document.querySelector('.sidebar-overlay');
@@ -204,12 +676,10 @@
                 sidebar.classList.toggle('open');
                 overlay.classList.toggle('active');
             });
-            if (overlay) {
-                overlay.addEventListener('click', function() {
-                    sidebar.classList.remove('open');
-                    overlay.classList.remove('active');
-                });
-            }
+            if (overlay) overlay.addEventListener('click', function() {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            });
         })();
     </script>
 </body>
