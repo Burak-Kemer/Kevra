@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesafeli Satış Sözleşmesi | KEVRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .page-hero {
+            background: #1a1a1a;
+            color: #fff;
+            padding: 100px 40px 60px;
+            text-align: center;
+        }
+        .page-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+        .page-hero p {
+            color: #aaa;
+            font-size: 14px;
+        }
+        .legal-content {
+            max-width: 860px;
+            margin: 60px auto;
+            padding: 0 24px 80px;
+        }
+        .legal-section {
+            margin-bottom: 36px;
+        }
+        .legal-section h2 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a1a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-left: 3px solid #c9a87c;
+            padding-left: 12px;
+            margin-bottom: 14px;
+        }
+        .legal-section p, .legal-section li {
+            font-size: 14px;
+            color: #444;
+            line-height: 1.85;
+            margin-bottom: 8px;
+        }
+        .legal-section ul, .legal-section ol {
+            padding-left: 20px;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .info-table td {
+            padding: 10px 14px;
+            border: 1px solid #e5e5e5;
+            color: #444;
+            vertical-align: top;
+        }
+        .info-table td:first-child {
+            font-weight: 600;
+            color: #1a1a1a;
+            background: #fafafa;
+            width: 35%;
+            white-space: nowrap;
+        }
+        .highlight-box {
+            background: #f8f5f2;
+            border-left: 4px solid #c9a87c;
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 16px 0;
+        }
+        .highlight-box p {
+            margin: 0;
+            font-size: 14px;
+            color: #555;
+        }
+        .update-date {
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+            margin-top: 60px;
+            padding-top: 24px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header" id="mainHeader">
+        <div class="header-left">
+            <button class="menu-toggle" onclick="toggleMenu()">☰ Menü</button>
+            <button class="search-toggle" onclick="toggleSearch()">🔍 Ara</button>
+        </div>
+        <div class="header-logo">
+            <a href="index.html">
+                <svg width="28" height="28" viewBox="0 0 100 100" fill="none">
+                    <path d="M50 10 L90 30 L90 70 L50 90 L10 70 L10 30 Z" stroke="#1a1a1a" stroke-width="3" fill="none"/>
+                    <path d="M50 25 L75 40 L75 65 L50 80 L25 65 L25 40 Z" fill="#1a1a1a"/>
+                </svg>
+                <span>K E V R A</span>
+            </a>
+        </div>
+        <div class="header-right">
+            <a href="hakkimizda.html">Hakkımızda</a>
+            <a href="iletisim.html">İletişim</a>
+            <a href="favoriler.html" class="icon-btn">♡ <span id="favCount">0</span></a>
+            <a href="sepetim.html" class="icon-btn">🛍 <span id="cartCount">0</span></a>
+            <a href="giris.html" id="authLink">Giriş Yap</a>
+        </div>
+    </header>
+
+    <div class="page-hero">
+        <h1>Mesafeli Satış Sözleşmesi</h1>
+        <p>Son güncelleme: Haziran 2026</p>
+    </div>
+
+    <div class="legal-content">
+
+        <div class="legal-section">
+            <h2>Madde 1 — Taraflar</h2>
+            <p><strong>SATICI:</strong></p>
+            <table class="info-table">
+                <tr><td>Unvan</td><td>KEVRA Premium Kadın Giyim</td></tr>
+                <tr><td>Adres</td><td>Nişantaşı Mahallesi, Şişli, İstanbul</td></tr>
+                <tr><td>Telefon</td><td>+90 531 960 13 03</td></tr>
+                <tr><td>E-posta</td><td>info@kevra.com.tr</td></tr>
+                <tr><td>Web Sitesi</td><td>https://kevra.com.tr</td></tr>
+            </table>
+            <p><strong>ALICI:</strong> Sipariş esnasında kayıt formunda belirtilen ad, adres ve iletişim bilgilerine sahip kişidir.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>Madde 2 — Sözleşmenin Konusu</h2>
+            <p>
+                İşbu sözleşme, ALICI'nın SATICI'ya ait <strong>kevra.com.tr</strong> adresindeki web sitesinden elektronik ortamda siparişini verdiği, sözleşmede belirtilen niteliklere sahip ürünün/ürünlerin satışı ve teslimi ile ilgili olarak 6502 Sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği hükümleri gereğince tarafların hak ve yükümlülüklerini düzenler.
+            </p>
+        </div>
+
+        <div class="legal-section">
+            <h2>Madde 3 — Sözleşme Konusu Ürün Bilgileri</h2>
+            <p>
+                Ürünün temel nitelikleri (türü, miktarı, marka/modeli, rengi, adedi, satış bedeli) ALICI tarafından onaylanan sipariş özetinde ve sipariş onay e-postasında yer almaktadır. Ürüne ilişkin bilgiler web sitesinde ürün sayfalarında ayrıntılı biçimde sunulmuştur.
+            </p>
+        </div>
+
+        <div class="legal-section">
+            <h2>Madde 4 — Satış Bedeli ve Ödeme</h2>
+            <p>Ürünün KDV dahil satış fiyatı sipariş ekranında ve sipariş onay e-postasında belirtilmektedir.</p>
+            <ul>
+                <li>Ödeme, kredi kartı / banka kartı ile PayTR altyapısı üzerinden 3D Secure güvencesiyle gerçekleştirilir.</li>
+                <li>Taksitli alımlarda ilgili banka kuralları geçerlidir.</li>
+                <li>Sipariş tamamlandığında ödeme tahsil edilir; ödeme onaylanmadan sipariş işleme alınmaz.</li>
+            </ul>
+        </div>
+
+        <div class="legal-section">
+            <h2>Madde 5 — Teslimat Bilgileri</h2>
+            <ul>
+                <li>Ürünler, ALICI'nın sipariş sırasında belirttiği teslimat adresine kargo aracılığıyla gönderilir.</li>
+                <li>Stokta bulunan ürünler, ödeme onayından itibaren <strong>1–5 iş günü</strong> içinde kargoya verilir.</li>
+                <li>Kargo süresi, teslimat bölgesine göre değişmekle birlikte ortalama <strong>2–4 iş günüdür</strong>.</li>
+                <li>Kargo takip numarası, sipariş kargoya verildikten sonra e-posta ile ALICI'ya iletilir.</li>
+                <li>Yasal azami teslimat süresi 30 gündür. Bu süre aşılırsa ALICI sözleşmeyi feshedebilir.</li>
+            </ul>
+        </div>
+
+        <div class="legal-section">
+            <h2>Madde 6 — Cayma Hakkı</h2>
+            <div class="highlight-box">
+                <p>ALICI, ürünü teslim aldığı tarihten itibaren <strong>14 gün içinde</strong> herhangi bir gerekçe göstermeksizin ve cezai şart ödemeksizin cayma hakkını kullanabilir.</p>
+            </div>
+            <p>Cayma hakkı bildirimi info@kevra.com.tr adresine e-posta veya +90 531 960 13 03 numarasına WhatsApp/çağrı yoluyla yapılabilir.</p>
+            <p>Cayma hakkının kullanımında ürünün kullanılmamış, yıkanmamış ve orijinal etiketlerinin yerinde olması gerekmektedir.</p>
+            <p><strong>Cayma hakkı kullanılamayacak haller (Mesafeli Sözleşmeler Yönetmeliği Md. 15):</strong></p>
+            <ul>
+                <li>Teslimden sonra ambalajı açılmış iç çamaşırı, mayo gibi sağlık ve hijyene duyarlı ürünler</li>
+                <li>ALICI'nın özel isteğiyle kişiselleştirilen veya değiştirilen ürünler</li>
+            </ul>
+        </div>
+
+        <div class="legal-section">
+            <h2>Madde 7 — İade Prosedürü</h2>
+            <ol>
+                <li>Cayma bildirimi yapıldıktan sonra ürün, <strong>10 gün içinde</strong> SATICI'ya iade edilmelidir.</li>
+                <li>İade kargo bedeli, ilk teslimat kargo bedeli ücretsizse ALICI'ya aittir; aksi durum sipariş koşullarında belirtilir.</li>
+                <li>Ürün SATICI'ya ulaştıktan ve kontrol edildikten sonra ödeme iadesi <strong>14 gün içinde</strong> aynı ödeme yöntemiyle yapılır.</li>
+                <li>İade süreci için <a href="iadekosullari.html">İade Koşulları</a> sayfamızı incelemenizi öneririz.</li>
+            </ol>
+        </div>
+
+        <div class="legal-section">
+            <h2>Madde 8 — Garanti ve Sorumluluk</h2>
+            <p>
+                Satışa sunulan ürünler, SATICI tarafından kalite kontrol sürecinden geçirilmiş olup Türk Standartları ve yasal mevzuata uygundur. Ürünlerde teslimat kaynaklı hasar ya da eksik/yanlış ürün gönderimi durumunda SATICI gerekli düzeltmeyi ücretsiz yapar.
+            </p>
+        </div>
+
+        <div class="legal-section">
+            <h2>Madde 9 — Kişisel Verilerin Korunması</h2>
+            <p>
+                ALICI'nın sipariş ve üyelik sürecinde paylaştığı kişisel veriler, 6698 Sayılı KVKK kapsamında işlenmekte ve yalnızca siparişin yerine getirilmesi ile yasal yükümlülüklerin karşılanması amacıyla kullanılmaktadır. Detaylar için <a href="gizlilik.html">Gizlilik Politikası</a> sayfamızı inceleyiniz.
+            </p>
+        </div>
+
+        <div class="legal-section">
+            <h2>Madde 10 — Uyuşmazlık Çözümü</h2>
+            <p>
+                İşbu sözleşmeden doğan uyuşmazlıklarda, T.C. Ticaret Bakanlığı tarafından ilan edilen parasal sınırlar dahilinde ALICI'nın yerleşim yerindeki veya tüketici işleminin yapıldığı yerdeki <strong>Tüketici Hakem Heyeti</strong>; bu sınırı aşan uyuşmazlıklarda ise <strong>Tüketici Mahkemeleri</strong> yetkilidir.
+            </p>
+        </div>
+
+        <div class="legal-section">
+            <h2>Madde 11 — Sözleşmenin Kurulması</h2>
+            <p>
+                ALICI, sipariş onay ekranında bu sözleşmeyi okuduğunu ve kabul ettiğini beyan ederek siparişini tamamlar. Elektronik ortamda verilen onay, ıslak imza ile aynı hukuki geçerliliğe sahiptir.
+            </p>
+        </div>
+
+        <p class="update-date">Bu sözleşme Haziran 2026 tarihinde güncellenmiştir. © 2026 KEVRA</p>
+    </div>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/kevradb.js"></script>
+    <script>
+        // Header cart/fav counts
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const cart = JSON.parse(localStorage.getItem('kevra_cart') || '[]');
+                document.getElementById('cartCount').textContent = cart.reduce((s,i) => s + (i.quantity||1), 0);
+                const favs = JSON.parse(localStorage.getItem('kevra_favorites') || '[]');
+                document.getElementById('favCount').textContent = favs.length;
+            } catch(e) {}
+        });
+        function toggleMenu() { document.querySelector('.side-menu')?.classList.toggle('active'); document.querySelector('.menu-overlay')?.classList.toggle('active'); }
+        function toggleSearch() { document.querySelector('.search-overlay')?.classList.toggle('active'); }
+    </script>
+</body>
+</html>

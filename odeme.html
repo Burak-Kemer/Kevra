@@ -527,6 +527,34 @@
             cursor: not-allowed;
         }
 
+        .contract-box {
+            margin: 16px 0 12px;
+            padding: 12px 14px;
+            background: #fafafa;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        .contract-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #444;
+            line-height: 1.5;
+        }
+        .contract-checkbox {
+            margin-top: 2px;
+            flex-shrink: 0;
+            accent-color: #c9a87c;
+            width: 16px;
+            height: 16px;
+        }
+        .contract-link {
+            color: #c9a87c;
+            text-decoration: underline;
+        }
+
         .secure-badge {
             display: flex;
             align-items: center;
@@ -1200,6 +1228,16 @@
             <div class="summary-row total">
                 <span>Toplam</span>
                 <span id="summaryTotal">0 ₺</span>
+            </div>
+
+            <div class="contract-box">
+                <label class="contract-label">
+                    <input type="checkbox" id="contractCheckbox" class="contract-checkbox">
+                    <span>
+                        <a href="mesafeli-satis-sozlesmesi.html" target="_blank" class="contract-link">Mesafeli Satış Sözleşmesi</a>'ni ve
+                        <a href="iadekosullari.html" target="_blank" class="contract-link">İade Koşulları</a>'nı okudum, onaylıyorum.
+                    </span>
+                </label>
             </div>
 
             <button class="place-order-btn" id="placeOrderBtn" onclick="placeOrder()">
