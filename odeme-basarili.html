@@ -2,14 +2,129 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Ödeme Başarılı</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ödeme Başarılı | KEVRA</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body { background: #f8f8f6; min-height: 100vh; display: flex; flex-direction: column; }
+        .success-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+        }
+        .success-card {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.08);
+            padding: 60px 40px;
+            max-width: 520px;
+            width: 100%;
+            text-align: center;
+        }
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 38px;
+        }
+        .success-card h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+        .success-card p {
+            color: #666;
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 8px;
+        }
+        .order-id {
+            background: #f3f4f6;
+            border-radius: 10px;
+            padding: 14px 20px;
+            margin: 24px 0;
+            font-size: 13px;
+            color: #555;
+        }
+        .order-id strong { color: #1a1a1a; font-family: monospace; font-size: 14px; }
+        .btn-home {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 14px 36px;
+            background: #1a1a1a;
+            color: #fff;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: background 0.2s;
+        }
+        .btn-home:hover { background: #c9a87c; }
+        .btn-orders {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 12px 30px;
+            border: 1.5px solid #ddd;
+            color: #555;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 10px;
+            transition: all 0.2s;
+        }
+        .btn-orders:hover { border-color: #1a1a1a; color: #1a1a1a; }
+        @media (max-width: 480px) {
+            .success-card { padding: 40px 24px; }
+            .btn-home, .btn-orders { display: block; margin: 10px 0 0; }
+        }
+    </style>
 </head>
 <body>
-<script>
-    // PayTR iFrame içinde yüklendi — parent sayfaya bildir
-    try {
-        window.parent.postMessage({ paytr: 'success' }, 'https://kevra.com.tr');
-    } catch(e) {}
-</script>
+    <div class="success-container">
+        <div class="success-card">
+            <div class="success-icon">✓</div>
+            <h1>Ödemeniz Alındı!</h1>
+            <p>Siparişiniz başarıyla oluşturuldu. Sipariş detaylarınızı e-posta adresinize gönderdik.</p>
+            <p>Ödemeniz ekstrenizde <strong>PAYTR/KEVRA.COM.TR</strong> açıklamasıyla görünecektir.</p>
+            <div class="order-id" id="orderInfo" style="display:none">
+                Sipariş No: <strong id="orderIdText"></strong>
+            </div>
+            <div style="margin-top: 32px;">
+                <a href="index.html" class="btn-home">Alışverişe Devam Et</a>
+                <a href="profil.html" class="btn-orders">Siparişlerim</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sepeti temizle
+        try {
+            localStorage.removeItem('kevra_cart');
+            localStorage.removeItem('kevra_cart_count');
+        } catch(e) {}
+
+        // URL'den sipariş ID'sini al (eğer varsa)
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const oid = params.get('merchant_oid') || params.get('oid');
+            if (oid) {
+                document.getElementById('orderIdText').textContent = oid;
+                document.getElementById('orderInfo').style.display = 'block';
+            }
+        } catch(e) {}
+
+        // postMessage ile parent'a bildir (iFrame içinde açılırsa)
+        try { window.parent.postMessage({ paytr: 'success' }, 'https://kevra.com.tr'); } catch(e) {}
+    </script>
 </body>
 </html>
