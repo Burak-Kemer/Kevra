@@ -1020,6 +1020,10 @@ document.addEventListener("DOMContentLoaded", () => {
             if (freshProducts && freshProducts.length > 0) {
                 allProducts = freshProducts;
                 filteredProducts = [...allProducts];
+                // Artık var olmayan ürünlere ait favorileri temizle
+                const validIds = new Set(freshProducts.map(p => String(p.id)));
+                favorites = favorites.filter(id => validIds.has(String(id)));
+                saveFavorites();
                 renderFromProducts();
                 updateFavUI();
             }
