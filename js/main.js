@@ -541,20 +541,26 @@ function updateCartUI() {
 function updateFavUI() {
     const favCount = document.getElementById("favCount");
     const favDrawerCount = document.getElementById("favDrawerCount");
-    
-    if (favCount) favCount.textContent = favorites.length;
-    if (favDrawerCount) favDrawerCount.textContent = favorites.length;
-    
+
+    // Sadece allProducts'ta gerçekten var olan favorileri say
+    const validFavProducts = favorites
+        .map(id => allProducts.find(p => String(p.id) === String(id)))
+        .filter(Boolean);
+
+    const displayCount = validFavProducts.length;
+    if (favCount) favCount.textContent = displayCount;
+    if (favDrawerCount) favDrawerCount.textContent = displayCount;
+
     const favItems = document.getElementById("favItems");
     if (!favItems) return;
-    
-    if (favorites.length === 0) {
+
+    if (displayCount === 0) {
         favItems.innerHTML = `
             <div style="text-align: center; padding: 80px 20px;">
                 <span style="font-size: 64px; display: block; margin-bottom: 20px;">♡</span>
                 <h3 style="margin-bottom: 10px; font-size: 20px;">Favorileriniz Boş</h3>
                 <p style="color: #666;">Beğendiğiniz ürünleri burada görebilirsiniz</p>
-                <button onclick="document.getElementById('closeFavBtn').click(); location.href='shop.html'" 
+                <button onclick="document.getElementById('closeFavBtn').click(); location.href='shop.html'"
                         style="margin-top: 20px; padding: 12px 24px; background: #1a1a1a; color: white; border: none; border-radius: 8px; cursor: pointer;">
                     Ürünleri Keşfet
                 </button>
@@ -562,9 +568,8 @@ function updateFavUI() {
         `;
         return;
     }
-    
-    favItems.innerHTML = favorites.map(id => {
-        const product = allProducts.find(p => p.id === id);
+
+    favItems.innerHTML = validFavProducts.map(product => {
         if (!product) return '';
         return `
             <div style="display: flex; gap: 15px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; background: white; margin-bottom: 10px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
