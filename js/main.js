@@ -70,23 +70,23 @@ function createProductCard(product) {
         <div class="product-card" data-id="${product.id}" data-product-id="${product.id}">
             ${product.badge ? `<div class="product-badge ${product.badgeType}">${product.badge}</div>` : ""}
             
-            <button class="fav-btn ${isFav ? "active" : ""}" onclick="event.stopPropagation(); toggleFavorite(${product.id}, event)">
+            <button class="fav-btn ${isFav ? "active" : ""}" onclick="event.stopPropagation(); toggleFavorite('${product.id}', event)">
                 ${isFav ? '♥' : '♡'}
             </button>
 
-            <div class="product-image" onclick="openProductDetail(${product.id})">
+            <div class="product-image" onclick="openProductDetail('${product.id}')">
                 <img src="${product.image}" alt="${product.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=No+Image'">
-                <button class="quick-view-btn" onclick="event.stopPropagation(); openQuickView(${product.id})">Hızlı İncele</button>
+                <button class="quick-view-btn" onclick="event.stopPropagation(); openQuickView('${product.id}')">Hızlı İncele</button>
             </div>
 
             <div class="product-info">
-                <h3 onclick="openProductDetail(${product.id})">${product.name}</h3>
+                <h3 onclick="openProductDetail('${product.id}')">${product.name}</h3>
                 <div class="product-price">
                     ${hasDiscount ? `<span class="original-price">${formatPrice(product.originalPrice)}</span>` : ''}
                     <span class="current-price">${formatPrice(product.price)}</span>
                     ${hasDiscount ? `<span class="discount-percent">%${discountPercent}</span>` : ''}
                 </div>
-                <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCartWithVariant(${product.id})">
+                <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCartWithVariant('${product.id}')">
                     🛒 Sepete Ekle
                 </button>
             </div>
@@ -513,13 +513,13 @@ function updateCartUI() {
                 
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <div style="display: flex; align-items: center; border: 2px solid #e0e0e0; border-radius: 25px; overflow: hidden; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-                        <button onclick="updateCartQty(${item.id}, -1)" 
+                        <button onclick="updateCartQty('${item.id}', -1)"
                                 style="width: 36px; height: 36px; border: none; background: white; cursor: pointer; font-size: 18px; color: #666; transition: all 0.3s; display: flex; align-items: center; justify-content: center;">−</button>
                         <span style="min-width: 45px; text-align: center; font-weight: 700; font-size: 16px; color: #1a1a1a;">${item.quantity}</span>
-                        <button onclick="updateCartQty(${item.id}, 1)" 
+                        <button onclick="updateCartQty('${item.id}', 1)"
                                 style="width: 36px; height: 36px; border: none; background: white; cursor: pointer; font-size: 18px; color: #666; transition: all 0.3s; display: flex; align-items: center; justify-content: center;">+</button>
                     </div>
-                    <button onclick="removeFromCart(${item.id})" 
+                    <button onclick="removeFromCart('${item.id}')"
                             style="padding: 8px 16px; background: transparent; border: 1px solid #e74c3c; color: #e74c3c; border-radius: 20px; cursor: pointer; font-size: 13px; transition: all 0.3s; font-weight: 500;">
                         🗑️ Sil
                     </button>
@@ -574,11 +574,11 @@ function updateFavUI() {
                     <p style="color: #c9a87c; font-weight: 700; font-size: 18px; margin-bottom: 15px;">${formatPrice(product.price)}</p>
                     
                     <div style="display: flex; gap: 10px;">
-                        <button onclick="addToCartWithVariant(${product.id})" 
+                        <button onclick="addToCartWithVariant('${product.id}')"
                                 style="padding: 12px 20px; background: #1a1a1a; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s; flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;">
                             🛒 Sepete Ekle
                         </button>
-                        <button onclick="toggleFavorite(${product.id}, event)" 
+                        <button onclick="toggleFavorite('${product.id}', event)"
                                 style="padding: 12px 20px; background: transparent; border: 2px solid #e74c3c; color: #e74c3c; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s; min-width: 80px;">
                             Sil
                         </button>
@@ -1021,6 +1021,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 allProducts = freshProducts;
                 filteredProducts = [...allProducts];
                 renderFromProducts();
+                updateFavUI();
             }
         }).catch(function(e) {
             console.warn('Firebase ürün yükleme hatası:', e);
