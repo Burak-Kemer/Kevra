@@ -6139,10 +6139,14 @@ font-size:18px;
   }
   
   .qv-color-btn {
-    width: 35px;
-    height: 35px;
+    width: auto;
+    height: auto;
+    padding: 6px 10px;
+    font-size: 12px;
+    min-height: 36px;
+    min-width: unset;
   }
-  
+
   .quick-view-actions {
     flex-direction: column;
     gap: 10px;
@@ -6415,10 +6419,14 @@ font-size:18px;
   }
   
   .qv-color-btn {
-    width: 32px;
-    height: 32px;
+    width: auto;
+    height: auto;
+    padding: 5px 9px;
+    font-size: 12px;
+    min-height: 34px;
+    min-width: unset;
   }
-  
+
   .qv-add-cart {
     padding: 12px;
     font-size: 14px;
@@ -6495,11 +6503,15 @@ font-size:18px;
   .qty-btn,
   .search-view-btn,
   .qv-size-btn,
-  .qv-color-btn,
   .qv-add-cart,
   .qv-add-fav {
     min-height: 44px;
     min-width: 44px;
+  }
+
+  .qv-color-btn {
+    min-height: 34px;
+    min-width: unset;
   }
 }
 

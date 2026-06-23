@@ -985,14 +985,24 @@ function setupHeaderScroll() {
     });
 }
 
+function renderFromProducts() {
+    const isShopPage = document.body.classList.contains('shop-page');
+    if (isShopPage) {
+        checkUrlParams();
+    } else {
+        const featuredContainer = document.getElementById("featuredProducts");
+        if (featuredContainer) {
+            let featured = allProducts.filter(p => p.badgeType === 'popular' || p.badgeType === 'premium');
+            if (featured.length === 0) featured = allProducts.slice(0, 4);
+            else if (featured.length > 4) featured = featured.slice(0, 4);
+            renderProducts(featured, featuredContainer);
+        }
+    }
+}
+
 // Init
 document.addEventListener("DOMContentLoaded", () => {
-    console.log(">>> KEVRA başlatılıyor");
-    console.log("Toplam ürün:", allProducts.length);
-    
-    // Kullanıcı menüsünü güncelle
     updateUserMenu();
-    
     updateCartUI();
     updateFavUI();
     setupSearch();
@@ -1000,29 +1010,23 @@ document.addEventListener("DOMContentLoaded", () => {
     setupDrawers();
     setupHeaderScroll();
     setupEscapeKey();
-    
-    const isShopPage = document.body.classList.contains('shop-page');
-    
-    if (isShopPage) {
-        checkUrlParams();
-    } else {
-        // Ana sayfa - öne çıkan ürünler
-        const featuredContainer = document.getElementById("featuredProducts");
-        if (featuredContainer) {
-            let featured = allProducts.filter(p => p.badgeType === 'popular' || p.badgeType === 'premium');
-            if (featured.length === 0) {
-                featured = allProducts.slice(0, 4);
-            } else if (featured.length > 4) {
-                featured = featured.slice(0, 4);
-            }
-            console.log("Öne çıkan ürünler:", featured.length);
-            renderProducts(featured, featuredContainer);
-        }
-    }
-    
-    console.log(">>> KEVRA hazır");
 
-    // Kullanıcı menüsünü güncelle (auth.js yüklendikten sonra)
+    // localStorage'daki veriyle hızlı ilk render
+    renderFromProducts();
+
+    // Firebase'den güncel ürünleri çek ve yeniden render et
+    if (window.KevraDB && typeof window.KevraDB.getProducts === 'function') {
+        window.KevraDB.getProducts().then(function(freshProducts) {
+            if (freshProducts && freshProducts.length > 0) {
+                allProducts = freshProducts;
+                filteredProducts = [...allProducts];
+                renderFromProducts();
+            }
+        }).catch(function(e) {
+            console.warn('Firebase ürün yükleme hatası:', e);
+        });
+    }
+
     if (typeof updateUserMenu === 'function') {
         updateUserMenu();
     }

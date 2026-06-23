@@ -8,25 +8,30 @@ const querystring = require('querystring');
 admin.initializeApp();
 const db = admin.firestore();
 
-setGlobalOptions({ region: 'europe-west1' });
+setGlobalOptions({ region: 'europe-west1', invoker: 'public' });
 
 const MERCHANT_ID   = '713189';
 const MERCHANT_KEY  = '979FtiUwRNdkuDww';
 const MERCHANT_SALT = '3nU2uRMt2auih4Ao';
 const TEST_MODE     = 1; // Canlıya geçince 0 yap
 
-const CORS_HEADERS = {
-    'Access-Control-Allow-Origin':  'https://kevra.com.tr',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-};
+const ALLOWED_ORIGINS = ['https://kevra.com.tr', 'https://www.kevra.com.tr'];
+
+function getCorsHeaders(origin) {
+    const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+    return {
+        'Access-Control-Allow-Origin':  allowed,
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+    };
+}
 
 // ───────────────────────────────────────────
 // POST /createPaytrToken
-// Sipariş verilerini alır, PayTR token üretir
 // ───────────────────────────────────────────
-exports.createPaytrToken = onRequest(async (req, res) => {
-    Object.entries(CORS_HEADERS).forEach(([k, v]) => res.set(k, v));
+exports.createPaytrToken = onRequest({ invoker: 'public' }, async (req, res) => {
+    const corsHeaders = getCorsHeaders(req.headers.origin || '');
+    Object.entries(corsHeaders).forEach(([k, v]) => res.set(k, v));
 
     if (req.method === 'OPTIONS') { res.status(204).send(''); return; }
     if (req.method !== 'POST')    { res.status(405).send('Method Not Allowed'); return; }
@@ -35,31 +40,34 @@ exports.createPaytrToken = onRequest(async (req, res) => {
         const { orderData } = req.body;
         if (!orderData) { res.status(400).json({ success: false, reason: 'orderData eksik' }); return; }
 
-        const merchantOid   = 'ORD' + Date.now();
-        const userIp        = (req.headers['x-forwarded-for'] || '1.2.3.4').split(',')[0].trim();
-        const email         = orderData.email;
-        const paymentAmount = Math.round(orderData.total * 100); // kuruş
+        const merchantOid    = 'ORD' + Date.now();
+        const userIp         = (req.headers['x-forwarded-for'] || '1.2.3.4').split(',')[0].trim();
+        const email          = String(orderData.email || '');
+        const paymentAmount  = String(Math.round(Number(orderData.total) * 100)); // kuruş
+        const noInstallment  = '0';
+        const maxInstallment = '0';
+        const currency       = 'TL';
+        const testMode       = String(TEST_MODE);
 
-        // Sepet: [[ürün adı, birim fiyat (kuruş str), adet str], ...]
+        // Sepet: fiyatlar TL string ('18.00'), adet integer — PayTR Node.js örneğine göre
         const basket = orderData.items.map(item => [
-            item.name,
-            String(Math.round(item.price * 100)),
-            String(item.quantity)
+            String(item.name),
+            Number(item.price).toFixed(2),
+            Number(item.quantity)
         ]);
         const userBasket = Buffer.from(JSON.stringify(basket)).toString('base64');
 
-        const noInstallment  = 0;
-        const maxInstallment = 0;
-        const currency       = 'TL';
-
-        // HMAC-SHA256 token
+        // PayTR Node.js örneğine göre: hashStr + MERCHANT_SALT mesaj, MERCHANT_KEY key
         const hashStr = MERCHANT_ID + userIp + merchantOid + email +
                         paymentAmount + userBasket + noInstallment +
-                        maxInstallment + currency + TEST_MODE;
+                        maxInstallment + currency + testMode;
         const paytrToken = crypto
-            .createHmac('sha256', MERCHANT_KEY + MERCHANT_SALT)
-            .update(hashStr)
+            .createHmac('sha256', MERCHANT_KEY)
+            .update(hashStr + MERCHANT_SALT)
             .digest('base64');
+
+        console.log('[PayTR] merchantOid:', merchantOid, 'userIp:', userIp);
+        console.log('[PayTR] paymentAmount:', paymentAmount, 'token:', paytrToken);
 
         // Firestore'a bekleyen sipariş kaydet
         await db.collection('orders').doc(merchantOid).set({
@@ -73,23 +81,25 @@ exports.createPaytrToken = onRequest(async (req, res) => {
         // PayTR API'ye token isteği gönder
         const postData = querystring.stringify({
             merchant_id:      MERCHANT_ID,
+            merchant_key:     MERCHANT_KEY,
+            merchant_salt:    MERCHANT_SALT,
             user_ip:          userIp,
             merchant_oid:     merchantOid,
             email:            email,
             payment_amount:   paymentAmount,
             paytr_token:      paytrToken,
             user_basket:      userBasket,
-            debug_on:         1,
+            debug_on:         '1',
             no_installment:   noInstallment,
             max_installment:  maxInstallment,
-            user_name:        orderData.firstName + ' ' + orderData.lastName,
-            user_address:     orderData.address + ', ' + orderData.district + '/' + orderData.city,
-            user_phone:       orderData.phone,
+            user_name:        (orderData.firstName || '') + ' ' + (orderData.lastName || ''),
+            user_address:     (orderData.address || '') + ', ' + (orderData.district || '') + '/' + (orderData.city || ''),
+            user_phone:       String(orderData.phone || ''),
             merchant_ok_url:  'https://kevra.com.tr/odeme-basarili.html',
             merchant_fail_url:'https://kevra.com.tr/odeme-basarisiz.html',
-            timeout_limit:    30,
+            timeout_limit:    '30',
             currency:         currency,
-            test_mode:        TEST_MODE,
+            test_mode:        testMode,
             lang:             'tr',
         });
 
@@ -104,10 +114,10 @@ exports.createPaytrToken = onRequest(async (req, res) => {
                     'Content-Length': Buffer.byteLength(postData),
                 },
             };
-            const r = https.request(options, res => {
+            const r = https.request(options, resp => {
                 let data = '';
-                res.on('data', c => data += c);
-                res.on('end', () => { try { resolve(JSON.parse(data)); } catch(e) { reject(e); } });
+                resp.on('data', c => data += c);
+                resp.on('end', () => { try { resolve(JSON.parse(data)); } catch(e) { reject(e); } });
             });
             r.on('error', reject);
             r.write(postData);
@@ -131,16 +141,16 @@ exports.createPaytrToken = onRequest(async (req, res) => {
 // POST /paytrCallback
 // PayTR ödeme sonucunu bildirir
 // ───────────────────────────────────────────
-exports.paytrCallback = onRequest(async (req, res) => {
+exports.paytrCallback = onRequest({ invoker: 'public' }, async (req, res) => {
     if (req.method !== 'POST') { res.status(405).send('Method Not Allowed'); return; }
 
     try {
         const { merchant_oid, status, total_amount, hash } = req.body;
 
-        // Hash doğrula
-        const hashStr      = MERCHANT_ID + merchant_oid + total_amount + status;
+        // PayTR Node.js örneğine göre: merchant_oid + salt + status + total_amount, key=MERCHANT_KEY
+        const hashStr      = merchant_oid + MERCHANT_SALT + status + total_amount;
         const expectedHash = crypto
-            .createHmac('sha256', MERCHANT_KEY + MERCHANT_SALT)
+            .createHmac('sha256', MERCHANT_KEY)
             .update(hashStr)
             .digest('base64');
 
@@ -164,7 +174,7 @@ exports.paytrCallback = onRequest(async (req, res) => {
             });
         }
 
-        res.send('OK'); // PayTR "OK" bekliyor
+        res.send('OK');
     } catch (e) {
         console.error('paytrCallback error:', e);
         res.status(500).send('ERROR');
