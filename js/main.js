@@ -262,9 +262,9 @@ function addToCartFromQuickView() {
         return;
     }
     
-    const existing = cart.find(item => 
-        item.id === currentQVProduct.id && 
-        item.size === selectedQVSize && 
+    const existing = cart.find(item =>
+        String(item.id) === String(currentQVProduct.id) &&
+        item.size === selectedQVSize &&
         item.color === selectedQVColor
     );
     
@@ -318,7 +318,7 @@ function toggleFavFromQuickView() {
 // ================= SEPETE EKLE (ZORUNLU BEDEN/RENK) =================
 
 function addToCartWithVariant(productId) {
-    const product = allProducts.find(p => p.id === productId);
+    const product = allProducts.find(p => String(p.id) === String(productId));
     if (!product) return;
     
     // Hemen hızlı incele modalını aç (beden/renk seçimi için)
@@ -404,10 +404,10 @@ function changePage(direction) {
 
 // Add to Cart (Basit - direkt ekleme)
 function addToCart(productId) {
-    const product = allProducts.find(p => p.id === productId);
+    const product = allProducts.find(p => String(p.id) === String(productId));
     if (!product) return;
-    
-    const existing = cart.find(item => item.id === productId);
+
+    const existing = cart.find(item => String(item.id) === String(productId));
     
     if (existing) {
         existing.quantity += 1;
@@ -595,18 +595,18 @@ function updateFavUI() {
 }
 
 function updateCartQty(id, change) {
-    const item = cart.find(i => i.id === id);
+    const item = cart.find(i => String(i.id) === String(id));
     if (!item) return;
     item.quantity += change;
     if (item.quantity <= 0) {
-        cart = cart.filter(i => i.id !== id);
+        cart = cart.filter(i => String(i.id) !== String(id));
     }
     saveCart();
     updateCartUI();
 }
 
 function removeFromCart(id) {
-    cart = cart.filter(i => i.id !== id);
+    cart = cart.filter(i => String(i.id) !== String(id));
     saveCart();
     updateCartUI();
     showToast('Ürün sepetten kaldırıldı');
