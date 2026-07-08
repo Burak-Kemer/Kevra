@@ -763,6 +763,10 @@
             const lastName = document.getElementById("lastName").value.trim();
             const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value;
+            const phone = document.getElementById("phone").value.trim();
+            const address = document.getElementById("address").value.trim();
+            const city = document.getElementById("city").value.trim();
+            const zipCode = document.getElementById("zipCode").value.trim();
             const submitBtn = document.getElementById('submitBtn');
 
             let hasError = false;
@@ -810,9 +814,14 @@
 
             setTimeout(() => {
                 const res = KevraAuth.register({
-                    name: firstName + " " + lastName,
+                    firstName: firstName,
+                    lastName: lastName,
                     email: email,
-                    password: password
+                    password: password,
+                    phone: phone,
+                    address: address,
+                    city: city,
+                    zipCode: zipCode
                 });
 
                 submitBtn.classList.remove('loading');

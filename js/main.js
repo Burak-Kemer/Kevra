@@ -97,7 +97,7 @@ function createProductCard(product) {
 // ================= QUICK VIEW MODAL =================
 
 function openQuickView(productId) {
-    const product = allProducts.find(p => p.id === productId);
+    const product = allProducts.find(p => String(p.id) === String(productId));
     if (!product) return;
     
     currentQVProduct = product;
@@ -698,7 +698,7 @@ function setupSearch() {
                             ${p.badge ? `<span class="search-item-badge ${p.badgeType}">${p.badge}</span>` : ''}
                         </div>
                         <div class="search-item-actions">
-                            <button class="search-view-btn" onclick="event.stopPropagation(); openQuickView(${p.id}); document.getElementById('searchModal').classList.remove('active'); document.body.style.overflow = '';">
+                            <button class="search-view-btn" onclick="event.stopPropagation(); openQuickView('${p.id}'); document.getElementById('searchModal').classList.remove('active'); document.body.style.overflow = '';">
                                 👁️ İncele
                             </button>
                         </div>
