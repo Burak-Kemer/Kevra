@@ -13,7 +13,7 @@ setGlobalOptions({ region: 'europe-west1', invoker: 'public' });
 const MERCHANT_ID   = '713189';
 const MERCHANT_KEY  = '979FtiUwRNdkuDww';
 const MERCHANT_SALT = '3nU2uRMt2auih4Ao';
-const TEST_MODE     = 1; // Canlıya geçince 0 yap
+const TEST_MODE     = 0; // Canlı mod - gerçek ödeme alınıyor
 
 const ALLOWED_ORIGINS = ['https://kevra.com.tr', 'https://www.kevra.com.tr'];
 
