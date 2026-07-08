@@ -64,7 +64,7 @@ function showToast(message, type = 'success') {
 function createProductCard(product) {
     const hasDiscount = product.discount && product.originalPrice > product.price;
     const discountPercent = hasDiscount ? Math.round((1 - product.price/product.originalPrice) * 100) : 0;
-    const isFav = favorites.includes(product.id);
+    const isFav = favorites.some(id => String(id) === String(product.id));
     
     return `
         <div class="product-card" data-id="${product.id}" data-product-id="${product.id}">
@@ -202,7 +202,7 @@ function openQuickView(productId) {
     // Favori butonu
     const favBtn = document.getElementById('qvFavBtn');
     if (favBtn) {
-        const isFav = favorites.includes(product.id);
+        const isFav = favorites.some(id => String(id) === String(product.id));
         favBtn.textContent = isFav ? '♥' : '♡';
         favBtn.className = isFav ? 'qv-add-fav active' : 'qv-add-fav';
     }
@@ -291,9 +291,9 @@ function addToCartFromQuickView() {
 function toggleFavFromQuickView() {
     if (!currentQVProduct) return;
     
-    const index = favorites.indexOf(currentQVProduct.id);
+    const index = favorites.indexOf(String(currentQVProduct.id));
     const favBtn = document.getElementById('qvFavBtn');
-    
+
     if (index > -1) {
         favorites.splice(index, 1);
         showToast(`${currentQVProduct.name} favorilerden çıkarıldı`, "error");
@@ -302,7 +302,7 @@ function toggleFavFromQuickView() {
             favBtn.classList.remove('active');
         }
     } else {
-        favorites.push(currentQVProduct.id);
+        favorites.push(String(currentQVProduct.id));
         showToast(`${currentQVProduct.name} favorilere eklendi`);
         if (favBtn) {
             favBtn.textContent = '♥';
@@ -436,9 +436,9 @@ function toggleFavorite(productId, event) {
         event.preventDefault();
     }
     
-    const product = allProducts.find(p => p.id === productId);
+    const product = allProducts.find(p => String(p.id) === String(productId));
     if (!product) return;
-    
+
     const index = favorites.indexOf(productId);
     
     if (index > -1) {
