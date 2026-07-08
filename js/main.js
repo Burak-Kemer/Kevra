@@ -463,6 +463,10 @@ function toggleFavorite(productId, event) {
 
 // Update Cart UI
 function updateCartUI() {
+    // sepetim.html gibi ayri bir sayfa kendi buyuk sepet listesini
+    // gosteriyorsa, cekmeceden yapilan degisiklikler sonrasi onu da guncelle
+    if (typeof window.renderCartPage === 'function') window.renderCartPage();
+
     const count = cart.reduce((sum, item) => sum + item.quantity, 0);
     const cartCount = document.getElementById("cartCount");
     const cartDrawerCount = document.getElementById("cartDrawerCount");

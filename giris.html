@@ -701,6 +701,16 @@
             toggleIcon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
         });
 
+        // ?redirect=... parametresini guvenli sekilde okur (sadece siteye ait
+        // bir .html dosyasina izin verir, disariya yonlendirmeyi engeller)
+        function getSafeRedirect(fallback) {
+            const target = new URLSearchParams(window.location.search).get('redirect');
+            if (target && /^[a-zA-Z0-9_-]+\.html(\?.*)?(#.*)?$/.test(target)) {
+                return target;
+            }
+            return fallback;
+        }
+
         // Form Submit
         document.getElementById("loginForm").addEventListener("submit", async e => {
             e.preventDefault();
@@ -743,7 +753,7 @@
 
             showAlert('Giriş başarılı! Yönlendiriliyorsunuz...', 'success');
             setTimeout(() => {
-                window.location.href = "index.html";
+                window.location.href = getSafeRedirect("index.html");
             }, 1200);
         });
 
@@ -794,7 +804,7 @@
                     localStorage.setItem("kevra_current_user", JSON.stringify(session));
                     showAlert('Google ile giriş başarılı! Yönlendiriliyorsunuz...', 'success');
                     setTimeout(() => {
-                        window.location.href = "index.html";
+                        window.location.href = getSafeRedirect("index.html");
                     }, 1200);
                 } else {
                     showAlert('Google ile giriş sırasında bir hata oluştu.', 'error');
