@@ -1680,18 +1680,18 @@
             }
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 const photoData = e.target.result;
-                
+
                 // Kullanıcıyı güncelle
-                const result = KevraAuth.updateUser({ photo: photoData });
+                const result = await KevraDB.updateUser({ photo: photoData });
                 if (result.success) {
                     // Avatarları güncelle
                     const avatar = document.getElementById('profileAvatar');
                     const photoPreview = document.getElementById('profilePhoto');
                     avatar.innerHTML = `<img src="${photoData}" alt="Profil">`;
                     photoPreview.innerHTML = `<img src="${photoData}" alt="Profil">`;
-                    
+
                     // Header avatarını da güncelle
                     updateUserMenu();
                     showToast('Profil fotoğrafınız güncellendi');
@@ -1700,9 +1700,9 @@
             reader.readAsDataURL(file);
         }
 
-        function updateProfile(e) {
+        async function updateProfile(e) {
             e.preventDefault();
-            
+
             const firstName = document.getElementById('firstName').value.trim();
             const lastName = document.getElementById('lastName').value.trim();
             const email = document.getElementById('profileEmailInput').value.trim();
@@ -1713,8 +1713,8 @@
 
             // Temel bilgileri güncelle
             const updates = { firstName, lastName, email, phone };
-            const result = KevraAuth.updateUser(updates);
-            
+            const result = await KevraDB.updateUser(updates);
+
             if (!result.success) {
                 showToast(result.message, 'error');
                 return;
@@ -1735,12 +1735,12 @@
                     return;
                 }
 
-                const passResult = KevraAuth.changePassword(currentPassword, newPassword);
+                const passResult = await KevraDB.changePassword(currentPassword, newPassword);
                 if (!passResult.success) {
                     showToast(passResult.message, 'error');
                     return;
                 }
-                
+
                 // Şifre alanlarını temizle
                 document.getElementById('currentPassword').value = '';
                 document.getElementById('newPassword').value = '';
@@ -2033,8 +2033,8 @@
 
         // ================= ADRESLER =================
 
-        function renderAddresses() {
-            const addresses = KevraAuth.getAddresses();
+        async function renderAddresses() {
+            const addresses = await KevraDB.getAddresses();
             const container = document.getElementById('addressGrid');
 
             if (addresses.length === 0) {
@@ -2072,16 +2072,16 @@
             `).join('');
         }
 
-        function openAddressModal(addressId = null) {
+        async function openAddressModal(addressId = null) {
             const modal = document.getElementById('addressModal');
             const form = document.getElementById('addressForm');
             const title = document.getElementById('addressModalTitle');
-            
+
             form.reset();
             document.getElementById('editAddressId').value = '';
 
             if (addressId) {
-                const addresses = KevraAuth.getAddresses();
+                const addresses = await KevraDB.getAddresses();
                 const addr = addresses.find(a => a.id === addressId);
                 if (addr) {
                     title.textContent = 'Adres Düzenle';
@@ -2115,7 +2115,7 @@
             document.getElementById('addressModal').classList.remove('active');
         }
 
-        function saveAddress(e) {
+        async function saveAddress(e) {
             e.preventDefault();
 
             const addressId = document.getElementById('editAddressId').value;
@@ -2134,56 +2134,43 @@
 
             let result;
             if (addressId) {
-                result = KevraAuth.updateAddress(addressId, addressData);
+                result = await KevraDB.updateAddress(addressId, addressData);
             } else {
-                result = KevraAuth.addAddress(addressData);
+                result = await KevraDB.addAddress(addressData);
             }
 
             if (result.success) {
                 closeAddressModal();
-                renderAddresses();
+                await renderAddresses();
                 showToast(addressId ? 'Adres güncellendi' : 'Yeni adres eklendi');
             } else {
                 showToast(result.message, 'error');
             }
         }
 
-        function editAddress(addressId) {
-            openAddressModal(addressId);
+        async function editAddress(addressId) {
+            await openAddressModal(addressId);
         }
 
-        function deleteAddress(addressId) {
+        async function deleteAddress(addressId) {
             if (!confirm('Bu adresi silmek istediğinize emin misiniz?')) return;
 
-            const result = KevraAuth.deleteAddress(addressId);
+            const result = await KevraDB.deleteAddress(addressId);
             if (result.success) {
-                renderAddresses();
+                await renderAddresses();
                 showToast('Adres silindi');
             } else {
                 showToast(result.message, 'error');
             }
         }
 
-        function setDefaultAddress(addressId) {
-            const addresses = KevraAuth.getAddresses();
-            const updates = addresses.map(a => ({
-                id: a.id,
-                isDefault: a.id === addressId
-            }));
-
-            // Tüm adresleri güncelle
-            const users = KevraAuth.getUsers();
-            const user = KevraAuth.getCurrentUser();
-            const userIndex = users.findIndex(u => u.id === user.id);
-            
-            if (userIndex !== -1) {
-                users[userIndex].addresses.forEach(a => {
-                    a.isDefault = (a.id === addressId);
-                });
-                KevraStorage.set('kevra_users', users);
-                localStorage.setItem('kevra_current_user', JSON.stringify(users[userIndex]));
-                renderAddresses();
+        async function setDefaultAddress(addressId) {
+            const result = await KevraDB.setDefaultAddress(addressId);
+            if (result.success) {
+                await renderAddresses();
                 showToast('Varsayılan adres güncellendi');
+            } else {
+                showToast(result.message, 'error');
             }
         }
 
@@ -2201,7 +2188,7 @@
             await renderReturns();
 
             // Adresleri render et
-            renderAddresses();
+            await renderAddresses();
 
             // URL hash kontrolü
             checkUrlHash();

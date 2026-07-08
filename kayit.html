@@ -720,6 +720,11 @@
         </div>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/kevra-db.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/auth.js"></script>
 
@@ -756,7 +761,7 @@
         });
 
         // Form Submit
-        document.getElementById("registerForm").addEventListener("submit", e => {
+        document.getElementById("registerForm").addEventListener("submit", async e => {
             e.preventDefault();
 
             const firstName = document.getElementById("firstName").value.trim();
@@ -812,31 +817,29 @@
             submitBtn.classList.add('loading');
             submitBtn.disabled = true;
 
+            const res = await KevraDB.registerUser({
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                password: password,
+                phone: phone,
+                address: address,
+                city: city,
+                zipCode: zipCode
+            });
+
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+
+            if (!res.success) {
+                showAlert(res.message, 'error');
+                return;
+            }
+
+            showAlert('Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...', 'success');
             setTimeout(() => {
-                const res = KevraAuth.register({
-                    firstName: firstName,
-                    lastName: lastName,
-                    email: email,
-                    password: password,
-                    phone: phone,
-                    address: address,
-                    city: city,
-                    zipCode: zipCode
-                });
-
-                submitBtn.classList.remove('loading');
-                submitBtn.disabled = false;
-
-                if (!res.success) {
-                    showAlert(res.message, 'error');
-                    return;
-                }
-
-                showAlert('Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...', 'success');
-                setTimeout(() => {
-                    window.location.href = "giris.html";
-                }, 1500);
-            }, 1000);
+                window.location.href = "giris.html";
+            }, 1500);
         });
 
         ['firstName', 'lastName', 'email', 'password', 'phone', 'address', 'city'].forEach(id => {
@@ -851,7 +854,7 @@
         });
 
         // Google Sign Up
-        window.handleGoogleSignUp = function(response) {
+        window.handleGoogleSignUp = async function(response) {
             const credential = response.credential;
             try {
                 const base64Url = credential.split('.')[1];
@@ -867,33 +870,27 @@
                     googleId: googleProfile.sub,
                     picture: googleProfile.picture || null
                 };
-                const users = KevraAuth.getUsers ? KevraAuth.getUsers() : [];
+                const users = await KevraDB.getAllUsers();
                 let existingUser = users.find(u => u.email === profile.email);
                 if (!existingUser) {
-                    const registerRes = KevraAuth.register({
+                    const registerRes = await KevraDB.registerUser({
                         email: profile.email,
                         password: 'google_oauth_' + profile.googleId,
                         firstName: profile.firstName,
                         lastName: profile.lastName
                     });
-                    if (!registerRes.success && registerRes.message !== "Bu e-posta adresi zaten kayıtlı") {
+                    if (!registerRes.success && registerRes.message !== 'Bu e-posta zaten kayıtlı') {
                         showAlert('Google ile kayıt başarısız. Lütfen tekrar deneyin.', 'error');
                         return;
                     }
                     existingUser = registerRes.user || users.find(u => u.email === profile.email);
-                } else {
-                    if (!existingUser.firstName || existingUser.firstName === 'Google') {
-                        existingUser.firstName = profile.firstName;
-                        existingUser.lastName = profile.lastName;
-                        const userIndex = users.findIndex(u => u.email === profile.email);
-                        if (userIndex !== -1) {
-                            users[userIndex] = existingUser;
-                            KevraAuth.saveUsers(users);
-                        }
-                    }
+                } else if (!existingUser.firstName || existingUser.firstName === 'Google') {
+                    const updateRes = await KevraDB._updateUserRecord(existingUser.id, u => ({ ...u, firstName: profile.firstName, lastName: profile.lastName }));
+                    if (updateRes.success) existingUser = updateRes.user;
                 }
                 if (existingUser) {
-                    localStorage.setItem("kevra_current_user", JSON.stringify(existingUser));
+                    const session = { id: existingUser.id, email: existingUser.email, firstName: existingUser.firstName, lastName: existingUser.lastName, phone: existingUser.phone, loginTime: new Date().toISOString() };
+                    localStorage.setItem("kevra_current_user", JSON.stringify(session));
                     showAlert('Google ile kayıt başarılı! Yönlendiriliyorsunuz...', 'success');
                     setTimeout(() => {
                         window.location.href = "index.html";
