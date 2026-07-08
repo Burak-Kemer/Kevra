@@ -443,6 +443,29 @@
             background: #E3F2FD;
             color: #1976D2;
         }
+        .status-badge.pending {
+            background: #FFF3E0;
+            color: #E65100;
+        }
+        .status-badge.processing {
+            background: #EDE7F6;
+            color: #5E35B1;
+        }
+        .status-badge.delivered {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+        .status-badge.cancelled {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+        .tracking-not-found {
+            display: none;
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--kevra-gray);
+        }
+        .tracking-not-found.active { display: block; }
         
         /* Timeline */
         .timeline {
@@ -866,72 +889,30 @@
         
         <div class="tracking-box">
             <div class="tracking-form">
-                <input type="text" class="tracking-input" id="orderNumber" placeholder="Sipariş numaranızı girin (örn: KVR-2025-001)">
+                <input type="text" class="tracking-input" id="orderNumber" placeholder="Sipariş numaranızı girin (örn: ORD1735660800000)">
                 <button class="tracking-btn" onclick="trackOrder()">🔍 Sorgula</button>
             </div>
             <p class="tracking-help">
                 Sipariş numaranızı bilmiyor musunuz? <a href="profil.html">Siparişlerim sayfasına gidin</a>
             </p>
-            
+
+            <!-- Bulunamadi mesaji -->
+            <div class="tracking-not-found" id="trackingNotFound">
+                <div class="icon" style="font-size:48px;margin-bottom:12px;">🔍</div>
+                <p>Bu sipariş numarasıyla eşleşen bir sipariş bulunamadı. Lütfen numarayı kontrol edin.</p>
+            </div>
+
             <!-- Order Status (Hidden by default) -->
             <div class="order-status" id="orderStatus">
                 <div class="status-header">
                     <div class="status-order-info">
-                        <h3>Sipariş #KVR-2025-001</h3>
-                        <p>2 ürün • 2.499 ₺</p>
+                        <h3 id="statusOrderId">Sipariş #</h3>
+                        <p id="statusOrderMeta"></p>
                     </div>
-                    <span class="status-badge shipped">Kargoya Verildi</span>
+                    <span class="status-badge" id="statusBadge"></span>
                 </div>
-                
-                <div class="timeline">
-                    <div class="timeline-item completed">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
-                            <h4>Sipariş Alındı</h4>
-                            <p>Siparişiniz başarıyla oluşturuldu</p>
-                            <div class="timeline-date">18 Nisan 2025, 14:30</div>
-                        </div>
-                    </div>
-                    <div class="timeline-item completed">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
-                            <h4>Ödeme Onaylandı</h4>
-                            <p>Ödemeniz başarıyla alındı</p>
-                            <div class="timeline-date">18 Nisan 2025, 14:32</div>
-                        </div>
-                    </div>
-                    <div class="timeline-item completed">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
-                            <h4>Ürünler Hazırlanıyor</h4>
-                            <p>Ürünleriniz özenle paketleniyor</p>
-                            <div class="timeline-date">18 Nisan 2025, 16:45</div>
-                        </div>
-                    </div>
-                    <div class="timeline-item completed">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
-                            <h4>Kargoya Verildi</h4>
-                            <p>Aras Kargo - Takip No: 1234567890</p>
-                            <div class="timeline-date">19 Nisan 2025, 09:15</div>
-                        </div>
-                    </div>
-                    <div class="timeline-item active">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
-                            <h4>Teslimatta</h4>
-                            <p>Kargonuz dağıtıma çıktı</p>
-                            <div class="timeline-date">Tahmini: 20 Nisan 2025</div>
-                        </div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
-                            <h4>Teslim Edildi</h4>
-                            <p>Ürünlerinizi teslim aldığınızda burada görünecek</p>
-                        </div>
-                    </div>
-                </div>
+
+                <div class="timeline" id="orderTimeline"></div>
             </div>
         </div>
         
@@ -1046,18 +1027,139 @@
             window.location.href = 'index.html';
         }
         
-        // Track Order
-        function trackOrder() {
-            const orderNumber = document.getElementById('orderNumber').value;
-            if (orderNumber.trim() === '') {
+        // Kargo firmasi adlari/linkleri (profil.html'deki ayni esleme ile tutarli)
+        const CARGO_NAMES = { yurtici:'Yurtiçi Kargo', aras:'Aras Kargo', mng:'MNG Kargo', surat:'Sürat Kargo', ptt:'PTT Kargo' };
+        const CARGO_URLS  = {
+            yurtici: 'https://kargotakip.yurticikargo.com/kargo-takip?code=',
+            aras:    'https://kargotakip.araskargo.com.tr/?trackingNumber=',
+            mng:     'https://www.mngkargo.com.tr/gonderi-takip?barcode=',
+            surat:   'https://www.suratkargo.com.tr/KargoSorgulama?kod=',
+            ptt:     'https://gonderitakip.ptt.gov.tr/Track/Verify?q='
+        };
+        const STATUS_BADGE = {
+            'pending':'pending','Beklemede':'pending',
+            'processing':'processing','Hazırlanıyor':'processing',
+            'shipped':'shipped','Kargoda':'shipped',
+            'delivered':'delivered','Teslim Edildi':'delivered',
+            'cancelled':'cancelled','İptal Edildi':'cancelled'
+        };
+        const STATUS_TEXT = {
+            'pending':'Beklemede','Beklemede':'Beklemede',
+            'processing':'Hazırlanıyor','Hazırlanıyor':'Hazırlanıyor',
+            'shipped':'Kargoda','Kargoda':'Kargoda',
+            'delivered':'Teslim Edildi','Teslim Edildi':'Teslim Edildi',
+            'cancelled':'İptal Edildi','İptal Edildi':'İptal Edildi'
+        };
+        // Siparis durumuna gore gercek zaman cizelgesini olusturur (uydurma
+        // tarih/saat eklemiyor, sadece elimizde olan gercek veriyi gosterir)
+        function buildTimeline(order) {
+            const status = order.status || 'pending';
+            const cancelled = ['cancelled', 'İptal Edildi'].includes(status);
+            const reachedProcessing = ['processing','Hazırlanıyor','shipped','Kargoda','delivered','Teslim Edildi'].includes(status);
+            const reachedShipped    = ['shipped','Kargoda','delivered','Teslim Edildi'].includes(status);
+            const reachedDelivered  = ['delivered','Teslim Edildi'].includes(status);
+            const paid = order.paymentStatus === 'paid' || order.paymentMethod !== 'card' || reachedProcessing;
+
+            const createdDate = order.createdAt ? new Date(order.createdAt).toLocaleString('tr-TR') : '';
+
+            if (cancelled) {
+                return `
+                    <div class="timeline-item completed">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <h4>Sipariş Alındı</h4>
+                            ${createdDate ? `<div class="timeline-date">${createdDate}</div>` : ''}
+                        </div>
+                    </div>
+                    <div class="timeline-item active" style="--kevra-gold:#C62828;">
+                        <div class="timeline-dot" style="background:#C62828;box-shadow:0 0 0 2px #C62828;"></div>
+                        <div class="timeline-content">
+                            <h4>Sipariş İptal Edildi</h4>
+                        </div>
+                    </div>`;
+            }
+
+            const steps = [
+                { key: 'received',   title: 'Sipariş Alındı',       detail: createdDate, done: true },
+                { key: 'paid',       title: 'Ödeme Onaylandı',      detail: paid ? '' : 'Bekleniyor', done: paid },
+                { key: 'processing', title: 'Ürünler Hazırlanıyor', detail: '', done: reachedProcessing },
+                { key: 'shipped',    title: 'Kargoya Verildi',
+                  detail: (reachedShipped && order.trackingNumber && order.cargoCompany)
+                            ? `${CARGO_NAMES[order.cargoCompany] || order.cargoCompany} - Takip No: ${order.trackingNumber}`
+                            : '',
+                  done: reachedShipped },
+                { key: 'delivered',  title: 'Teslim Edildi',        detail: '', done: reachedDelivered }
+            ];
+
+            let activeAssigned = false;
+            return steps.map(step => {
+                let cls = '';
+                if (step.done) cls = 'completed';
+                else if (!activeAssigned) { cls = 'active'; activeAssigned = true; }
+                const linkHtml = (step.key === 'shipped' && reachedShipped && order.trackingNumber && order.cargoCompany && CARGO_URLS[order.cargoCompany])
+                    ? `<br><a href="${CARGO_URLS[order.cargoCompany]}${order.trackingNumber}" target="_blank">Kargoyu Takip Et →</a>` : '';
+                return `
+                    <div class="timeline-item ${cls}">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <h4>${step.title}</h4>
+                            ${step.detail ? `<p>${step.detail}</p>` : ''}
+                            ${linkHtml}
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        // Track Order — gercek siparisi Firestore/localStorage'dan (KevraDB) sorgular
+        async function trackOrder() {
+            const orderNumber = document.getElementById('orderNumber').value.trim();
+            const notFoundBox = document.getElementById('trackingNotFound');
+            const statusBox   = document.getElementById('orderStatus');
+
+            notFoundBox.classList.remove('active');
+            statusBox.classList.remove('active');
+
+            if (orderNumber === '') {
                 alert('Lütfen sipariş numarası girin');
                 return;
             }
-            document.getElementById('orderStatus').classList.add('active');
+
+            const btn = document.querySelector('.tracking-btn');
+            const originalText = btn.textContent;
+            btn.textContent = 'Aranıyor...';
+            btn.disabled = true;
+
+            let order = null;
+            try {
+                const orders = await KevraDB.getAllOrders();
+                order = orders.find(o => String(o.id).toLowerCase() === orderNumber.toLowerCase());
+            } catch (e) {
+                console.error('Sipariş sorgulama hatası:', e);
+            }
+
+            btn.textContent = originalText;
+            btn.disabled = false;
+
+            if (!order) {
+                notFoundBox.classList.add('active');
+                return;
+            }
+
+            const itemCount = (order.items || []).reduce((sum, i) => sum + (i.quantity || 1), 0);
+            document.getElementById('statusOrderId').textContent = `Sipariş #${order.id}`;
+            document.getElementById('statusOrderMeta').textContent = `${itemCount} ürün • ${(order.total || 0).toLocaleString('tr-TR')} ₺`;
+
+            const badge = document.getElementById('statusBadge');
+            badge.className = 'status-badge ' + (STATUS_BADGE[order.status] || 'pending');
+            badge.textContent = STATUS_TEXT[order.status] || 'Beklemede';
+
+            document.getElementById('orderTimeline').innerHTML = buildTimeline(order);
+            statusBox.classList.add('active');
         }
     </script>
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/kevra-db.js"></script>
