@@ -1539,7 +1539,10 @@ async function placeOrder() {
     const total          = subtotal - discountAmount;
     const paymentMethod  = document.querySelector('input[name="payment"]:checked').value;
 
+    const currentUser = (window.KevraDB && KevraDB.getCurrentUser()) || null;
+
     const orderData = {
+        userId:        currentUser ? currentUser.id : 'guest',
         items:         [...checkoutCart],
         subtotal:      subtotal,
         discount:      discountAmount,

@@ -32,10 +32,20 @@ let _db   = null;
 let _auth = null;
 let firebaseReady = false;
 
+// Firestore güvenlik kuralları "request.auth != null" istiyor (bkz.
+// firestore.rules). Müşteriler kendi e-posta/şifresiyle Firebase Auth'a
+// hiç girmiyor (KevraDB kendi hash'li şifre kontrolünü yapıyor) — bu
+// yüzden her sayfa yüklendiğinde otomatik, görünmez bir anonim oturum
+// açılıyor. Bu, Firestore'un "giriş yapılmış" saymasını sağlıyor.
+// authReady: Firestore'a ilk istekten önce beklenmesi gereken promise.
+let _resolveAuthReady;
+const authReady = new Promise(resolve => { _resolveAuthReady = resolve; });
+
 function initFirebase() {
     try {
         if (typeof firebase === 'undefined') {
             console.warn('[KevraDB] Firebase SDK yüklenmedi — localStorage moduna geçiliyor');
+            _resolveAuthReady();
             return false;
         }
         if (!firebase.apps.length) {
@@ -45,9 +55,28 @@ function initFirebase() {
         _auth = firebase.auth();
         firebaseReady = true;
         console.log('[KevraDB] ✅ Firebase bağlantısı kuruldu');
+
+        // onAuthStateChanged: SDK'nin (varsa) kalıcı oturumu geri yükleyip
+        // yüklemediğini kesin olarak bildirdiği ilk an. currentUser'ı
+        // senkron okumak güvenilir değil — henüz geri yüklenmemiş olabilir.
+        const unsubscribe = _auth.onAuthStateChanged(user => {
+            unsubscribe();
+            if (user) {
+                _resolveAuthReady();
+            } else {
+                _auth.signInAnonymously()
+                    .then(() => console.log('[KevraDB] ✅ Anonim oturum açıldı'))
+                    .catch(e => console.warn('[KevraDB] Anonim oturum hatası:', e.message))
+                    .finally(() => _resolveAuthReady());
+            }
+        }, e => {
+            console.warn('[KevraDB] Auth durumu hatası:', e.message);
+            _resolveAuthReady();
+        });
         return true;
     } catch (e) {
         console.warn('[KevraDB] Firebase hatası, localStorage modunda devam:', e.message);
+        _resolveAuthReady();
         return false;
     }
 }
@@ -72,6 +101,7 @@ window.KevraFirebase = {
     get auth() { return _auth; },
     ready: () => firebaseReady,
     init:  initFirebase,
+    authReady,
     COLLECTIONS
 };
 

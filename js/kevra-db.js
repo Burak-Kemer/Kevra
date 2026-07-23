@@ -5,6 +5,15 @@
 
 const KevraDB = {
 
+    // Firestore çağrılarından önce (varsa) anonim oturumun açılmasını
+    // bekler — sayfa yeni yüklendiğinde Firestore isteği anonim girişten
+    // önce atılıp 403 almasını önler. Bkz. js/firebase-config.js.
+    _firebaseAvailable: async function() {
+        if (!window.KevraFirebase) return false;
+        if (window.KevraFirebase.authReady) await window.KevraFirebase.authReady;
+        return window.KevraFirebase.ready();
+    },
+
     // ===================== KULLANICI =====================
 
     registerUser: async function(userData) {
@@ -24,10 +33,11 @@ const KevraDB = {
             city:         userData.city || '',
             zipCode:      userData.zipCode || '',
             registerDate: new Date().toISOString(),
-            active:       true
+            active:       true,
+            addresses:    []
         };
 
-        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+        if (await this._firebaseAvailable()) {
             try {
                 await window.KevraFirebase.db.collection('users').doc(newUser.id).set(newUser);
             } catch (e) { console.warn('Firestore yazma hatası:', e); }
@@ -47,7 +57,7 @@ const KevraDB = {
         if (!user)                                       return { success: false, message: 'Kullanıcı bulunamadı' };
         if (user.password !== this._hash(password))     return { success: false, message: 'Şifre hatalı' };
 
-        const session = { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, phone: user.phone, loginTime: new Date().toISOString() };
+        const session = { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, phone: user.phone, photo: user.photo || null, loginTime: new Date().toISOString() };
         localStorage.setItem('kevra_current_user', JSON.stringify(session));
         return { success: true, user: session };
     },
@@ -62,7 +72,7 @@ const KevraDB = {
 
     getAllUsers: async function() {
         const local = JSON.parse(localStorage.getItem('kevra_users') || '[]');
-        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+        if (await this._firebaseAvailable()) {
             try {
                 const snap = await window.KevraFirebase.db.collection('users').get();
                 const fsData = snap.docs.map(d => d.data());
@@ -78,10 +88,117 @@ const KevraDB = {
         return local;
     },
 
+    // Bir kullanıcı kaydını Firestore + localStorage'da tutarlı şekilde
+    // günceller. mutate(user) güncellenmiş kaydı döndürmeli.
+    _updateUserRecord: async function(userId, mutate) {
+        const users = await this.getAllUsers();
+        const idx = users.findIndex(u => u.id === userId);
+        if (idx === -1) return { success: false, message: 'Kullanıcı bulunamadı' };
+
+        const updated = mutate({ ...users[idx] });
+
+        if (await this._firebaseAvailable()) {
+            try {
+                await window.KevraFirebase.db.collection('users').doc(userId).set(updated, { merge: true });
+            } catch (e) { console.warn('Firestore kullanıcı güncelleme hatası:', e); }
+        }
+
+        const local = JSON.parse(localStorage.getItem('kevra_users') || '[]');
+        const localIdx = local.findIndex(u => u.id === userId);
+        if (localIdx !== -1) local[localIdx] = updated; else local.push(updated);
+        localStorage.setItem('kevra_users', JSON.stringify(local));
+
+        return { success: true, user: updated };
+    },
+
+    updateUser: async function(updates) {
+        const currentUser = this.getCurrentUser();
+        if (!currentUser) return { success: false, message: 'Oturum açık değil' };
+
+        const result = await this._updateUserRecord(currentUser.id, user => ({ ...user, ...updates }));
+        if (!result.success) return result;
+
+        // Header/menüde kullanılan oturum bilgisini de güncelle
+        const session = { ...currentUser, ...updates };
+        delete session.password;
+        localStorage.setItem('kevra_current_user', JSON.stringify(session));
+
+        return { success: true, user: result.user };
+    },
+
+    changePassword: async function(currentPassword, newPassword) {
+        const currentUser = this.getCurrentUser();
+        if (!currentUser) return { success: false, message: 'Oturum açık değil' };
+
+        const users = await this.getAllUsers();
+        const user = users.find(u => u.id === currentUser.id);
+        if (!user) return { success: false, message: 'Kullanıcı bulunamadı' };
+        if (user.password !== this._hash(currentPassword)) return { success: false, message: 'Mevcut şifre yanlış' };
+
+        await this._updateUserRecord(currentUser.id, u => ({ ...u, password: this._hash(newPassword) }));
+        return { success: true };
+    },
+
+    // ===================== ADRESLER =====================
+
+    getAddresses: async function() {
+        const currentUser = this.getCurrentUser();
+        if (!currentUser) return [];
+        const users = await this.getAllUsers();
+        const user = users.find(u => u.id === currentUser.id);
+        return (user && user.addresses) || [];
+    },
+
+    addAddress: async function(address) {
+        const currentUser = this.getCurrentUser();
+        if (!currentUser) return { success: false, message: 'Oturum açık değil' };
+
+        const newAddress = { id: 'addr_' + Date.now(), ...address, createdAt: new Date().toISOString() };
+        const result = await this._updateUserRecord(currentUser.id, user => {
+            const addresses = user.addresses ? [...user.addresses, newAddress] : [newAddress];
+            return { ...user, addresses };
+        });
+        if (!result.success) return result;
+        return { success: true, address: newAddress };
+    },
+
+    updateAddress: async function(addressId, updates) {
+        const currentUser = this.getCurrentUser();
+        if (!currentUser) return { success: false, message: 'Oturum açık değil' };
+
+        const result = await this._updateUserRecord(currentUser.id, user => ({
+            ...user,
+            addresses: (user.addresses || []).map(a => a.id === addressId ? { ...a, ...updates } : a)
+        }));
+        return result.success ? { success: true } : result;
+    },
+
+    deleteAddress: async function(addressId) {
+        const currentUser = this.getCurrentUser();
+        if (!currentUser) return { success: false, message: 'Oturum açık değil' };
+
+        const result = await this._updateUserRecord(currentUser.id, user => ({
+            ...user,
+            addresses: (user.addresses || []).filter(a => a.id !== addressId)
+        }));
+        return result.success ? { success: true } : result;
+    },
+
+    setDefaultAddress: async function(addressId) {
+        const currentUser = this.getCurrentUser();
+        if (!currentUser) return { success: false, message: 'Oturum açık değil' };
+
+        const result = await this._updateUserRecord(currentUser.id, user => ({
+            ...user,
+            addresses: (user.addresses || []).map(a => ({ ...a, isDefault: a.id === addressId }))
+        }));
+        return result.success ? { success: true } : result;
+    },
+
     // ===================== ÜRÜNLER =====================
 
     getProducts: async function() {
-        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+        if (await this._firebaseAvailable()) {
             try {
                 const snap = await window.KevraFirebase.db.collection('products').orderBy('createdAt', 'desc').get();
                 if (!snap.empty) {
@@ -104,7 +221,7 @@ const KevraDB = {
         const id   = productData.id ? String(productData.id) : 'p_' + Date.now();
         const data = { ...productData, id, updatedAt: new Date().toISOString(), createdAt: productData.createdAt || new Date().toISOString() };
 
-        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+        if (await this._firebaseAvailable()) {
             try {
                 await window.KevraFirebase.db.collection('products').doc(id).set(data, { merge: true });
             } catch (e) { console.warn('Firestore ürün kayıt hatası:', e); }
@@ -120,7 +237,7 @@ const KevraDB = {
 
     deleteProduct: async function(productId) {
         const id = String(productId);
-        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+        if (await this._firebaseAvailable()) {
             try { await window.KevraFirebase.db.collection('products').doc(id).delete(); } catch (e) {}
         }
         const products = JSON.parse(localStorage.getItem('kevra_products') || '[]').filter(p => String(p.id) !== id);
@@ -149,7 +266,7 @@ const KevraDB = {
             notes:         orderData.notes || ''
         };
 
-        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+        if (await this._firebaseAvailable()) {
             try {
                 await window.KevraFirebase.db.collection('orders').doc(newOrder.id).set(newOrder);
             } catch (e) { console.warn('Firestore sipariş hatası:', e); }
@@ -163,7 +280,7 @@ const KevraDB = {
 
     getAllOrders: async function() {
         const local = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
-        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+        if (await this._firebaseAvailable()) {
             try {
                 const snap = await window.KevraFirebase.db.collection('orders').orderBy('createdAt', 'desc').get();
                 const fsData = snap.docs.map(d => d.data());
@@ -212,7 +329,7 @@ const KevraDB = {
     },
 
     updateOrderStatus: async function(orderId, status, shippingStatus, extra = {}) {
-        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+        if (await this._firebaseAvailable()) {
             try {
                 const update = { status };
                 if (shippingStatus) update.shippingStatus = shippingStatus;
@@ -288,7 +405,7 @@ const KevraDB = {
     // ===================== İADE TALEPLERİ =====================
 
     saveReturnRequest: async function(returnData) {
-        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+        if (await this._firebaseAvailable()) {
             try {
                 await window.KevraFirebase.db.collection('returns').doc(returnData.id).set(returnData);
             } catch (e) { console.warn('Firestore iade kaydetme:', e); }
@@ -301,7 +418,7 @@ const KevraDB = {
     },
 
     getAllReturnRequests: async function() {
-        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+        if (await this._firebaseAvailable()) {
             try {
                 const snap = await window.KevraFirebase.db.collection('returns').get();
                 const returns = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -321,7 +438,7 @@ const KevraDB = {
 
     updateReturnStatus: async function(returnId, status, statusText) {
         const now = new Date().toISOString();
-        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+        if (await this._firebaseAvailable()) {
             try {
                 await window.KevraFirebase.db.collection('returns').doc(returnId).update({ status, statusText, updatedAt: now });
             } catch (e) { console.warn('Firestore iade güncelleme:', e); }

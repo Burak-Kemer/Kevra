@@ -64,7 +64,7 @@ function showToast(message, type = 'success') {
 function createProductCard(product) {
     const hasDiscount = product.discount && product.originalPrice > product.price;
     const discountPercent = hasDiscount ? Math.round((1 - product.price/product.originalPrice) * 100) : 0;
-    const isFav = favorites.includes(product.id);
+    const isFav = favorites.some(id => String(id) === String(product.id));
     
     return `
         <div class="product-card" data-id="${product.id}" data-product-id="${product.id}">
@@ -97,7 +97,7 @@ function createProductCard(product) {
 // ================= QUICK VIEW MODAL =================
 
 function openQuickView(productId) {
-    const product = allProducts.find(p => p.id === productId);
+    const product = allProducts.find(p => String(p.id) === String(productId));
     if (!product) return;
     
     currentQVProduct = product;
@@ -202,7 +202,7 @@ function openQuickView(productId) {
     // Favori butonu
     const favBtn = document.getElementById('qvFavBtn');
     if (favBtn) {
-        const isFav = favorites.includes(product.id);
+        const isFav = favorites.some(id => String(id) === String(product.id));
         favBtn.textContent = isFav ? '♥' : '♡';
         favBtn.className = isFav ? 'qv-add-fav active' : 'qv-add-fav';
     }
@@ -291,9 +291,9 @@ function addToCartFromQuickView() {
 function toggleFavFromQuickView() {
     if (!currentQVProduct) return;
     
-    const index = favorites.indexOf(currentQVProduct.id);
+    const index = favorites.indexOf(String(currentQVProduct.id));
     const favBtn = document.getElementById('qvFavBtn');
-    
+
     if (index > -1) {
         favorites.splice(index, 1);
         showToast(`${currentQVProduct.name} favorilerden çıkarıldı`, "error");
@@ -302,7 +302,7 @@ function toggleFavFromQuickView() {
             favBtn.classList.remove('active');
         }
     } else {
-        favorites.push(currentQVProduct.id);
+        favorites.push(String(currentQVProduct.id));
         showToast(`${currentQVProduct.name} favorilere eklendi`);
         if (favBtn) {
             favBtn.textContent = '♥';
@@ -436,9 +436,9 @@ function toggleFavorite(productId, event) {
         event.preventDefault();
     }
     
-    const product = allProducts.find(p => p.id === productId);
+    const product = allProducts.find(p => String(p.id) === String(productId));
     if (!product) return;
-    
+
     const index = favorites.indexOf(productId);
     
     if (index > -1) {
@@ -463,6 +463,10 @@ function toggleFavorite(productId, event) {
 
 // Update Cart UI
 function updateCartUI() {
+    // sepetim.html gibi ayri bir sayfa kendi buyuk sepet listesini
+    // gosteriyorsa, cekmeceden yapilan degisiklikler sonrasi onu da guncelle
+    if (typeof window.renderCartPage === 'function') window.renderCartPage();
+
     const count = cart.reduce((sum, item) => sum + item.quantity, 0);
     const cartCount = document.getElementById("cartCount");
     const cartDrawerCount = document.getElementById("cartDrawerCount");
@@ -698,7 +702,7 @@ function setupSearch() {
                             ${p.badge ? `<span class="search-item-badge ${p.badgeType}">${p.badge}</span>` : ''}
                         </div>
                         <div class="search-item-actions">
-                            <button class="search-view-btn" onclick="event.stopPropagation(); openQuickView(${p.id}); document.getElementById('searchModal').classList.remove('active'); document.body.style.overflow = '';">
+                            <button class="search-view-btn" onclick="event.stopPropagation(); openQuickView('${p.id}'); document.getElementById('searchModal').classList.remove('active'); document.body.style.overflow = '';">
                                 👁️ İncele
                             </button>
                         </div>

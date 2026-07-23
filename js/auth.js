@@ -28,7 +28,12 @@ window.KevraAuth = {
       firstName: userData.firstName || '',
       lastName: userData.lastName || '',
       phone: userData.phone || '',
+      address: userData.address || '',
+      city: userData.city || '',
+      zipCode: userData.zipCode || '',
+      active: true,
       createdAt: new Date().toISOString(),
+      registerDate: new Date().toISOString(),
       addresses: [],
       orders: []
     };

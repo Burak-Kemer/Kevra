@@ -224,13 +224,15 @@
     </script>
     <script>
         let selectedFile = null, selectedOrderId = null;
-        function loadOrders() {
-            const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+        let allOrdersCache = [];
+        async function loadOrders() {
+            allOrdersCache = await KevraDB.getAllOrders();
             const select = document.getElementById('orderSelect');
-            orders.forEach(order => {
+            allOrdersCache.forEach(order => {
                 const option = document.createElement('option');
                 option.value = order.id;
-                option.textContent = `${order.id} - ${order.customer?.firstName || ''} ${order.customer?.lastName || ''} (₺${order.total})`;
+                const c = order.customer || {};
+                option.textContent = `${order.id} - ${c.firstName || order.firstName || ''} ${c.lastName || order.lastName || ''} (₺${order.total})`;
                 select.appendChild(option);
             });
             select.addEventListener('change', function() { selectedOrderId = this.value; checkFormValidity(); });
@@ -238,7 +240,10 @@
         function handleFileSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
-            if (file.size > 5 * 1024 * 1024) { showToast('Dosya boyutu 5MB\'dan büyük olamaz!', 'error'); return; }
+            // Firestore doküman başına 1MB sınırı var; base64 kodlama boyutu ~%33 büyüttüğü
+            // için dosya boyutu 600KB ile sınırlandırılıyor (aksi halde yükleme "başarılı"
+            // görünüp Firestore'a hiç yazılmaz ve sayfa değişince kaybolur).
+            if (file.size > 600 * 1024) { showToast('Dosya boyutu 600KB\'dan büyük olamaz!', 'error'); return; }
             const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
             if (!allowedTypes.includes(file.type)) { showToast('Sadece PDF, JPG veya PNG dosyaları yükleyebilirsiniz!', 'error'); return; }
             selectedFile = file;
@@ -260,13 +265,12 @@
         function uploadInvoice() {
             if (!selectedOrderId || !selectedFile) return;
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 const invoiceData = { orderId: selectedOrderId, fileName: selectedFile.name, fileSize: selectedFile.size, fileType: selectedFile.type, data: e.target.result, uploadDate: new Date().toISOString() };
-                const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
-                const order = orders.find(o => o.id === selectedOrderId);
+                const order = allOrdersCache.find(o => o.id === selectedOrderId);
                 if (order) {
+                    await KevraDB.updateOrderStatus(order.id, order.status, order.shippingStatus, { invoice: invoiceData });
                     order.invoice = invoiceData;
-                    localStorage.setItem('kevra_orders', JSON.stringify(orders));
                     showToast('Fatura başarıyla yüklendi!');
                     removeFile();
                     document.getElementById('orderSelect').value = '';
@@ -277,8 +281,7 @@
             reader.readAsDataURL(selectedFile);
         }
         function loadInvoices() {
-            const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
-            const invoicesWithOrders = orders.filter(o => o.invoice);
+            const invoicesWithOrders = allOrdersCache.filter(o => o.invoice);
             const container = document.getElementById('invoicesList');
             if (invoicesWithOrders.length === 0) {
                 container.innerHTML = '<div class="empty-state"><div style="font-size:64px;margin-bottom:20px;opacity:0.3;">📋</div><p>Henüz fatura yüklenmemiş</p></div>';
@@ -288,23 +291,22 @@
             const list = document.getElementById('invoicesContainer');
             invoicesWithOrders.forEach(order => {
                 const invoice = order.invoice;
+                const c = order.customer || {};
                 const item = document.createElement('div');
                 item.className = 'invoice-item';
-                item.innerHTML = `<div class="invoice-info"><div class="invoice-icon">${invoice.fileType === 'application/pdf' ? '📄' : '🖼️'}</div><div class="invoice-details"><h4>${invoice.fileName}</h4><p>Sipariş: ${order.id} | Müşteri: ${order.customer?.firstName || ''} ${order.customer?.lastName || ''} | ${formatFileSize(invoice.fileSize)} | ${new Date(invoice.uploadDate).toLocaleDateString('tr-TR')}</p></div></div><div class="invoice-actions"><button class="btn btn-primary btn-small" onclick="viewInvoice('${order.id}')">👁 Görüntüle</button><button class="btn btn-success btn-small" onclick="downloadInvoice('${order.id}')">⬇ İndir</button><button class="btn btn-danger btn-small" onclick="deleteInvoice('${order.id}')">🗑 Sil</button></div>`;
+                item.innerHTML = `<div class="invoice-info"><div class="invoice-icon">${invoice.fileType === 'application/pdf' ? '📄' : '🖼️'}</div><div class="invoice-details"><h4>${invoice.fileName}</h4><p>Sipariş: ${order.id} | Müşteri: ${c.firstName || order.firstName || ''} ${c.lastName || order.lastName || ''} | ${formatFileSize(invoice.fileSize)} | ${new Date(invoice.uploadDate).toLocaleDateString('tr-TR')}</p></div></div><div class="invoice-actions"><button class="btn btn-primary btn-small" onclick="viewInvoice('${order.id}')">👁 Görüntüle</button><button class="btn btn-success btn-small" onclick="downloadInvoice('${order.id}')">⬇ İndir</button><button class="btn btn-danger btn-small" onclick="deleteInvoice('${order.id}')">🗑 Sil</button></div>`;
                 list.appendChild(item);
             });
         }
         function viewInvoice(orderId) {
-            const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
-            const order = orders.find(o => o.id === orderId);
+            const order = allOrdersCache.find(o => o.id === orderId);
             if (order && order.invoice) {
                 const newWindow = window.open();
                 newWindow.document.write(`<iframe src="${order.invoice.data}" style="width:100%;height:100vh;border:none;"></iframe>`);
             }
         }
         function downloadInvoice(orderId) {
-            const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
-            const order = orders.find(o => o.id === orderId);
+            const order = allOrdersCache.find(o => o.id === orderId);
             if (order && order.invoice) {
                 const link = document.createElement('a');
                 link.href = order.invoice.data;
@@ -312,11 +314,15 @@
                 link.click();
             }
         }
-        function deleteInvoice(orderId) {
+        async function deleteInvoice(orderId) {
             if (!confirm('Bu faturayı silmek istediğinize emin misiniz?')) return;
-            const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
-            const order = orders.find(o => o.id === orderId);
-            if (order) { order.invoice = null; localStorage.setItem('kevra_orders', JSON.stringify(orders)); showToast('Fatura silindi!'); loadInvoices(); }
+            const order = allOrdersCache.find(o => o.id === orderId);
+            if (order) {
+                await KevraDB.updateOrderStatus(order.id, order.status, order.shippingStatus, { invoice: null });
+                order.invoice = null;
+                showToast('Fatura silindi!');
+                loadInvoices();
+            }
         }
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
@@ -339,7 +345,7 @@
             const files = dt.files;
             if (files.length) { document.getElementById('invoiceFile').files = files; handleFileSelect({ target: { files: files } }); }
         }, false);
-        document.addEventListener('DOMContentLoaded', () => { loadOrders(); loadInvoices(); });
+        document.addEventListener('DOMContentLoaded', async () => { await loadOrders(); loadInvoices(); });
     </script>
 
     <script>

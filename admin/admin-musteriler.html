@@ -184,9 +184,9 @@
         if (!localStorage.getItem('kevra_admin_logged_in')) { window.location.replace('admin-login.html'); }
     </script>
     <script>
-        function loadCustomers() {
-            const users = JSON.parse(localStorage.getItem('kevra_users') || '[]');
-            const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+        async function loadCustomers() {
+            const users = await KevraDB.getAllUsers();
+            const orders = await KevraDB.getAllOrders();
             document.getElementById('totalCustomers').textContent = users.length;
             document.getElementById('activeCustomers').textContent = users.filter(u => u.active !== false).length;
             const thirtyDaysAgo = new Date(); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -208,10 +208,10 @@
                 tbody.appendChild(row);
             });
         }
-        function searchCustomers() {
+        async function searchCustomers() {
             const term = document.getElementById('searchInput').value.toLowerCase();
-            const users = JSON.parse(localStorage.getItem('kevra_users') || '[]');
-            const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+            const users = await KevraDB.getAllUsers();
+            const orders = await KevraDB.getAllOrders();
             const filtered = users.filter(u => (u.firstName && u.firstName.toLowerCase().includes(term)) || (u.lastName && u.lastName.toLowerCase().includes(term)) || (u.email && u.email.toLowerCase().includes(term)) || (u.phone && u.phone.includes(term)));
             renderCustomers(filtered, orders);
         }

@@ -1425,7 +1425,10 @@
 <script>
 // Sepetim sayfası özel JS - sadece sepet görünümü ve özet
 (function() {
-    let cart = JSON.parse(localStorage.getItem('kevra_cart')) || [];
+    // NOT: kendi 'cart' kopyasini tutmuyoruz — js/main.js'in global 'cart'
+    // degiskenini paylasiyoruz (ayni sayfada ayri <script> tag'leri ust
+    // seviye let/const'lari paylasir). Boylece sepet cekmecesi (drawer) ile
+    // bu sayfadaki liste her zaman ayni veriyi gosterir.
     const FREE_SHIPPING_LIMIT = 150;
 
     function formatPrice(price) {
@@ -1563,18 +1566,22 @@
         if (cart[index].quantity <= 0) {
             cart.splice(index, 1);
         }
-        localStorage.setItem('kevra_cart', JSON.stringify(cart));
-        loadCart();
-        if (typeof updateCartUI === 'function') updateCartUI();
+        saveCart();
+        // updateCartUI() -> window.renderCartPage() (= loadCart) zaten bu
+        // sayfanin listesini de yeniliyor, ayrica cagirmaya gerek yok
+        if (typeof updateCartUI === 'function') updateCartUI(); else loadCart();
     };
 
     window.removeItem = function(index) {
         cart.splice(index, 1);
-        localStorage.setItem('kevra_cart', JSON.stringify(cart));
-        loadCart();
-        if (typeof updateCartUI === 'function') updateCartUI();
+        saveCart();
+        if (typeof updateCartUI === 'function') updateCartUI(); else loadCart();
         showToast('Ürün sepetten kaldırıldı');
     };
+
+    // main.js'teki updateCartUI() cagrildiginda (sepet cekmecesinden yapilan
+    // degisikliklerde de) bu sayfadaki buyuk listenin de guncellenmesi icin
+    window.renderCartPage = loadCart;
 
     // Sayfa yüklendiğinde sepeti göster
     document.addEventListener('DOMContentLoaded', function() {
