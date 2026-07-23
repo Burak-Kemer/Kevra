@@ -51,31 +51,9 @@ exports.createPaytrToken = onRequest({ invoker: 'public' }, async (req, res) => 
         // GÜVENLİK: Tutarı client'in gönderdiği orderData.total'a DEĞİL, Firestore'daki
         // gerçek ürün fiyatlarına göre sunucuda yeniden hesapla. Aksi halde istek
         // tarayıcıdan değiştirilip istenen tutar ödenebilir (fiyat manipülasyonu).
-        const cartItems = Array.isArray(orderData.items) ? orderData.items : [];
-        if (cartItems.length === 0) { res.status(400).json({ success: false, reason: 'Sepet boş' }); return; }
-
-        let subtotal = 0;
-        const verifiedItems = [];
-        for (const item of cartItems) {
-            const prodSnap = await db.collection('products').doc(String(item.id)).get();
-            if (!prodSnap.exists) { res.status(400).json({ success: false, reason: 'Geçersiz ürün: ' + item.id }); return; }
-            const prod  = prodSnap.data();
-            const qty   = Math.max(1, parseInt(item.quantity, 10) || 1);
-            const price = Number(prod.price) || 0;
-            subtotal += price * qty;
-            verifiedItems.push({
-                id: item.id, name: prod.name, price, quantity: qty,
-                size: item.size || null, color: item.color || null, image: prod.image || null
-            });
-        }
-
-        // Kupon indirimi de client'tan gelen tutara değil, sunucudaki sabit
-        // kupon listesine göre hesaplanır.
-        const COUPONS    = { KEVRA10: 0.10, KEVRA20: 0.20, WELCOME: 0.15, VIP25: 0.25 };
-        const couponCode = orderData.couponCode ? String(orderData.couponCode).toUpperCase() : null;
-        const discount   = (couponCode && COUPONS[couponCode] != null) ? Math.round(subtotal * COUPONS[couponCode]) : 0;
-        const shipping   = 0;
-        const total      = subtotal - discount + shipping;
+        const verified = await verifyCartAndTotals(orderData);
+        if (verified.error) { res.status(400).json({ success: false, reason: verified.error }); return; }
+        const { verifiedItems, subtotal, discount, shipping, total, couponCode } = verified;
 
         const paymentAmount = String(Math.round(total * 100)); // kuruş
 
@@ -107,6 +85,7 @@ exports.createPaytrToken = onRequest({ invoker: 'public' }, async (req, res) => 
             discount,
             shipping,
             total,
+            couponCode,
             id:            merchantOid,
             status:        'Beklemede',
             paymentStatus: 'pending',
@@ -241,7 +220,8 @@ exports.registerCustomer = onRequest({ invoker: 'public' }, async (req, res) => 
     if (req.method !== 'POST')    { res.status(405).send('Method Not Allowed'); return; }
 
     try {
-        const { firstName, lastName, email, password, phone, address, city, zipCode } = req.body || {};
+        const { firstName, lastName, password, phone, address, city, zipCode } = req.body || {};
+        const email = String(req.body && req.body.email || '').trim().toLowerCase();
         if (!email || !password || String(password).length < 6) {
             res.json({ success: false, message: 'Geçersiz e-posta veya şifre (en az 6 karakter)' });
             return;
@@ -289,10 +269,17 @@ exports.loginCustomer = onRequest({ invoker: 'public' }, async (req, res) => {
     if (req.method !== 'POST')    { res.status(405).send('Method Not Allowed'); return; }
 
     try {
-        const { email, password } = req.body || {};
-        if (!email || !password) { res.json({ success: false, message: 'E-posta ve şifre gerekli' }); return; }
+        const rawEmail = String(req.body && req.body.email || '').trim();
+        const { password } = req.body || {};
+        if (!rawEmail || !password) { res.json({ success: false, message: 'E-posta ve şifre gerekli' }); return; }
 
-        const snap = await db.collection('users').where('email', '==', email).limit(1).get();
+        const emailNorm = rawEmail.toLowerCase();
+        let snap = await db.collection('users').where('email', '==', emailNorm).limit(1).get();
+        // Geriye dönük uyumluluk: e-posta normalize edilmeden ÖNCE kaydolmuş
+        // hesaplar orijinal büyük/küçük harfle saklanmış olabilir.
+        if (snap.empty && emailNorm !== rawEmail) {
+            snap = await db.collection('users').where('email', '==', rawEmail).limit(1).get();
+        }
         if (snap.empty) { res.json({ success: false, message: 'Kullanıcı bulunamadı' }); return; }
 
         const user = snap.docs[0].data();
@@ -364,5 +351,170 @@ exports.getMyReturns = onRequest({ invoker: 'public' }, async (req, res) => {
     } catch (e) {
         console.error('getMyReturns error:', e);
         res.status(500).json({ success: false, returns: [] });
+    }
+});
+
+// ───────────────────────────────────────────
+// Yardımcı: sepetteki ürünleri Firestore'daki gerçek fiyatlarla doğrular
+// ve sunucu tarafında toplamları hesaplar (createPaytrToken ile aynı mantık).
+// ───────────────────────────────────────────
+async function verifyCartAndTotals(orderData) {
+    const cartItems = Array.isArray(orderData.items) ? orderData.items : [];
+    if (cartItems.length === 0) return { error: 'Sepet boş' };
+
+    let subtotal = 0;
+    const verifiedItems = [];
+    for (const item of cartItems) {
+        const prodSnap = await db.collection('products').doc(String(item.id)).get();
+        if (!prodSnap.exists) return { error: 'Geçersiz ürün: ' + item.id };
+        const prod  = prodSnap.data();
+        const qty   = Math.max(1, parseInt(item.quantity, 10) || 1);
+        const price = Number(prod.price) || 0;
+        subtotal += price * qty;
+        verifiedItems.push({
+            id: item.id, name: prod.name, price, quantity: qty,
+            size: item.size || null, color: item.color || null, image: prod.image || null
+        });
+    }
+
+    const COUPONS    = { KEVRA10: 0.10, KEVRA20: 0.20, WELCOME: 0.15, VIP25: 0.25 };
+    const couponCode = orderData.couponCode ? String(orderData.couponCode).toUpperCase() : null;
+    const discount   = (couponCode && COUPONS[couponCode] != null) ? Math.round(subtotal * COUPONS[couponCode]) : 0;
+    const shipping   = 0;
+    const total      = subtotal - discount + shipping;
+
+    return { verifiedItems, subtotal, discount, shipping, total, couponCode };
+}
+
+// ───────────────────────────────────────────
+// POST /createOrder
+// Havale / kapıda ödeme siparişleri artık doğrudan client'tan Firestore'a
+// yazılmıyor — Firestore kuralları 'orders' koleksiyonuna client yazmasını
+// tamamen kapattı (aksi halde herkes sahte "ödendi" siparişi oluşturabilir
+// veya başkasının siparişini değiştirebilirdi). Fiyatlar da createPaytrToken
+// ile aynı şekilde sunucuda doğrulanır.
+// ───────────────────────────────────────────
+exports.createOrder = onRequest({ invoker: 'public' }, async (req, res) => {
+    const corsHeaders = getCorsHeaders(req.headers.origin || '');
+    Object.entries(corsHeaders).forEach(([k, v]) => res.set(k, v));
+    if (req.method === 'OPTIONS') { res.status(204).send(''); return; }
+    if (req.method !== 'POST')    { res.status(405).send('Method Not Allowed'); return; }
+
+    try {
+        const orderData = req.body && req.body.orderData;
+        if (!orderData) { res.json({ success: false, message: 'orderData eksik' }); return; }
+
+        const verified = await verifyCartAndTotals(orderData);
+        if (verified.error) { res.json({ success: false, message: verified.error }); return; }
+
+        const newOrder = {
+            id:             'KVR' + Date.now(),
+            userId:         orderData.userId || 'guest',
+            customer:       {
+                firstName: orderData.firstName || '', lastName: orderData.lastName || '',
+                email: orderData.email || '', phone: orderData.phone || '',
+                address: orderData.address || '', city: orderData.city || '', zipCode: orderData.zipCode || ''
+            },
+            items:          verified.verifiedItems,
+            subtotal:       verified.subtotal,
+            shipping:       verified.shipping,
+            discount:       verified.discount,
+            total:          verified.total,
+            paymentMethod:  orderData.paymentMethod || '',
+            couponCode:     verified.couponCode,
+            status:         'Beklemede',
+            shippingStatus: 'Hazırlanıyor',
+            createdAt:      new Date().toISOString(),
+            notes:          orderData.notes || ''
+        };
+
+        await db.collection('orders').doc(newOrder.id).set(newOrder);
+        res.json({ success: true, order: newOrder });
+    } catch (e) {
+        console.error('createOrder error:', e);
+        res.status(500).json({ success: false, message: 'Sunucu hatası' });
+    }
+});
+
+// ───────────────────────────────────────────
+// POST /cancelMyOrder
+// GÜVENLİK: Siparişin gerçekten verilen userId'ye ait olduğunu doğrular —
+// aksi halde sipariş takibi herkese açık olduğu için (meşru bir özellik)
+// bir sipariş numarasını bilen herkes başkasının siparişini iptal edebilirdi.
+// ───────────────────────────────────────────
+exports.cancelMyOrder = onRequest({ invoker: 'public' }, async (req, res) => {
+    const corsHeaders = getCorsHeaders(req.headers.origin || '');
+    Object.entries(corsHeaders).forEach(([k, v]) => res.set(k, v));
+    if (req.method === 'OPTIONS') { res.status(204).send(''); return; }
+    if (req.method !== 'POST')    { res.status(405).send('Method Not Allowed'); return; }
+
+    try {
+        const { userId, orderId } = req.body || {};
+        if (!userId || !orderId) { res.json({ success: false, message: 'Eksik bilgi' }); return; }
+
+        const ref  = db.collection('orders').doc(String(orderId));
+        const snap = await ref.get();
+        if (!snap.exists) { res.json({ success: false, message: 'Sipariş bulunamadı' }); return; }
+
+        const order = snap.data();
+        if (order.userId !== userId) { res.json({ success: false, message: 'Bu sipariş size ait değil' }); return; }
+
+        const nonCancellable = ['Kargoda', 'Teslim Edildi', 'İptal Edildi', 'shipped', 'delivered', 'cancelled'];
+        if (nonCancellable.includes(order.status)) {
+            res.json({ success: false, message: 'Bu sipariş artık iptal edilemez' });
+            return;
+        }
+
+        await ref.update({ status: 'İptal Edildi', shippingStatus: 'İptal Edildi' });
+        res.json({ success: true });
+    } catch (e) {
+        console.error('cancelMyOrder error:', e);
+        res.status(500).json({ success: false, message: 'Sunucu hatası' });
+    }
+});
+
+// ───────────────────────────────────────────
+// POST /createReturnRequest
+// GÜVENLİK: İade talebinin, verilen userId'ye ait ve gerçekten var olan bir
+// siparişe karşı açıldığını doğrular.
+// ───────────────────────────────────────────
+exports.createReturnRequest = onRequest({ invoker: 'public' }, async (req, res) => {
+    const corsHeaders = getCorsHeaders(req.headers.origin || '');
+    Object.entries(corsHeaders).forEach(([k, v]) => res.set(k, v));
+    if (req.method === 'OPTIONS') { res.status(204).send(''); return; }
+    if (req.method !== 'POST')    { res.status(405).send('Method Not Allowed'); return; }
+
+    try {
+        const { userId, userEmail, userName, orderId, reason, reasonText, method, methodText, description } = req.body || {};
+        if (!userId || !orderId || !reason || !method) {
+            res.json({ success: false, message: 'Eksik bilgi' });
+            return;
+        }
+
+        const orderSnap = await db.collection('orders').doc(String(orderId)).get();
+        if (!orderSnap.exists || orderSnap.data().userId !== userId) {
+            res.json({ success: false, message: 'Sipariş bulunamadı' });
+            return;
+        }
+
+        const newReturn = {
+            id:          'RET-' + Date.now(),
+            userId, orderId: String(orderId),
+            userEmail:   userEmail   || '',
+            userName:    userName    || '',
+            reason:      reason      || '',
+            reasonText:  reasonText  || '',
+            method:      method      || '',
+            methodText:  methodText  || '',
+            description: description || '',
+            status:      'pending',
+            statusText:  'İnceleniyor',
+            createdAt:   new Date().toISOString()
+        };
+        await db.collection('returns').doc(newReturn.id).set(newReturn);
+        res.json({ success: true, return: newReturn });
+    } catch (e) {
+        console.error('createReturnRequest error:', e);
+        res.status(500).json({ success: false, message: 'Sunucu hatası' });
     }
 });

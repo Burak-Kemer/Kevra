@@ -277,35 +277,65 @@ const KevraDB = {
 
     // ===================== SİPARİŞLER =====================
 
+    // GÜVENLİK: Sipariş artık doğrudan client'tan Firestore'a yazılmıyor —
+    // createOrder Cloud Function'ı fiyatları Firestore'daki gerçek ürün
+    // kayıtlarından yeniden hesaplar (bkz. firestore.rules'taki 'orders'
+    // açıklaması).
     createOrder: async function(orderData) {
         const currentUser = this.getCurrentUser();
-        const newOrder = {
-            id:            'KVR' + Date.now(),
-            userId:        currentUser ? currentUser.id : 'guest',
-            customer:      { firstName: orderData.firstName, lastName: orderData.lastName, email: orderData.email, phone: orderData.phone, address: orderData.address, city: orderData.city, zipCode: orderData.zipCode },
-            items:         orderData.items,
-            subtotal:      orderData.subtotal,
-            shipping:      orderData.shipping,
-            discount:      orderData.discount || 0,
-            total:         orderData.total,
-            paymentMethod: orderData.paymentMethod,
-            couponCode:    orderData.couponCode || null,
-            status:        'Beklemede',
-            shippingStatus:'Hazırlanıyor',
-            createdAt:     new Date().toISOString(),
-            notes:         orderData.notes || ''
-        };
+        const payload = { ...orderData, userId: currentUser ? currentUser.id : 'guest' };
 
         if (await this._firebaseAvailable()) {
             try {
-                await window.KevraFirebase.db.collection('orders').doc(newOrder.id).set(newOrder);
-            } catch (e) { console.warn('Firestore sipariş hatası:', e); }
+                const res  = await fetch(CLOUD_FN_BASE + '/createOrder', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderData: payload })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+                    orders.push(data.order);
+                    localStorage.setItem('kevra_orders', JSON.stringify(orders));
+                }
+                return data;
+            } catch (e) { console.warn('createOrder isteği başarısız, localStorage moduna düşülüyor:', e); }
         }
 
+        // Firebase yoksa: eski localStorage-only yol (fiyatlar doğrulanmaz)
+        const newOrder = {
+            id: 'KVR' + Date.now(), userId: payload.userId,
+            customer: { firstName: orderData.firstName, lastName: orderData.lastName, email: orderData.email, phone: orderData.phone, address: orderData.address, city: orderData.city, zipCode: orderData.zipCode },
+            items: orderData.items, subtotal: orderData.subtotal, shipping: orderData.shipping,
+            discount: orderData.discount || 0, total: orderData.total, paymentMethod: orderData.paymentMethod,
+            couponCode: orderData.couponCode || null, status: 'Beklemede', shippingStatus: 'Hazırlanıyor',
+            createdAt: new Date().toISOString(), notes: orderData.notes || ''
+        };
         const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
         orders.push(newOrder);
         localStorage.setItem('kevra_orders', JSON.stringify(orders));
         return { success: true, order: newOrder };
+    },
+
+    // GÜVENLİK: Müşterinin kendi siparişini iptal etmesi artık
+    // cancelMyOrder Cloud Function'ı üzerinden yapılır — bu fonksiyon
+    // siparişin gerçekten bu kullanıcıya ait olduğunu doğrular. Admin
+    // panel sipariş durumu güncellemesi için hâlâ updateOrderStatus
+    // kullanır (admin yetkisiyle doğrudan Firestore'a yazar).
+    cancelMyOrder: async function(orderId) {
+        const currentUser = this.getCurrentUser();
+        if (!currentUser) return { success: false, message: 'Oturum açık değil' };
+        try {
+            const res  = await fetch(CLOUD_FN_BASE + '/cancelMyOrder', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: currentUser.id, orderId })
+            });
+            return await res.json();
+        } catch (e) {
+            console.warn('cancelMyOrder isteği başarısız:', e);
+            return { success: false, message: 'Bağlantı hatası' };
+        }
     },
 
     // GÜVENLİK: Sipariş takibi (bilinen bir sipariş numarasıyla arama) sadece
@@ -391,14 +421,21 @@ const KevraDB = {
     },
 
     updateOrderStatus: async function(orderId, status, shippingStatus, extra = {}) {
+        let firestoreOk = false;
         if (await this._firebaseAvailable()) {
             try {
                 const update = { status };
                 if (shippingStatus) update.shippingStatus = shippingStatus;
                 Object.assign(update, extra);
                 await window.KevraFirebase.db.collection('orders').doc(orderId).update(update);
+                firestoreOk = true;
             } catch (e) { console.warn('Firestore sipariş güncelleme:', e); }
         }
+
+        // localStorage önbelleği varsa (ör. admin veya COD siparişleri) onu da
+        // güncelle — ama artık müşteri siparişleri her zaman bu önbellekte
+        // olmayabilir (getUserOrders artık Cloud Function'dan geliyor), bu
+        // yüzden başarı durumu sadece bu önbelleğin varlığına bağlı değil.
         const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
         const order  = orders.find(o => o.id === orderId);
         if (order) {
@@ -406,9 +443,9 @@ const KevraDB = {
             if (shippingStatus) order.shippingStatus = shippingStatus;
             Object.assign(order, extra);
             localStorage.setItem('kevra_orders', JSON.stringify(orders));
-            return { success: true };
         }
-        return { success: false };
+
+        return { success: firestoreOk || !!order };
     },
 
     // ===================== ADMIN AUTH =====================
@@ -464,11 +501,25 @@ const KevraDB = {
 
     // ===================== İADE TALEPLERİ =====================
 
+    // GÜVENLİK: İade talebi artık createReturnRequest Cloud Function'ı
+    // üzerinden oluşturuluyor — bu, talebin gerçekten bu kullanıcıya ait
+    // (ve var olan) bir siparişe karşı açıldığını doğrular.
     saveReturnRequest: async function(returnData) {
         if (await this._firebaseAvailable()) {
             try {
-                await window.KevraFirebase.db.collection('returns').doc(returnData.id).set(returnData);
-            } catch (e) { console.warn('Firestore iade kaydetme:', e); }
+                const res  = await fetch(CLOUD_FN_BASE + '/createReturnRequest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(returnData)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const returns = JSON.parse(localStorage.getItem('kevra_returns') || '[]');
+                    returns.push(data.return);
+                    localStorage.setItem('kevra_returns', JSON.stringify(returns));
+                }
+                return data;
+            } catch (e) { console.warn('createReturnRequest isteği başarısız, localStorage moduna düşülüyor:', e); }
         }
         const returns = JSON.parse(localStorage.getItem('kevra_returns') || '[]');
         const idx = returns.findIndex(r => r.id === returnData.id);

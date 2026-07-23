@@ -1903,13 +1903,19 @@
         async function cancelOrder(orderNumber) {
             if (!confirm('Siparişi iptal etmek istediğinize emin misiniz?')) return;
 
+            let result = { success: true };
             if (typeof KevraDB !== 'undefined') {
-                await KevraDB.updateOrderStatus(orderNumber, 'İptal Edildi', 'İptal Edildi');
+                result = await KevraDB.cancelMyOrder(orderNumber);
             } else {
                 const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
                 const o = orders.find(ord => ord.id === orderNumber);
                 if (o) { o.status = 'İptal Edildi'; o.shippingStatus = 'İptal Edildi'; }
                 localStorage.setItem('kevra_orders', JSON.stringify(orders));
+            }
+
+            if (!result.success) {
+                showToast(result.message || 'Sipariş iptal edilemedi', 'error');
+                return;
             }
 
             await renderOrders();
