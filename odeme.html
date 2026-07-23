@@ -1284,7 +1284,7 @@
         <div class="success-icon">✓</div>
         <h2>Siparişiniz Alındı!</h2>
         <p>Siparişiniz başarıyla oluşturuldu. Sipariş detaylarınızı e-posta adresinize gönderdik.</p>
-        <div class="order-id" id="successOrderId">ORD-0000000000000</div>
+        <div class="order-id" id="successOrderId">KVR-0000000000000</div>
         <p style="font-size: 13px; color: #888;">Siparişinizi "Siparişlerim" sayfasından takip edebilirsiniz.</p>
         <div class="success-actions">
             <a href="profil.html#siparisler" class="success-btn primary">📦 Siparişlerim</a>
@@ -1583,7 +1583,7 @@ async function placeOrder() {
                 orderResult = await KevraDB.createOrder(orderData);
             } else {
                 const orders = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
-                const newOrder = { id: 'ORD-' + Date.now(), ...orderData, status: 'Beklemede', createdAt: new Date().toISOString() };
+                const newOrder = { id: 'KVR-' + Date.now(), ...orderData, status: 'Beklemede', createdAt: new Date().toISOString() };
                 orders.unshift(newOrder);
                 localStorage.setItem('kevra_orders', JSON.stringify(orders));
                 orderResult = { success: true, order: newOrder };
@@ -1761,7 +1761,7 @@ window.addEventListener('DOMContentLoaded', function() {
         </div>
         <div class="footer-links">
             <h4>İletişim</h4>
-            <a href="https://wa.me/905555555555">WhatsApp</a>
+            <a href="https://wa.me/905422530907">WhatsApp</a>
             <a href="mailto:info@kevra.com">E-posta</a>
             <p style="margin-top: 12px; color: #666; font-size: 13px;">Pzt-Cmt: 09:00 - 18:00</p>
         </div>

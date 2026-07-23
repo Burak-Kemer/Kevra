@@ -202,6 +202,16 @@
             background: var(--light);
             color: var(--primary);
         }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
         
         .content-card {
             background: white;
@@ -575,7 +585,10 @@
         <main class="main-content">
             <div class="header">
                 <button type="button" class="mobile-menu-btn" title="Menü">☰</button><h2>Sipariş Yönetimi</h2>
-                <button class="btn btn-primary" onclick="refreshOrders()">🔄 Yenile</button>
+                <div class="header-actions">
+                    <button type="button" class="btn btn-primary" onclick="refreshOrders()">🔄 Yenile</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteAllOrders()">🗑️ Tüm Siparişleri Sil</button>
+                </div>
             </div>
             
             <div class="stats-grid">
@@ -753,10 +766,13 @@
 
             // Firestore Timestamp → ISO string
             let createdAt = o.createdAt;
-            if (createdAt && typeof createdAt.toDate === 'function') {
-                createdAt = createdAt.toDate().toISOString();
-            } else if (createdAt && createdAt._seconds) {
-                createdAt = new Date(createdAt._seconds * 1000).toISOString();
+            if (createdAt && typeof createdAt === 'object') {
+                if (typeof createdAt.toDate === 'function') {
+                    createdAt = createdAt.toDate().toISOString();
+                } else {
+                    const seconds = createdAt._seconds ?? createdAt.seconds;
+                    createdAt = seconds != null ? new Date(seconds * 1000).toISOString() : '';
+                }
             }
 
             return {
@@ -1096,6 +1112,23 @@
         async function refreshOrders() {
             await loadOrders();
             showToast('Sipariş listesi güncellendi!');
+        }
+
+        async function deleteAllOrders() {
+            if (allOrders.length === 0) { showToast('Silinecek sipariş yok', 'error'); return; }
+            const confirm1 = confirm('Tüm sipariş geçmişini silmek istediğinizden emin misiniz? Bu işlem GERİ ALINAMAZ (' + allOrders.length + ' sipariş silinecek).');
+            if (!confirm1) return;
+            const confirm2 = prompt('Emin olmak için "SİL" yazın:');
+            if (confirm2 !== 'SİL') { showToast('İşlem iptal edildi', 'error'); return; }
+
+            try {
+                await KevraDB.deleteAllOrders();
+                showToast('Tüm siparişler silindi');
+                await loadOrders();
+            } catch (e) {
+                console.error(e);
+                showToast('Siparişler silinirken hata oluştu', 'error');
+            }
         }
         
         function showToast(message, type = 'success') {

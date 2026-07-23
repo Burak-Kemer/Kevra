@@ -133,7 +133,7 @@ const KevraDB = {
     createOrder: async function(orderData) {
         const currentUser = this.getCurrentUser();
         const newOrder = {
-            id:            'ORD' + Date.now(),
+            id:            'KVR' + Date.now(),
             userId:        currentUser ? currentUser.id : 'guest',
             customer:      { firstName: orderData.firstName, lastName: orderData.lastName, email: orderData.email, phone: orderData.phone, address: orderData.address, city: orderData.city, zipCode: orderData.zipCode },
             items:         orderData.items,
@@ -193,6 +193,22 @@ const KevraDB = {
         if (!currentUser) return [];
         const all = await this.getAllOrders();
         return all.filter(o => o.userId === currentUser.id);
+    },
+
+    deleteAllOrders: async function() {
+        if (window.KevraFirebase && window.KevraFirebase.ready()) {
+            try {
+                const snap = await window.KevraFirebase.db.collection('orders').get();
+                const chunkSize = 400; // Firestore batch limiti: 500 işlem
+                for (let i = 0; i < snap.docs.length; i += chunkSize) {
+                    const batch = window.KevraFirebase.db.batch();
+                    snap.docs.slice(i, i + chunkSize).forEach(d => batch.delete(d.ref));
+                    await batch.commit();
+                }
+            } catch (e) { console.warn('Firestore sipariş silme hatası:', e); }
+        }
+        localStorage.removeItem('kevra_orders');
+        return { success: true };
     },
 
     updateOrderStatus: async function(orderId, status, shippingStatus, extra = {}) {

@@ -160,7 +160,7 @@ function openQuickView(productId) {
     // Stok bilgisi
     if (qvStock) {
         if (product.stock > 0) {
-            qvStock.innerHTML = '<span>✓</span> Stokta var (' + product.stock + ' adet)';
+            qvStock.innerHTML = '<span>✓</span> Stokta var';
             qvStock.className = 'quick-view-stock';
         } else {
             qvStock.innerHTML = '<span>✗</span> Stokta yok';

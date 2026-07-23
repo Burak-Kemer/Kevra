@@ -40,7 +40,7 @@ exports.createPaytrToken = onRequest({ invoker: 'public' }, async (req, res) => 
         const { orderData } = req.body;
         if (!orderData) { res.status(400).json({ success: false, reason: 'orderData eksik' }); return; }
 
-        const merchantOid    = 'ORD' + Date.now();
+        const merchantOid    = 'KVR' + Date.now();
         const userIp         = (req.headers['x-forwarded-for'] || '1.2.3.4').split(',')[0].trim();
         const email          = String(orderData.email || '');
         const paymentAmount  = String(Math.round(Number(orderData.total) * 100)); // kuruş

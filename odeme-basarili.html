@@ -88,6 +88,7 @@
             transition: all 0.2s;
         }
         .btn-orders:hover { border-color: #1a1a1a; color: #1a1a1a; }
+        .redirect-note { margin-top: 20px; font-size: 13px; color: #999; }
         @media (max-width: 480px) {
             .success-card { padding: 40px 24px; }
             .btn-home, .btn-orders { display: block; margin: 10px 0 0; }
@@ -108,6 +109,7 @@
                 <a href="index.html" class="btn-home">Alışverişe Devam Et</a>
                 <a href="profil.html" class="btn-orders">Siparişlerim</a>
             </div>
+            <p id="redirectNote" class="redirect-note"></p>
         </div>
     </div>
 
@@ -130,6 +132,26 @@
 
         // postMessage ile parent'a bildir (iFrame içinde açılırsa)
         try { window.parent.postMessage({ paytr: 'success' }, 'https://kevra.com.tr'); } catch(e) {}
+
+        // Birkaç saniye sonra otomatik olarak ana sayfaya yönlendir
+        (function() {
+            const inIframe = window.self !== window.top;
+            if (inIframe) return; // PayTR iframe içindeyse yönlendirme, sadece postMessage yeterli
+
+            let secondsLeft = 5;
+            const note = document.getElementById('redirectNote');
+            const updateNote = () => { note.textContent = secondsLeft + ' saniye içinde ana sayfaya yönlendirileceksiniz...'; };
+            updateNote();
+            const timer = setInterval(() => {
+                secondsLeft--;
+                if (secondsLeft <= 0) {
+                    clearInterval(timer);
+                    window.location.href = 'index.html';
+                } else {
+                    updateNote();
+                }
+            }, 1000);
+        })();
     </script>
 </body>
 </html>

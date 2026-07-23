@@ -923,9 +923,11 @@
 
         function toISOSafe(ts) {
             if (!ts) return '';
+            if (typeof ts === 'string' || typeof ts === 'number') return ts;
             if (typeof ts.toDate === 'function') return ts.toDate().toISOString();
-            if (ts._seconds) return new Date(ts._seconds * 1000).toISOString();
-            return ts;
+            const seconds = ts._seconds ?? ts.seconds;
+            if (seconds != null) return new Date(seconds * 1000).toISOString();
+            return '';
         }
 
         function renderRecentOrders(orders) {

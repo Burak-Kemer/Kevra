@@ -216,7 +216,7 @@ window.KevraAuth = {
     if (userIndex === -1) return { success: false, message: "Kullanıcı bulunamadı" };
 
     const newOrder = {
-      id: 'ORD-' + Date.now(),
+      id: 'KVR-' + Date.now(),
       ...orderData,
       status: 'pending',
       statusText: 'Beklemede',
