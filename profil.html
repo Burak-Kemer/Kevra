@@ -1559,9 +1559,6 @@
             window.location.href = 'giris.html?redirect=profil.html';
         }
 
-        let currentUser = KevraAuth.getCurrentUser();
-        let returns = JSON.parse(localStorage.getItem('kevra_returns') || '[]');
-
         // Header scroll effect
         window.addEventListener('scroll', function() {
             const header = document.getElementById('mainHeader');

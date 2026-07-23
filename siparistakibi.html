@@ -1131,8 +1131,7 @@
 
             let order = null;
             try {
-                const orders = await KevraDB.getAllOrders();
-                order = orders.find(o => String(o.id).toLowerCase() === orderNumber.toLowerCase());
+                order = await KevraDB.getOrderById(orderNumber);
             } catch (e) {
                 console.error('Sipariş sorgulama hatası:', e);
             }

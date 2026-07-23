@@ -413,8 +413,7 @@
         let order = null;
         try {
             if (window.KevraDB) {
-                const all = await KevraDB.getAllOrders();
-                order = all.find(o => String(o.id) === String(orderId));
+                order = await KevraDB.getOrderById(orderId);
             }
         } catch(e) { /* firebase bağlantısı yoksa devam */ }
 

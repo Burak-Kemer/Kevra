@@ -3,6 +3,8 @@
 //  Firebase varsa Firestore kullanır, yoksa localStorage'a düşer
 // ============================================================
 
+const CLOUD_FN_BASE = 'https://europe-west1-kevra-88a60.cloudfunctions.net';
+
 const KevraDB = {
 
     // Firestore çağrılarından önce (varsa) anonim oturumun açılmasını
@@ -16,46 +18,63 @@ const KevraDB = {
 
     // ===================== KULLANICI =====================
 
+    // GÜVENLİK: E-posta tekillik kontrolü ve şifre karşılaştırması artık
+    // registerCustomer/loginCustomer Cloud Function'larında (sunucuda)
+    // yapılıyor. Eskiden client tüm 'users' koleksiyonunu (şifre hash'leri
+    // dahil) indirip tarayıcıda karşılaştırıyordu — bu satırlar kaldırıldı.
     registerUser: async function(userData) {
-        const users = await this.getAllUsers();
-        if (users.find(u => u.email === userData.email)) {
-            return { success: false, message: 'Bu e-posta zaten kayıtlı' };
-        }
-
-        const newUser = {
-            id:           'user_' + Date.now(),
-            firstName:    userData.firstName,
-            lastName:     userData.lastName,
-            email:        userData.email,
-            password:     this._hash(userData.password),
-            phone:        userData.phone || '',
-            address:      userData.address || '',
-            city:         userData.city || '',
-            zipCode:      userData.zipCode || '',
-            registerDate: new Date().toISOString(),
-            active:       true,
-            addresses:    []
-        };
-
         if (await this._firebaseAvailable()) {
             try {
-                await window.KevraFirebase.db.collection('users').doc(newUser.id).set(newUser);
-            } catch (e) { console.warn('Firestore yazma hatası:', e); }
+                const res  = await fetch(CLOUD_FN_BASE + '/registerCustomer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const local = JSON.parse(localStorage.getItem('kevra_users') || '[]');
+                    local.push(data.user);
+                    localStorage.setItem('kevra_users', JSON.stringify(local));
+                }
+                return data;
+            } catch (e) { console.warn('registerCustomer isteği başarısız, localStorage moduna düşülüyor:', e); }
         }
 
-        // localStorage'a da yaz (hız + offline)
+        // Firebase yoksa (yerel geliştirme / file://): eski localStorage-only yol
         const local = JSON.parse(localStorage.getItem('kevra_users') || '[]');
+        if (local.find(u => u.email === userData.email)) {
+            return { success: false, message: 'Bu e-posta zaten kayıtlı' };
+        }
+        const newUser = {
+            id: 'user_' + Date.now(), firstName: userData.firstName, lastName: userData.lastName,
+            email: userData.email, password: this._hash(userData.password), phone: userData.phone || '',
+            address: userData.address || '', city: userData.city || '', zipCode: userData.zipCode || '',
+            registerDate: new Date().toISOString(), active: true, addresses: []
+        };
         local.push(newUser);
         localStorage.setItem('kevra_users', JSON.stringify(local));
-
         return { success: true, user: newUser };
     },
 
     loginUser: async function(email, password) {
-        const users = await this.getAllUsers();
-        const user  = users.find(u => u.email === email);
-        if (!user)                                       return { success: false, message: 'Kullanıcı bulunamadı' };
-        if (user.password !== this._hash(password))     return { success: false, message: 'Şifre hatalı' };
+        if (await this._firebaseAvailable()) {
+            try {
+                const res  = await fetch(CLOUD_FN_BASE + '/loginCustomer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (data.success) localStorage.setItem('kevra_current_user', JSON.stringify(data.user));
+                return data;
+            } catch (e) { console.warn('loginCustomer isteği başarısız, localStorage moduna düşülüyor:', e); }
+        }
+
+        // Firebase yoksa: eski localStorage-only yol
+        const local = JSON.parse(localStorage.getItem('kevra_users') || '[]');
+        const user  = local.find(u => u.email === email);
+        if (!user)                                   return { success: false, message: 'Kullanıcı bulunamadı' };
+        if (user.password !== this._hash(password))  return { success: false, message: 'Şifre hatalı' };
 
         const session = { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, phone: user.phone, photo: user.photo || null, loginTime: new Date().toISOString() };
         localStorage.setItem('kevra_current_user', JSON.stringify(session));
@@ -88,14 +107,27 @@ const KevraDB = {
         return local;
     },
 
+    // GÜVENLİK: Tek bir kullanıcıyı bulmak için 'users' koleksiyonunun
+    // tamamını listelemek yerine (Firestore kuralları artık müşterilere
+    // bunu izin vermiyor) doğrudan bilinen ID ile tek doküman okunur.
+    _getUserById: async function(userId) {
+        if (await this._firebaseAvailable()) {
+            try {
+                const doc = await window.KevraFirebase.db.collection('users').doc(userId).get();
+                if (doc.exists) return doc.data();
+            } catch (e) { console.warn('Firestore kullanıcı okuma hatası:', e); }
+        }
+        const local = JSON.parse(localStorage.getItem('kevra_users') || '[]');
+        return local.find(u => u.id === userId) || null;
+    },
+
     // Bir kullanıcı kaydını Firestore + localStorage'da tutarlı şekilde
     // günceller. mutate(user) güncellenmiş kaydı döndürmeli.
     _updateUserRecord: async function(userId, mutate) {
-        const users = await this.getAllUsers();
-        const idx = users.findIndex(u => u.id === userId);
-        if (idx === -1) return { success: false, message: 'Kullanıcı bulunamadı' };
+        const current = await this._getUserById(userId);
+        if (!current) return { success: false, message: 'Kullanıcı bulunamadı' };
 
-        const updated = mutate({ ...users[idx] });
+        const updated = mutate({ ...current });
 
         if (await this._firebaseAvailable()) {
             try {
@@ -130,8 +162,7 @@ const KevraDB = {
         const currentUser = this.getCurrentUser();
         if (!currentUser) return { success: false, message: 'Oturum açık değil' };
 
-        const users = await this.getAllUsers();
-        const user = users.find(u => u.id === currentUser.id);
+        const user = await this._getUserById(currentUser.id);
         if (!user) return { success: false, message: 'Kullanıcı bulunamadı' };
         if (user.password !== this._hash(currentPassword)) return { success: false, message: 'Mevcut şifre yanlış' };
 
@@ -144,8 +175,7 @@ const KevraDB = {
     getAddresses: async function() {
         const currentUser = this.getCurrentUser();
         if (!currentUser) return [];
-        const users = await this.getAllUsers();
-        const user = users.find(u => u.id === currentUser.id);
+        const user = await this._getUserById(currentUser.id);
         return (user && user.addresses) || [];
     },
 
@@ -278,6 +308,21 @@ const KevraDB = {
         return { success: true, order: newOrder };
     },
 
+    // GÜVENLİK: Sipariş takibi (bilinen bir sipariş numarasıyla arama) sadece
+    // tek bir dokümanı okur — koleksiyonun tamamını listelemez, böylece
+    // giriş yapmamış ziyaretçiler de kendi sipariş numaralarıyla sorgu
+    // yapabilir ama başkalarının siparişlerini toplu olarak göremez.
+    getOrderById: async function(orderId) {
+        if (await this._firebaseAvailable()) {
+            try {
+                const doc = await window.KevraFirebase.db.collection('orders').doc(String(orderId)).get();
+                if (doc.exists) return doc.data();
+            } catch (e) { console.warn('Firestore sipariş okuma hatası:', e); }
+        }
+        const local = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+        return local.find(o => String(o.id).toLowerCase() === String(orderId).toLowerCase()) || null;
+    },
+
     getAllOrders: async function() {
         const local = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
         if (await this._firebaseAvailable()) {
@@ -305,11 +350,28 @@ const KevraDB = {
         return local;
     },
 
+    // GÜVENLİK: Tüm 'orders' koleksiyonunu çekip client'ta filtrelemek yerine
+    // getMyOrders Cloud Function'ı ile sadece bu kullanıcıya ait siparişler
+    // istenir (Firestore kuralları artık müşterilere koleksiyonun tamamını
+    // listeletmiyor).
     getUserOrders: async function() {
         const currentUser = this.getCurrentUser();
         if (!currentUser) return [];
-        const all = await this.getAllOrders();
-        return all.filter(o => o.userId === currentUser.id);
+
+        if (await this._firebaseAvailable()) {
+            try {
+                const res  = await fetch(CLOUD_FN_BASE + '/getMyOrders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: currentUser.id })
+                });
+                const data = await res.json();
+                if (data.success) return data.orders;
+            } catch (e) { console.warn('getMyOrders isteği başarısız, localStorage moduna düşülüyor:', e); }
+        }
+
+        const local = JSON.parse(localStorage.getItem('kevra_orders') || '[]');
+        return local.filter(o => o.userId === currentUser.id);
     },
 
     deleteAllOrders: async function() {
@@ -364,14 +426,12 @@ const KevraDB = {
                 return { success: false, message: 'Firebase hata: ' + e.message };
             }
         }
-        // Fallback: config'deki bilgilerle karşılaştır
-        const cfg = window.ADMIN_CONFIG || {};
-        if (email === cfg.email && password === cfg.password) {
-            localStorage.setItem('kevra_admin_logged_in', 'true');
-            localStorage.setItem('kevra_admin_user', email);
-            return { success: true };
-        }
-        return { success: false, message: 'Kullanıcı adı veya şifre hatalı' };
+        // GÜVENLİK: Eskiden burada, tarayıcıya gönderilen js/firebase-config.js
+        // içindeki sabit bir şifre client tarafında karşılaştırılıyordu — yani
+        // admin şifresi "sayfa kaynağını görüntüle" ile herkes tarafından
+        // okunabiliyordu. Kaldırıldı: Firebase Auth kullanılamıyorsa admin
+        // girişi de yapılamaz.
+        return { success: false, message: 'Firebase Auth kullanılamıyor, admin girişi yapılamıyor.' };
     },
 
     adminLogout: async function() {
@@ -429,11 +489,26 @@ const KevraDB = {
         return JSON.parse(localStorage.getItem('kevra_returns') || '[]');
     },
 
+    // GÜVENLİK: getMyReturns Cloud Function'ı ile sadece bu kullanıcıya ait
+    // iade talepleri istenir (bkz. getUserOrders'taki aynı gerekçe).
     getUserReturnRequests: async function() {
         const user = this.getCurrentUser();
         if (!user) return [];
-        const all = await this.getAllReturnRequests();
-        return all.filter(r => r.userId === user.id);
+
+        if (await this._firebaseAvailable()) {
+            try {
+                const res  = await fetch(CLOUD_FN_BASE + '/getMyReturns', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: user.id })
+                });
+                const data = await res.json();
+                if (data.success) return data.returns;
+            } catch (e) { console.warn('getMyReturns isteği başarısız, localStorage moduna düşülüyor:', e); }
+        }
+
+        const local = JSON.parse(localStorage.getItem('kevra_returns') || '[]');
+        return local.filter(r => r.userId === user.id);
     },
 
     updateReturnStatus: async function(returnId, status, statusText) {

@@ -151,38 +151,21 @@
                     <h3>API Bağlantı Bilgileri</h3>
                 </div>
                 <div class="card-body">
-                    <div class="info-box">
-                        <p>💡 PayTR hesabınızdan aldığınız API bilgilerini buraya girin. Test modu aktifken gerçek ödeme alınmaz.</p>
+                    <div class="info-box" style="background:#fdecea;border-left-color:#e74c3c;">
+                        <p style="color:#c0392b;">⚠️ Bu sayfa bilgilendirme amaçlıdır — buraya girilecek bir değer <strong>gerçek ödeme sistemine hiçbir şekilde bağlı değildir</strong>, sadece bu tarayıcıda saklanır ve hiçbir işleve etkisi olmaz.</p>
                     </div>
-                    <form id="paytrForm">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Merchant ID</label>
-                                <input type="text" id="merchantId" placeholder="Örn: 123456">
-                            </div>
-                            <div class="form-group">
-                                <label>Merchant Key</label>
-                                <input type="text" id="merchantKey" placeholder="Merchant Key">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Merchant Salt</label>
-                            <input type="text" id="merchantSalt" placeholder="Merchant Salt">
-                        </div>
-                        <div style="margin-top: 25px;">
-                            <button type="button" class="btn btn-primary" onclick="saveSettings()">💾 Ayarları Kaydet</button>
-                            <button type="button" class="btn btn-success" onclick="testConnection()" style="margin-left: 10px;">🔗 Bağlantıyı Test Et</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="content-card">
-                <div class="card-header">
-                    <h3>Durum</h3>
-                </div>
-                <div class="card-body">
-                    <p>PayTR Entegrasyonu: <span class="status-badge status-inactive" id="statusBadge">Pasif</span></p>
-                    <p style="margin-top: 15px; color: #666; font-size: 14px;">Son güncelleme: <span id="lastUpdate">-</span></p>
+                    <p style="font-size:14px;color:#444;line-height:1.7;">
+                        Merchant ID / Key / Salt ve canlı/test modu, güvenlik nedeniyle
+                        <strong>Cloud Function kaynak kodunda</strong> (<code>functions/index.js</code>)
+                        sabit olarak tutuluyor — bir web formuna yazılıp tarayıcıdan
+                        kaydedilmiyor (aksi halde bu bilgiler herkesin erişebileceği
+                        şekilde tarayıcıda saklanmış olurdu). Bu değerleri değiştirmek
+                        için <code>functions/index.js</code> içindeki
+                        <code>MERCHANT_ID</code>, <code>MERCHANT_KEY</code>,
+                        <code>MERCHANT_SALT</code>, <code>TEST_MODE</code> sabitlerini
+                        düzenleyip <code>firebase deploy --only functions</code> ile
+                        yeniden dağıtmanız gerekir.
+                    </p>
                 </div>
             </div>
         </main>
@@ -197,47 +180,8 @@
         if (!localStorage.getItem('kevra_admin_logged_in')) { window.location.replace('admin-login.html'); }
     </script>
     <script>
-        function loadSettings() {
-            const settings = JSON.parse(localStorage.getItem('kevra_paytr_settings') || '{}');
-            if (settings.merchantId) document.getElementById('merchantId').value = settings.merchantId;
-            if (settings.merchantKey) document.getElementById('merchantKey').value = settings.merchantKey;
-            if (settings.merchantSalt) document.getElementById('merchantSalt').value = settings.merchantSalt;
-            updateStatus(settings);
-        }
-        function updateStatus(settings) {
-            const hasCredentials = settings.merchantId && settings.merchantKey && settings.merchantSalt;
-            const badge = document.getElementById('statusBadge');
-            if (hasCredentials) {
-                badge.textContent = 'Aktif';
-                badge.className = 'status-badge status-active';
-            } else {
-                badge.textContent = 'Pasif';
-                badge.className = 'status-badge status-inactive';
-            }
-            document.getElementById('lastUpdate').textContent = settings.lastUpdate ? new Date(settings.lastUpdate).toLocaleString('tr-TR') : '-';
-        }
-        function saveSettings() {
-            const settings = {
-                merchantId: document.getElementById('merchantId').value.trim(),
-                merchantKey: document.getElementById('merchantKey').value.trim(),
-                merchantSalt: document.getElementById('merchantSalt').value.trim(),
-                lastUpdate: new Date().toISOString()
-            };
-            localStorage.setItem('kevra_paytr_settings', JSON.stringify(settings));
-            updateStatus(settings);
-            showToast('Ayarlar kaydedildi!');
-        }
-        function testConnection() {
-            showToast('Bağlantı test ediliyor...');
-            setTimeout(() => showToast('Bağlantı başarılı! (Simülasyon)'), 1500);
-        }
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-        document.addEventListener('DOMContentLoaded', loadSettings);
+        // Not: Bu sayfa artık PayTR kimlik bilgilerini localStorage'a yazan
+        // sahte bir form içermiyor — bkz. yukarıdaki bilgi kutusu.
     </script>
 
     <script>

@@ -17,12 +17,13 @@ const FIREBASE_CONFIG = {
 };
 
 // ============================================================
-//  Admin şifresi (Firebase Auth kullanmıyorsan bu kısım geçerli)
-//  Admin e-posta: Firebase Console → Authentication → Users'dan ekle
+//  Admin girişi: Firebase Console → Authentication → Users'dan eklenen
+//  gerçek e-posta/şifre ile yapılır (signInWithEmailAndPassword).
+//  GÜVENLİK: Buraya asla şifre yazılmaz — bu dosya tarayıcıya gönderilir,
+//  herkes "sayfa kaynağını görüntüle" ile okuyabilir.
 // ============================================================
 const ADMIN_CONFIG = {
-    email:    "admin@kevra.com.tr",
-    password: "Kevra2026!"   // Güçlü bir şifreyle değiştir
+    email: "admin@kevra.com.tr"
 };
 
 // ============================================================

@@ -43,14 +43,44 @@ exports.createPaytrToken = onRequest({ invoker: 'public' }, async (req, res) => 
         const merchantOid    = 'KVR' + Date.now();
         const userIp         = (req.headers['x-forwarded-for'] || '1.2.3.4').split(',')[0].trim();
         const email          = String(orderData.email || '');
-        const paymentAmount  = String(Math.round(Number(orderData.total) * 100)); // kuruş
         const noInstallment  = '0';
         const maxInstallment = '0';
         const currency       = 'TL';
         const testMode       = String(TEST_MODE);
 
+        // GÜVENLİK: Tutarı client'in gönderdiği orderData.total'a DEĞİL, Firestore'daki
+        // gerçek ürün fiyatlarına göre sunucuda yeniden hesapla. Aksi halde istek
+        // tarayıcıdan değiştirilip istenen tutar ödenebilir (fiyat manipülasyonu).
+        const cartItems = Array.isArray(orderData.items) ? orderData.items : [];
+        if (cartItems.length === 0) { res.status(400).json({ success: false, reason: 'Sepet boş' }); return; }
+
+        let subtotal = 0;
+        const verifiedItems = [];
+        for (const item of cartItems) {
+            const prodSnap = await db.collection('products').doc(String(item.id)).get();
+            if (!prodSnap.exists) { res.status(400).json({ success: false, reason: 'Geçersiz ürün: ' + item.id }); return; }
+            const prod  = prodSnap.data();
+            const qty   = Math.max(1, parseInt(item.quantity, 10) || 1);
+            const price = Number(prod.price) || 0;
+            subtotal += price * qty;
+            verifiedItems.push({
+                id: item.id, name: prod.name, price, quantity: qty,
+                size: item.size || null, color: item.color || null, image: prod.image || null
+            });
+        }
+
+        // Kupon indirimi de client'tan gelen tutara değil, sunucudaki sabit
+        // kupon listesine göre hesaplanır.
+        const COUPONS    = { KEVRA10: 0.10, KEVRA20: 0.20, WELCOME: 0.15, VIP25: 0.25 };
+        const couponCode = orderData.couponCode ? String(orderData.couponCode).toUpperCase() : null;
+        const discount   = (couponCode && COUPONS[couponCode] != null) ? Math.round(subtotal * COUPONS[couponCode]) : 0;
+        const shipping   = 0;
+        const total      = subtotal - discount + shipping;
+
+        const paymentAmount = String(Math.round(total * 100)); // kuruş
+
         // Sepet: fiyatlar TL string ('18.00'), adet integer — PayTR Node.js örneğine göre
-        const basket = orderData.items.map(item => [
+        const basket = verifiedItems.map(item => [
             String(item.name),
             Number(item.price).toFixed(2),
             Number(item.quantity)
@@ -69,9 +99,14 @@ exports.createPaytrToken = onRequest({ invoker: 'public' }, async (req, res) => 
         console.log('[PayTR] merchantOid:', merchantOid, 'userIp:', userIp);
         console.log('[PayTR] paymentAmount:', paymentAmount, 'token:', paytrToken);
 
-        // Firestore'a bekleyen sipariş kaydet
+        // Firestore'a bekleyen sipariş kaydet (fiyatlar sunucuda doğrulanmış değerlerle)
         await db.collection('orders').doc(merchantOid).set({
             ...orderData,
+            items:         verifiedItems,
+            subtotal,
+            discount,
+            shipping,
+            total,
             id:            merchantOid,
             status:        'Beklemede',
             paymentStatus: 'pending',
@@ -178,5 +213,156 @@ exports.paytrCallback = onRequest({ invoker: 'public' }, async (req, res) => {
     } catch (e) {
         console.error('paytrCallback error:', e);
         res.status(500).send('ERROR');
+    }
+});
+
+// ───────────────────────────────────────────
+// Yardımcı: js/kevra-db.js _hash() ile birebir aynı algoritma.
+// Zaten kayıtlı kullanıcıların şifreleri bu formatta saklı olduğu için
+// uyumluluğu bozmamak adına aynı yöntem korunuyor.
+// ───────────────────────────────────────────
+function legacyHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCodeAt(i); hash = hash & hash; }
+    return hash.toString();
+}
+
+// ───────────────────────────────────────────
+// POST /registerCustomer
+// GÜVENLİK: E-posta tekillik kontrolü ve şifre saklama sunucuda yapılır.
+// Eskiden client tüm 'users' koleksiyonunu (şifre hash'leri dahil) indirip
+// tarayıcıda karşılaştırıyordu — artık hiçbir kullanıcı verisi client'a
+// dökülmüyor.
+// ───────────────────────────────────────────
+exports.registerCustomer = onRequest({ invoker: 'public' }, async (req, res) => {
+    const corsHeaders = getCorsHeaders(req.headers.origin || '');
+    Object.entries(corsHeaders).forEach(([k, v]) => res.set(k, v));
+    if (req.method === 'OPTIONS') { res.status(204).send(''); return; }
+    if (req.method !== 'POST')    { res.status(405).send('Method Not Allowed'); return; }
+
+    try {
+        const { firstName, lastName, email, password, phone, address, city, zipCode } = req.body || {};
+        if (!email || !password || String(password).length < 6) {
+            res.json({ success: false, message: 'Geçersiz e-posta veya şifre (en az 6 karakter)' });
+            return;
+        }
+
+        const existing = await db.collection('users').where('email', '==', email).limit(1).get();
+        if (!existing.empty) {
+            res.json({ success: false, message: 'Bu e-posta zaten kayıtlı' });
+            return;
+        }
+
+        const newUser = {
+            id:           'user_' + Date.now(),
+            firstName:    firstName || '',
+            lastName:     lastName  || '',
+            email,
+            password:     legacyHash(password),
+            phone:        phone   || '',
+            address:      address || '',
+            city:         city    || '',
+            zipCode:      zipCode || '',
+            addresses:    [],
+            registerDate: new Date().toISOString(),
+            active:       true
+        };
+        await db.collection('users').doc(newUser.id).set(newUser);
+
+        const session = { id: newUser.id, email: newUser.email, firstName: newUser.firstName, lastName: newUser.lastName, phone: newUser.phone };
+        res.json({ success: true, user: session });
+    } catch (e) {
+        console.error('registerCustomer error:', e);
+        res.status(500).json({ success: false, message: 'Sunucu hatası' });
+    }
+});
+
+// ───────────────────────────────────────────
+// POST /loginCustomer
+// GÜVENLİK: Şifre karşılaştırması sunucuda yapılır, başka kullanıcıların
+// verisi client'a hiç gönderilmez.
+// ───────────────────────────────────────────
+exports.loginCustomer = onRequest({ invoker: 'public' }, async (req, res) => {
+    const corsHeaders = getCorsHeaders(req.headers.origin || '');
+    Object.entries(corsHeaders).forEach(([k, v]) => res.set(k, v));
+    if (req.method === 'OPTIONS') { res.status(204).send(''); return; }
+    if (req.method !== 'POST')    { res.status(405).send('Method Not Allowed'); return; }
+
+    try {
+        const { email, password } = req.body || {};
+        if (!email || !password) { res.json({ success: false, message: 'E-posta ve şifre gerekli' }); return; }
+
+        const snap = await db.collection('users').where('email', '==', email).limit(1).get();
+        if (snap.empty) { res.json({ success: false, message: 'Kullanıcı bulunamadı' }); return; }
+
+        const user = snap.docs[0].data();
+        if (user.password !== legacyHash(password)) {
+            res.json({ success: false, message: 'Şifre hatalı' });
+            return;
+        }
+
+        const session = { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, phone: user.phone, loginTime: new Date().toISOString() };
+        res.json({ success: true, user: session });
+    } catch (e) {
+        console.error('loginCustomer error:', e);
+        res.status(500).json({ success: false, message: 'Sunucu hatası' });
+    }
+});
+
+// ───────────────────────────────────────────
+// POST /getMyOrders
+// GÜVENLİK: Sadece verilen userId'ye ait siparişleri döner — Firestore
+// kuralları artık 'orders' koleksiyonunun tamamını client'ın listelemesine
+// izin vermiyor, bu uç nokta Admin SDK ile dar kapsamlı sorgu yapar.
+// ───────────────────────────────────────────
+exports.getMyOrders = onRequest({ invoker: 'public' }, async (req, res) => {
+    const corsHeaders = getCorsHeaders(req.headers.origin || '');
+    Object.entries(corsHeaders).forEach(([k, v]) => res.set(k, v));
+    if (req.method === 'OPTIONS') { res.status(204).send(''); return; }
+    if (req.method !== 'POST')    { res.status(405).send('Method Not Allowed'); return; }
+
+    try {
+        const { userId } = req.body || {};
+        if (!userId) { res.json({ success: true, orders: [] }); return; }
+
+        const snap = await db.collection('orders').where('userId', '==', userId).get();
+        const orders = snap.docs.map(d => {
+            const data = d.data();
+            if (data.createdAt && typeof data.createdAt.toDate === 'function') data.createdAt = data.createdAt.toDate().toISOString();
+            if (data.paidAt && typeof data.paidAt.toDate === 'function')       data.paidAt    = data.paidAt.toDate().toISOString();
+            return data;
+        }).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+        res.json({ success: true, orders });
+    } catch (e) {
+        console.error('getMyOrders error:', e);
+        res.status(500).json({ success: false, orders: [] });
+    }
+});
+
+// ───────────────────────────────────────────
+// POST /getMyReturns
+// GÜVENLİK: Sadece verilen userId'ye ait iade taleplerini döner.
+// ───────────────────────────────────────────
+exports.getMyReturns = onRequest({ invoker: 'public' }, async (req, res) => {
+    const corsHeaders = getCorsHeaders(req.headers.origin || '');
+    Object.entries(corsHeaders).forEach(([k, v]) => res.set(k, v));
+    if (req.method === 'OPTIONS') { res.status(204).send(''); return; }
+    if (req.method !== 'POST')    { res.status(405).send('Method Not Allowed'); return; }
+
+    try {
+        const { userId } = req.body || {};
+        if (!userId) { res.json({ success: true, returns: [] }); return; }
+
+        const snap = await db.collection('returns').where('userId', '==', userId).get();
+        const returns = snap.docs.map(d => {
+            const data = d.data();
+            if (data.createdAt && typeof data.createdAt.toDate === 'function') data.createdAt = data.createdAt.toDate().toISOString();
+            return data;
+        });
+        res.json({ success: true, returns });
+    } catch (e) {
+        console.error('getMyReturns error:', e);
+        res.status(500).json({ success: false, returns: [] });
     }
 });

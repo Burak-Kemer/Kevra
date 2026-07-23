@@ -870,27 +870,36 @@
                     googleId: googleProfile.sub,
                     picture: googleProfile.picture || null
                 };
-                const users = await KevraDB.getAllUsers();
-                let existingUser = users.find(u => u.email === profile.email);
-                if (!existingUser) {
-                    const registerRes = await KevraDB.registerUser({
-                        email: profile.email,
-                        password: 'google_oauth_' + profile.googleId,
-                        firstName: profile.firstName,
-                        lastName: profile.lastName
-                    });
-                    if (!registerRes.success && registerRes.message !== 'Bu e-posta zaten kayıtlı') {
-                        showAlert('Google ile kayıt başarısız. Lütfen tekrar deneyin.', 'error');
-                        return;
+                // GÜVENLİK: Tüm kullanıcı listesini çekip e-postayı client'ta
+                // aramak yerine doğrudan kayıt denenir; e-posta zaten
+                // kayıtlıysa aynı (Google'a özgü, deterministik) şifreyle
+                // giriş yapılır. Tekillik kontrolü ve şifre karşılaştırması
+                // sunucuda (registerCustomer/loginCustomer) yapılır.
+                const gPassword = 'google_oauth_' + profile.googleId;
+                let sessionUser = null;
+
+                const registerRes = await KevraDB.registerUser({
+                    email: profile.email,
+                    password: gPassword,
+                    firstName: profile.firstName,
+                    lastName: profile.lastName
+                });
+
+                if (registerRes.success) {
+                    sessionUser = registerRes.user;
+                } else if (registerRes.message === 'Bu e-posta zaten kayıtlı') {
+                    const loginRes = await KevraDB.loginUser(profile.email, gPassword);
+                    if (loginRes.success) {
+                        sessionUser = loginRes.user;
+                        if (!sessionUser.firstName || sessionUser.firstName === 'Google') {
+                            const updateRes = await KevraDB.updateUser({ firstName: profile.firstName, lastName: profile.lastName });
+                            if (updateRes.success) sessionUser = updateRes.user;
+                        }
                     }
-                    existingUser = registerRes.user || users.find(u => u.email === profile.email);
-                } else if (!existingUser.firstName || existingUser.firstName === 'Google') {
-                    const updateRes = await KevraDB._updateUserRecord(existingUser.id, u => ({ ...u, firstName: profile.firstName, lastName: profile.lastName }));
-                    if (updateRes.success) existingUser = updateRes.user;
                 }
-                if (existingUser) {
-                    const session = { id: existingUser.id, email: existingUser.email, firstName: existingUser.firstName, lastName: existingUser.lastName, phone: existingUser.phone, loginTime: new Date().toISOString() };
-                    localStorage.setItem("kevra_current_user", JSON.stringify(session));
+
+                if (sessionUser) {
+                    localStorage.setItem("kevra_current_user", JSON.stringify(sessionUser));
                     showAlert('Google ile kayıt başarılı! Yönlendiriliyorsunuz...', 'success');
                     setTimeout(() => {
                         window.location.href = "index.html";

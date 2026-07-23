@@ -1641,6 +1641,12 @@ function onOrderSuccess(orderId) {
 
 // PayTR başarı/başarısız mesajlarını dinle
 window.addEventListener('message', function(e) {
+    // GÜVENLİK: odeme-basarili/basarisiz.html sadece kevra.com.tr'den
+    // postMessage gönderir; başka bir origin'den gelen (ör. bu sayfayı
+    // kendi sitesine iframe'leyen bir saldırganın sahte "ödeme başarılı"
+    // mesajı) istekleri reddet.
+    const allowedOrigins = ['https://kevra.com.tr', 'https://www.kevra.com.tr'];
+    if (!allowedOrigins.includes(e.origin)) return;
     if (!e.data || e.data.paytr === undefined) return;
     const overlay = document.getElementById('paytrOverlay');
     if (e.data.paytr === 'success') {
