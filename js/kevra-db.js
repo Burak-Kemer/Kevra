@@ -275,6 +275,33 @@ const KevraDB = {
         return { success: true };
     },
 
+    // ===================== KATEGORİ GÖRSELLERİ =====================
+
+    getCategoryImages: async function() {
+        if (await this._firebaseAvailable()) {
+            try {
+                const doc = await window.KevraFirebase.db.collection('settings').doc('categoryImages').get();
+                if (doc.exists) {
+                    localStorage.setItem('kevra_category_images', JSON.stringify(doc.data()));
+                    return doc.data();
+                }
+            } catch (e) { console.warn('Kategori görselleri okuma hatası:', e); }
+        }
+        return JSON.parse(localStorage.getItem('kevra_category_images') || '{}');
+    },
+
+    saveCategoryImage: async function(slug, base64) {
+        if (await this._firebaseAvailable()) {
+            try {
+                await window.KevraFirebase.db.collection('settings').doc('categoryImages').set({ [slug]: base64 }, { merge: true });
+            } catch (e) { console.warn('Kategori görseli kaydetme hatası:', e); }
+        }
+        const current = JSON.parse(localStorage.getItem('kevra_category_images') || '{}');
+        current[slug] = base64;
+        localStorage.setItem('kevra_category_images', JSON.stringify(current));
+        return { success: true };
+    },
+
     // ===================== SİPARİŞLER =====================
 
     // GÜVENLİK: Sipariş artık doğrudan client'tan Firestore'a yazılmıyor —

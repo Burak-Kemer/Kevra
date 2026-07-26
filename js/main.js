@@ -96,6 +96,41 @@ function createProductCard(product) {
 
 // ================= QUICK VIEW MODAL =================
 
+// Bir ürünün belirli bir renge ait görsellerini döner. Ürün admin panelden
+// yeni sistemle (renk başına görsel) kaydedilmişse colorImages kullanılır;
+// eski ürünlerde (colorImages yok) tek genel görsele düşer.
+function getColorImages(product, color) {
+    if (product.colorImages && product.colorImages[color] && product.colorImages[color].length > 0) {
+        return product.colorImages[color];
+    }
+    return product.image ? [product.image] : [];
+}
+
+function renderQvThumbnails(images) {
+    const container = document.getElementById('qvThumbnails');
+    if (!container) return;
+
+    if (!images || images.length <= 1) {
+        container.innerHTML = '';
+        container.style.display = 'none';
+        return;
+    }
+
+    container.style.display = 'flex';
+    container.innerHTML = images.map((src, i) =>
+        `<button type="button" class="qv-thumb-btn ${i === 0 ? 'selected' : ''}" onclick="selectQvThumbnail(this, '${src}')">
+            <img src="${src}" alt="">
+        </button>`
+    ).join('');
+}
+
+function selectQvThumbnail(btn, src) {
+    const qvImg = document.getElementById('qvImg');
+    if (qvImg) qvImg.src = src;
+    document.querySelectorAll('#qvThumbnails .qv-thumb-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+}
+
 function openQuickView(productId) {
     const product = allProducts.find(p => String(p.id) === String(productId));
     if (!product) return;
@@ -122,6 +157,11 @@ function openQuickView(productId) {
     
     if (qvImg) qvImg.src = product.image;
     if (qvImg) qvImg.alt = product.name;
+
+    // Varsayılan olarak ilk rengin görselleri gösterilir (kullanıcı henüz
+    // renk seçmediyse); bir renk seçilince selectQVColor bunu günceller.
+    const defaultColor = product.colors && product.colors[0];
+    renderQvThumbnails(defaultColor ? getColorImages(product, defaultColor) : (product.image ? [product.image] : []));
     if (qvName) qvName.textContent = product.name;
     if (qvPrice) qvPrice.textContent = formatPrice(product.price);
     if (qvDesc) qvDesc.textContent = product.description;
@@ -180,7 +220,7 @@ function openQuickView(productId) {
     const colorsContainer = document.getElementById('qvColors');
     if (colorsContainer && product.colors) {
         const colorMap = {
-            'Beyaz': '#ffffff', 'Siyah': '#000000', 'Pembe': '#f4a0b5',
+            'Beyaz': '#ffffff', 'Siyah': '#000000', 'Kırmızı': '#dc2626', 'Pembe': '#f4a0b5',
             'Mavi': '#1a56db', 'Haki': '#8b8c5e', 'Mürdüm': '#4a0e2e',
             'Bordo': '#800020', 'Acı Kahve': '#4e2c0e', 'Sarı': '#f5c518',
             'Vizon': '#c4a882', 'Bej': '#e8d5b7', 'Lacivert': '#000080',
@@ -238,6 +278,16 @@ function selectQVColor(btn, color) {
     btn.classList.add('selected');
     const colorError = document.getElementById('colorError');
     if (colorError) colorError.classList.remove('show');
+
+    // Seçilen renge ait görseli/görselleri göster
+    if (currentQVProduct) {
+        const images = getColorImages(currentQVProduct, color);
+        if (images.length > 0) {
+            const qvImg = document.getElementById('qvImg');
+            if (qvImg) qvImg.src = images[0];
+        }
+        renderQvThumbnails(images);
+    }
 }
 
 function addToCartFromQuickView() {

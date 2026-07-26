@@ -1318,13 +1318,36 @@
             min-height: 400px;
             background: #f9f9f9;
             position: relative;
+            display: flex;
+            flex-direction: column;
         }
         
-        .quick-view-image img {
+        .quick-view-image > img {
             width: 100%;
-            height: 100%;
+            flex: 1;
+            min-height: 0;
             object-fit: cover;
         }
+        .qv-thumbnails {
+            display: none;
+            gap: 8px;
+            padding: 10px;
+            overflow-x: auto;
+            background: #fff;
+        }
+        .qv-thumb-btn {
+            flex-shrink: 0;
+            width: 56px;
+            height: 56px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            cursor: pointer;
+            padding: 0;
+            background: none;
+        }
+        .qv-thumb-btn.selected { border-color: #c9a87c; }
+        .qv-thumb-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
         
         .quick-view-info {
             padding: 30px;
@@ -2217,28 +2240,28 @@
     <h2 class="section-title">Kategoriler</h2>
     <div class="categories-grid">
         <div class="category-card large" onclick="location.href='shop.html?category=elbise'">
-            <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=800" alt="Elbiseler">
+            <img id="catImgElbise" src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=800" alt="Elbiseler">
             <div class="category-overlay">
                 <h3>Elbiseler</h3>
                 <span>Keşfet →</span>
             </div>
         </div>
         <div class="category-card" onclick="location.href='shop.html?category=ust'">
-            <img src="https://images.unsplash.com/photo-1564257631407-4deb1f99d992?q=80&w=600" alt="Üst Giyim">
+            <img id="catImgUst" src="https://images.unsplash.com/photo-1564257631407-4deb1f99d992?q=80&w=600" alt="Üst Giyim">
             <div class="category-overlay">
                 <h3>Üst Giyim</h3>
                 <span>Keşfet →</span>
             </div>
         </div>
         <div class="category-card" onclick="location.href='shop.html?category=triko'">
-            <img src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=600" alt="Triko">
+            <img id="catImgTriko" src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=600" alt="Triko">
             <div class="category-overlay">
                 <h3>Triko</h3>
                 <span>Keşfet →</span>
             </div>
         </div>
         <div class="category-card" onclick="location.href='shop.html?category=dis'">
-            <img src="https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=600" alt="Dış Giyim">
+            <img id="catImgDis" src="https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=600" alt="Dış Giyim">
             <div class="category-overlay">
                 <h3>Dış Giyim</h3>
                 <span>Keşfet →</span>
@@ -2358,6 +2381,7 @@
         <button class="quick-view-close" onclick="closeQuickView()">✖</button>
         <div class="quick-view-image">
             <img src="" alt="" id="qvImg">
+            <div class="qv-thumbnails" id="qvThumbnails"></div>
         </div>
         <div class="quick-view-info">
             <span class="quick-view-badge" id="qvBadge">Yeni</span>
@@ -2399,6 +2423,24 @@
 <script src="js/storage.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/main.js"></script>
+
+<script>
+    // Anasayfa kategori kartlarının görselleri admin panelden değiştirilebilir
+    // (bkz. admin/admin-urunler.html "Kategori Görselleri"). Ayarlanmamışsa
+    // yukarıdaki varsayılan Unsplash görselleri kalır.
+    document.addEventListener('DOMContentLoaded', async function() {
+        try {
+            const imgs = await KevraDB.getCategoryImages();
+            const map = { elbise: 'catImgElbise', ust: 'catImgUst', triko: 'catImgTriko', dis: 'catImgDis' };
+            Object.entries(map).forEach(([slug, id]) => {
+                if (imgs[slug]) {
+                    const el = document.getElementById(id);
+                    if (el) el.src = imgs[slug];
+                }
+            });
+        } catch (e) { console.warn('Kategori görselleri yüklenemedi:', e); }
+    });
+</script>
 
 </body>
 </html>

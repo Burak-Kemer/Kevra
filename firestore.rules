@@ -23,6 +23,13 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Site ayarları (ör. anasayfa kategori kartlarının görselleri) — herkes
+    // okuyabilir, sadece admin değiştirebilir.
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Müşteri kaydı/girişi/profil güncelleme tek tek doküman (get/create/
     // update) üzerinden açık kalıyor — uygulama anonim müşteri oturumlarına
     // ihtiyaç duyuyor. KOLEKSİYONUN TAMAMINI listelemek (list) ve silmek
