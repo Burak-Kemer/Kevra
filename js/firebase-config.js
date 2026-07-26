@@ -53,6 +53,13 @@ function initFirebase() {
             firebase.initializeApp(FIREBASE_CONFIG);
         }
         _db   = firebase.firestore();
+        // Bazı mobil operatör ağları / vekil sunucular (proxy) Firestore'un
+        // varsayılan WebSocket tabanlı bağlantısını sessizce engelliyor —
+        // sayfa "Firestore'a ulaşılamadı" hatası veriyor (bazı Safari/Chrome
+        // mobil kullanıcılarında görülen ürün yüklenememe sorunu). Bu ayar,
+        // SDK'nın böyle bir ağı otomatik tespit edip HTTP long-polling'e
+        // geçmesini sağlar — Google'ın bu tür ağlar için resmi önerisi.
+        _db.settings({ experimentalAutoDetectLongPolling: true });
         _auth = firebase.auth();
         firebaseReady = true;
         console.log('[KevraDB] ✅ Firebase bağlantısı kuruldu');
