@@ -1909,28 +1909,6 @@
     <!-- SIDEBAR FILTERS -->
     <aside class="shop-sidebar" id="shopSidebar">
         <div class="filter-section">
-            <h4 class="filter-title">Kategoriler</h4>
-            <label class="filter-checkbox">
-                <input type="checkbox" data-filter="category" value="elbise" onchange="handleFilterChange(this)"> Elbiseler
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" data-filter="category" value="ust" onchange="handleFilterChange(this)"> Üst Giyim
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" data-filter="category" value="alt" onchange="handleFilterChange(this)"> Alt Giyim
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" data-filter="category" value="triko" onchange="handleFilterChange(this)"> Triko
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" data-filter="category" value="dis" onchange="handleFilterChange(this)"> Dış Giyim
-            </label>
-            <label class="filter-checkbox">
-                <input type="checkbox" data-filter="category" value="aksesuar" onchange="handleFilterChange(this)"> Aksesuar
-            </label>
-        </div>
-        
-        <div class="filter-section">
             <h4 class="filter-title">Beden</h4>
             <div class="size-filters">
                 <button class="size-filter-btn" data-size="XS" onclick="handleSizeFilter(this)">XS</button>
@@ -2119,33 +2097,18 @@
 <!-- SCRIPTS -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="js/firebase-config.js?v=20260727b"></script>
-<script src="js/kevra-db.js?v=20260727b"></script>
-<script src="js/storage.js?v=20260727b"></script>
-<script src="js/auth.js?v=20260727b"></script>
-<script src="js/main.js?v=20260727b"></script>
+<script src="js/firebase-config.js?v=20260727c"></script>
+<script src="js/kevra-db.js?v=20260727c"></script>
+<script src="js/storage.js?v=20260727c"></script>
+<script src="js/auth.js?v=20260727c"></script>
+<script src="js/main.js?v=20260727c"></script>
 
 <script>
 // Aktif filtreleri takip et
 let activeFilters = {
-    categories: [],
     sizes: [],
     discount: false
 };
-
-// Kategori filtresi değiştiğinde
-function handleFilterChange(checkbox) {
-    const value = checkbox.value;
-    if (checkbox.checked) {
-        if (!activeFilters.categories.includes(value)) {
-            activeFilters.categories.push(value);
-        }
-    } else {
-        activeFilters.categories = activeFilters.categories.filter(c => c !== value);
-    }
-    updateActiveFiltersDisplay();
-    applyFilters();
-}
 
 // Beden filtresi değiştiğinde
 function handleSizeFilter(btn) {
@@ -2174,26 +2137,7 @@ function handleDiscountChange(checkbox) {
 function updateActiveFiltersDisplay() {
     const container = document.getElementById('activeFilters');
     let html = '';
-    
-    // Kategori filtreleri
-    const categoryNames = {
-        'elbise': 'Elbiseler',
-        'ust': 'Üst Giyim',
-        'alt': 'Alt Giyim',
-        'triko': 'Triko',
-        'dis': 'Dış Giyim',
-        'aksesuar': 'Aksesuar'
-    };
-    
-    activeFilters.categories.forEach(cat => {
-        html += `
-            <span class="active-filter-tag">
-                ${categoryNames[cat] || cat}
-                <button onclick="removeCategoryFilter('${cat}')" title="Kaldır">×</button>
-            </span>
-        `;
-    });
-    
+
     // Beden filtreleri
     activeFilters.sizes.forEach(size => {
         html += `
@@ -2215,21 +2159,11 @@ function updateActiveFiltersDisplay() {
     }
     
     // Tümünü temizle butonu
-    if (activeFilters.categories.length > 0 || activeFilters.sizes.length > 0 || activeFilters.discount) {
+    if (activeFilters.sizes.length > 0 || activeFilters.discount) {
         html += `<button class="clear-all-filters" onclick="clearAllFilters()">Tümünü Temizle</button>`;
     }
-    
-    container.innerHTML = html;
-}
 
-// Kategori filtresini kaldır
-function removeCategoryFilter(category) {
-    activeFilters.categories = activeFilters.categories.filter(c => c !== category);
-    // Checkbox'ı unchecked yap
-    const checkbox = document.querySelector(`input[data-filter="category"][value="${category}"]`);
-    if (checkbox) checkbox.checked = false;
-    updateActiveFiltersDisplay();
-    applyFilters();
+    container.innerHTML = html;
 }
 
 // Beden filtresini kaldır
@@ -2254,13 +2188,10 @@ function removeDiscountFilter() {
 // Tüm filtreleri temizle
 function clearAllFilters() {
     activeFilters = {
-        categories: [],
         sizes: [],
         discount: false
     };
-    
-    // Tüm checkbox'ları unchecked yap
-    document.querySelectorAll('input[data-filter="category"]').forEach(cb => cb.checked = false);
+
     document.getElementById('onlyDiscount').checked = false;
     
     // Tüm beden butonlarını inactive yap
@@ -2273,12 +2204,7 @@ function clearAllFilters() {
 // Filtreleri uygula (main.js'deki fonksiyonu override et)
 function applyFilters() {
     let result = [...allProducts];
-    
-    // Kategori filtresi
-    if (activeFilters.categories.length > 0) {
-        result = result.filter(p => activeFilters.categories.includes(p.category));
-    }
-    
+
     // İndirim filtresi
     if (activeFilters.discount) {
         result = result = result.filter(p => p.discount);
