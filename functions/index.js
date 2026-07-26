@@ -548,3 +548,24 @@ exports.getProducts = onRequest({ invoker: 'public' }, async (req, res) => {
         res.status(500).json({ success: false, products: [] });
     }
 });
+
+// ───────────────────────────────────────────
+// GET /getCategoryImages
+// getProducts ile aynı gerekçe: anasayfa kategori kartı görselleri de
+// artık düz bir HTTPS isteğiyle çekiliyor, Firestore client SDK'sının
+// bazı mobil tarayıcılarda engellenen gerçek-zamanlı bağlantısı yerine.
+// ───────────────────────────────────────────
+exports.getCategoryImages = onRequest({ invoker: 'public' }, async (req, res) => {
+    const corsHeaders = getCorsHeaders(req.headers.origin || '');
+    Object.entries(corsHeaders).forEach(([k, v]) => res.set(k, v));
+    if (req.method === 'OPTIONS') { res.status(204).send(''); return; }
+
+    try {
+        const doc = await db.collection('settings').doc('categoryImages').get();
+        res.set('Cache-Control', 'public, max-age=60');
+        res.json({ success: true, images: doc.exists ? doc.data() : {} });
+    } catch (e) {
+        console.error('getCategoryImages error:', e);
+        res.status(500).json({ success: false, images: {} });
+    }
+});

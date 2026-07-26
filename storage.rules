@@ -1,0 +1,22 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Admin = gerçek (anonim olmayan) bir Firebase Auth oturumu — bkz.
+    // firestore.rules'taki aynı isimli fonksiyonun açıklaması.
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider != 'anonymous';
+    }
+
+    // Ürün ve kategori görselleri: herkes okuyabilir (mağaza sayfaları
+    // giriş yapmamış ziyaretçilere de görsel göstermeli), yazma sadece admin.
+    match /products/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /settings/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

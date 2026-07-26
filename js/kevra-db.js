@@ -335,7 +335,20 @@ const KevraDB = {
 
     // ===================== KATEGORİ GÖRSELLERİ =====================
 
+    // GÜVENİLİRLİK: getProducts ile aynı gerekçe — önce düz HTTPS Cloud
+    // Function denenir (Instagram/bazı mobil tarayıcılarda Firestore'un
+    // gerçek-zamanlı bağlantısı engellenebiliyordu), sadece o başarısız
+    // olursa client SDK'sına düşülür.
     getCategoryImages: async function() {
+        try {
+            const res  = await fetch(CLOUD_FN_BASE + '/getCategoryImages', { method: 'GET' });
+            const data = await res.json();
+            if (data.success && data.images) {
+                localStorage.setItem('kevra_category_images', JSON.stringify(data.images));
+                return data.images;
+            }
+        } catch (e) { console.warn('getCategoryImages isteği başarısız, Firestore SDK deneniyor:', e); }
+
         if (await this._firebaseAvailable()) {
             try {
                 const doc = await window.KevraFirebase.db.collection('settings').doc('categoryImages').get();

@@ -29,8 +29,9 @@ const ADMIN_CONFIG = {
 // ============================================================
 //  Firebase başlatma
 // ============================================================
-let _db   = null;
-let _auth = null;
+let _db      = null;
+let _auth    = null;
+let _storage = null;
 let firebaseReady = false;
 
 // Firestore güvenlik kuralları "request.auth != null" istiyor (bkz.
@@ -61,6 +62,9 @@ function initFirebase() {
         // geçmesini sağlar — Google'ın bu tür ağlar için resmi önerisi.
         _db.settings({ experimentalAutoDetectLongPolling: true });
         _auth = firebase.auth();
+        // firebase-storage-compat.js sadece görsel yükleyen sayfalarda
+        // (ör. admin-urunler.html) yüklü olur — o yüzden koşullu.
+        if (typeof firebase.storage === 'function') _storage = firebase.storage();
         firebaseReady = true;
         console.log('[KevraDB] ✅ Firebase bağlantısı kuruldu');
 
@@ -105,8 +109,9 @@ window.ADMIN_CONFIG    = ADMIN_CONFIG;
 // Getter kullan — initFirebase() sonrası _db/_auth güncellenir,
 // window.KevraFirebase.db her erişimde güncel değeri döner
 window.KevraFirebase = {
-    get db()   { return _db; },
-    get auth() { return _auth; },
+    get db()      { return _db; },
+    get auth()    { return _auth; },
+    get storage() { return _storage; },
     ready: () => firebaseReady,
     init:  initFirebase,
     authReady,

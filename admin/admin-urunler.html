@@ -369,8 +369,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="../js/firebase-config.js?v=20260726e"></script>
-    <script src="../js/kevra-db.js?v=20260726e"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    <script src="../js/firebase-config.js?v=20260726f"></script>
+    <script src="../js/kevra-db.js?v=20260726f"></script>
     <script>
         if (!localStorage.getItem('kevra_admin_logged_in')) {
             window.location.replace('admin-login.html');
@@ -378,6 +379,10 @@
 
         let allProducts = [];
         let editingId = null;
+        // Storage'a yüklenen görsellerin klasör yolu için kararlı bir ID —
+        // modal açılır açılmaz belirlenir (yeni üründe de), böylece o
+        // oturumda yüklenen tüm görseller aynı ürün klasörüne gider.
+        let currentDraftId = null;
 
         const CAT_NAMES = {
             elbise: 'Elbise', ust: 'Üst Giyim', alt: 'Alt Giyim',
@@ -425,17 +430,22 @@
             `).join('');
         }
 
-        function handleCategoryImageSelect(event, slug) {
+        async function handleCategoryImageSelect(event, slug) {
             const file = event.target.files[0];
             if (!file) return;
             if (!file.type.startsWith('image/')) { showToast('Lütfen geçerli bir görsel dosyası seçin!', 'error'); return; }
 
-            compressImageFile(file, 900).then(async base64 => {
-                categoryImagesData[slug] = base64;
+            try {
+                const dataUrl = await compressImageFile(file, 1000, 0.85);
+                const url = await uploadToStorage(dataUrl, `settings/categories/${slug}-${Date.now()}.jpg`);
+                categoryImagesData[slug] = url;
                 renderCategoryImagesGrid();
-                await KevraDB.saveCategoryImage(slug, base64);
+                await KevraDB.saveCategoryImage(slug, url);
                 showToast('Kategori görseli güncellendi!');
-            }).catch(() => showToast('Görsel işlenemedi!', 'error'));
+            } catch (e) {
+                console.error('Kategori görseli yükleme hatası:', e);
+                showToast(e.message || 'Görsel işlenemedi!', 'error');
+            }
         }
 
         async function loadProducts() {
@@ -526,11 +536,13 @@
 
             if (productId !== undefined) {
                 editingId = productId;
+                currentDraftId = String(productId);
                 document.getElementById('modalTitle').textContent = 'Ürün Düzenle';
                 const p = allProducts.find(x => String(x.id) === String(productId));
                 if (p) fillForm(p);
             } else {
                 editingId = null;
+                currentDraftId = String(Date.now());
                 document.getElementById('modalTitle').textContent = 'Yeni Ürün Ekle';
                 document.getElementById('productStock').value = '10';
             }
@@ -620,7 +632,7 @@
             effectiveColors.forEach(c => { colorImages[c] = colorImagesData[c]; });
 
             const productData = {
-                id:            editingId || String(Date.now()),
+                id:            currentDraftId || editingId || String(Date.now()),
                 name, category, price, costPrice,
                 originalPrice: origPrice > price ? origPrice : price,
                 description, stock,
@@ -632,15 +644,6 @@
                 colorImages,
                 image:         colorImages[effectiveColors[0]][0] // eski (tek görsel) alanlarla geriye dönük uyum için
             };
-
-            // Firestore'un doküman başına 1MB sınırı var — çok sayıda/büyük
-            // renk görseli eklenirse bu sınır aşılıp kayıt sessizce
-            // reddedilebiliyordu. Göndermeden önce kabaca boyutu kontrol et.
-            const approxSizeKB = Math.round(JSON.stringify(productData).length / 1024);
-            if (approxSizeKB > 850) {
-                showToast('Görseller çok büyük (~' + approxSizeKB + ' KB). Lütfen renk başına daha az/küçük fotoğraf kullanın.', 'error');
-                return;
-            }
 
             const saveBtn = document.getElementById('saveBtn');
             saveBtn.disabled = true;
@@ -744,24 +747,37 @@
             }).join('');
         }
 
+        // Sıkıştırılmış görseli Firebase Storage'a yükler ve indirme
+        // bağlantısını döner. GÜVENİLİRLİK: Görseller artık Firestore
+        // dokümanına gömülmüyor (1MB doküman sınırına takılıyordu) —
+        // Storage'da dosya boyutu pratikte bir sorun değil, Firestore'da
+        // sadece kısa bir bağlantı (URL) saklanıyor.
+        async function uploadToStorage(dataUrl, path) {
+            const storage = window.KevraFirebase && window.KevraFirebase.storage;
+            if (!storage) throw new Error('Depolama servisine bağlanılamadı');
+            const ref = storage.ref().child(path);
+            await ref.putString(dataUrl, 'data_url');
+            return await ref.getDownloadURL();
+        }
+
         async function handleColorFileSelect(event, color) {
             const files = Array.from(event.target.files || []);
             if (files.length === 0) return;
 
             for (const file of files) {
                 try {
-                    // Renk başına birden fazla görsel birikebildiği için
-                    // (Firestore'un 1MB doküman sınırına takılmamak adına)
-                    // kategori görsellerinden daha sıkı sıkıştırılıyor.
-                    const base64 = await compressImageFile(file, 640, 0.7);
+                    const dataUrl = await compressImageFile(file, 1000, 0.85);
+                    const path = `products/${currentDraftId}/${color}/${Date.now()}-${Math.round(Math.random()*1e6)}.jpg`;
+                    const url  = await uploadToStorage(dataUrl, path);
                     if (!colorImagesData[color]) colorImagesData[color] = [];
-                    colorImagesData[color].push(base64);
+                    colorImagesData[color].push(url);
+                    renderColorImageBlocks();
                 } catch (e) {
-                    showToast(e.message || 'Görsel işlenemedi!', 'error');
+                    console.error('Görsel yükleme hatası:', e);
+                    showToast(e.message || 'Görsel yüklenemedi!', 'error');
                 }
             }
             event.target.value = '';
-            renderColorImageBlocks();
         }
 
         function removeColorImage(color, index) {
