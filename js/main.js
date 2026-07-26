@@ -1102,13 +1102,6 @@ function renderFromProducts() {
     if (isShopPage) {
         checkUrlParams();
     } else {
-        const featuredContainer = document.getElementById("featuredProducts");
-        if (featuredContainer) {
-            let featured = allProducts.filter(p => p.badgeType === 'popular' || p.badgeType === 'premium');
-            if (featured.length === 0) featured = allProducts.slice(0, 4);
-            else if (featured.length > 4) featured = featured.slice(0, 4);
-            renderProducts(featured, featuredContainer);
-        }
         renderNewArrivals();
     }
 }
