@@ -3,6 +3,19 @@
 //  Firebase varsa Firestore kullanır, yoksa localStorage'a düşer
 // ============================================================
 
+// ÖNBELLEK SÜRÜM KONTROLÜ: Bazı tarayıcılarda (özellikle mobil Safari)
+// eski bir ziyarette önbelleğe yazılmış ürün listesi (artık silinmiş/sahte
+// ürünler içerebilir) günlerce/haftalarca kalabiliyordu — sayfa/uygulama
+// kapatılıp açılması bunu temizlemiyor. Bu sürüm numarası her arttığında
+// TÜM tarayıcılarda eski ürün önbelleği bir kerelik otomatik temizlenir,
+// böylece Firebase'den taze veri gelene kadar (ya da hiç gelmezse) eski
+// yanlış veri değil, gerçekten boş bir liste kullanılır.
+const PRODUCTS_CACHE_VERSION = '2';
+if (localStorage.getItem('kevra_products_cache_v') !== PRODUCTS_CACHE_VERSION) {
+    localStorage.removeItem('kevra_products');
+    localStorage.setItem('kevra_products_cache_v', PRODUCTS_CACHE_VERSION);
+}
+
 const CLOUD_FN_BASE = 'https://europe-west1-kevra-88a60.cloudfunctions.net';
 
 const KevraDB = {
