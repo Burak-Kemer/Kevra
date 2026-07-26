@@ -231,14 +231,17 @@ const KevraDB = {
         if (await this._firebaseAvailable()) {
             try {
                 const snap = await window.KevraFirebase.db.collection('products').orderBy('createdAt', 'desc').get();
-                if (!snap.empty) {
-                    const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                    localStorage.setItem('kevra_products', JSON.stringify(products)); // local cache
-                    return products;
-                }
+                // Firestore'a başarıyla ulaşıldıysa sonucu OLDUĞU GİBİ döndür —
+                // katalog gerçekten boşsa (admin tüm ürünleri sildiyse) bu,
+                // "Firestore'a ulaşılamadı" ile karıştırılıp yerine sahte
+                // varsayılan ürünler gösterilmemeli (bkz. aşağıdaki catch/fallback).
+                const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                localStorage.setItem('kevra_products', JSON.stringify(products)); // local cache
+                return products;
             } catch (e) { console.warn('Firestore ürün okuma hatası:', e); }
         }
-        // localStorage fallback
+        // Firestore'a hiç ulaşılamadı (offline/hata) — sadece bu durumda
+        // localStorage önbelleğine, o da yoksa varsayılan ürünlere düş.
         let products = JSON.parse(localStorage.getItem('kevra_products') || '[]');
         if (products.length === 0) {
             products = this._defaultProducts();

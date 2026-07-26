@@ -1076,7 +1076,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // Firebase'den güncel ürünleri çek ve yeniden render et
     if (window.KevraDB && typeof window.KevraDB.getProducts === 'function') {
         window.KevraDB.getProducts().then(function(freshProducts) {
-            if (freshProducts && freshProducts.length > 0) {
+            // Array.isArray kontrolü: Firestore'dan gelen sonuç boş bir dizi
+            // de olsa (katalog gerçekten boşsa) uygulanmalı — eskiden sadece
+            // "length > 0" iken güncelleniyordu, bu yüzden admin panelinden
+            // silinen ürünler hâlâ (localStorage/varsayılan) önbellekten
+            // gösterilmeye devam ediyordu.
+            if (Array.isArray(freshProducts)) {
                 allProducts = freshProducts;
                 filteredProducts = [...allProducts];
                 // Artık var olmayan ürünlere ait favorileri temizle
