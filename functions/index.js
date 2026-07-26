@@ -518,3 +518,33 @@ exports.createReturnRequest = onRequest({ invoker: 'public' }, async (req, res) 
         res.status(500).json({ success: false, message: 'Sunucu hatası' });
     }
 });
+
+// ───────────────────────────────────────────
+// GET /getProducts
+// GÜVENİLİRLİK: Ürün kataloğu artık client'ın doğrudan Firestore SDK'sı
+// (WebSocket/uzun bağlantı gerektiren gerçek-zamanlı sorgu) yerine düz bir
+// HTTPS isteğiyle de çekilebiliyor. Bazı mobil tarayıcılar/uygulama-içi
+// tarayıcılar (ör. Instagram) Firestore'un gerçek-zamanlı bağlantısını
+// engelliyor/bozuyordu; bu uç nokta Admin SDK kullandığı için o kısıtlamayı
+// hiç görmüyor ve düz bir fetch() ile her yerden güvenilir çalışır.
+// ───────────────────────────────────────────
+exports.getProducts = onRequest({ invoker: 'public' }, async (req, res) => {
+    const corsHeaders = getCorsHeaders(req.headers.origin || '');
+    Object.entries(corsHeaders).forEach(([k, v]) => res.set(k, v));
+    if (req.method === 'OPTIONS') { res.status(204).send(''); return; }
+
+    try {
+        const snap = await db.collection('products').orderBy('createdAt', 'desc').get();
+        const products = snap.docs.map(d => {
+            const data = d.data();
+            if (data.createdAt && typeof data.createdAt.toDate === 'function') data.createdAt = data.createdAt.toDate().toISOString();
+            if (data.updatedAt && typeof data.updatedAt.toDate === 'function') data.updatedAt = data.updatedAt.toDate().toISOString();
+            return { id: d.id, ...data };
+        });
+        res.set('Cache-Control', 'public, max-age=30');
+        res.json({ success: true, products });
+    } catch (e) {
+        console.error('getProducts error:', e);
+        res.status(500).json({ success: false, products: [] });
+    }
+});

@@ -240,7 +240,24 @@ const KevraDB = {
 
     // ===================== ÜRÜNLER =====================
 
+    // GÜVENİLİRLİK: Ürünler artık ÖNCELİKLE getProducts Cloud Function'ından
+    // (düz HTTPS isteği) çekiliyor. Bazı mobil tarayıcılar/uygulama-içi
+    // tarayıcılar (Instagram vb.) Firestore'un client SDK'sının kullandığı
+    // gerçek-zamanlı bağlantıyı (WebSocket/uzun bağlantı) engelliyordu —
+    // düz bir fetch() isteği bu kısıtlamalardan etkilenmiyor ve bu
+    // konuşma boyunca (kayıt/giriş/sipariş uçları) hiç sorun yaşamadı.
+    // Firestore client SDK'sı sadece bu istek de başarısız olursa devreye
+    // giren ikinci bir yedek.
     getProducts: async function() {
+        try {
+            const res  = await fetch(CLOUD_FN_BASE + '/getProducts', { method: 'GET' });
+            const data = await res.json();
+            if (data.success && Array.isArray(data.products)) {
+                localStorage.setItem('kevra_products', JSON.stringify(data.products));
+                return data.products;
+            }
+        } catch (e) { console.warn('getProducts isteği başarısız, Firestore SDK deneniyor:', e); }
+
         if (await this._firebaseAvailable()) {
             // Mobil ağlarda tek seferlik bağlantı takılmaları yaygın olduğu
             // için bir kere daha deneniyor, hemen pes edilmiyor.
@@ -260,12 +277,12 @@ const KevraDB = {
                 }
             }
         }
-        // GÜVENLİK/DOĞRULUK: Firestore'a gerçekten ulaşılamadıysa (offline,
-        // ağ hatası) sahte/örnek ürünler ASLA gösterilmez — bu, gerçekte var
+        // GÜVENLİK/DOĞRULUK: Hiçbir yoldan ulaşılamadıysa (offline, ağ
+        // hatası) sahte/örnek ürünler ASLA gösterilmez — bu, gerçekte var
         // olmayan (silinmiş) ürünlerin gerçekmiş gibi satışa sunulmasına yol
-        // açıyordu. Sadece daha önce gerçekten Firestore'dan çekilmiş, bu
-        // cihazda önbelleklenmiş veri kullanılır; o da yoksa boş liste
-        // döner (arayüz "ürün bulunamadı" durumunu zaten düzgün gösteriyor).
+        // açıyordu. Sadece daha önce gerçekten çekilmiş, bu cihazda
+        // önbelleklenmiş veri kullanılır; o da yoksa boş liste döner
+        // (arayüz "ürün bulunamadı" durumunu zaten düzgün gösteriyor).
         return JSON.parse(localStorage.getItem('kevra_products') || '[]');
     },
 
