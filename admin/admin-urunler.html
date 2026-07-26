@@ -369,8 +369,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="../js/firebase-config.js?v=20260726d"></script>
-    <script src="../js/kevra-db.js?v=20260726d"></script>
+    <script src="../js/firebase-config.js?v=20260726e"></script>
+    <script src="../js/kevra-db.js?v=20260726e"></script>
     <script>
         if (!localStorage.getItem('kevra_admin_logged_in')) {
             window.location.replace('admin-login.html');
@@ -633,12 +633,25 @@
                 image:         colorImages[effectiveColors[0]][0] // eski (tek görsel) alanlarla geriye dönük uyum için
             };
 
+            // Firestore'un doküman başına 1MB sınırı var — çok sayıda/büyük
+            // renk görseli eklenirse bu sınır aşılıp kayıt sessizce
+            // reddedilebiliyordu. Göndermeden önce kabaca boyutu kontrol et.
+            const approxSizeKB = Math.round(JSON.stringify(productData).length / 1024);
+            if (approxSizeKB > 850) {
+                showToast('Görseller çok büyük (~' + approxSizeKB + ' KB). Lütfen renk başına daha az/küçük fotoğraf kullanın.', 'error');
+                return;
+            }
+
             const saveBtn = document.getElementById('saveBtn');
             saveBtn.disabled = true;
             saveBtn.textContent = 'Kaydediliyor...';
 
             try {
-                await KevraDB.saveProduct(productData);
+                const result = await KevraDB.saveProduct(productData);
+                if (!result.success) {
+                    showToast(result.message || 'Kayıt sırasında hata oluştu!', 'error');
+                    return;
+                }
                 showToast(editingId ? 'Ürün güncellendi!' : 'Yeni ürün eklendi!');
                 closeModal();
                 await loadProducts();
@@ -666,7 +679,7 @@
         }
 
         // ── Görsel sıkıştırma (genel amaçlı, Promise tabanlı) ───────────
-        function compressImageFile(file, maxSize = 800) {
+        function compressImageFile(file, maxSize = 800, quality = 0.80) {
             return new Promise((resolve, reject) => {
                 if (file.size > 10 * 1024 * 1024) { reject(new Error('Dosya boyutu 10MB\'dan büyük olamaz')); return; }
                 if (!file.type.startsWith('image/')) { reject(new Error('Geçersiz dosya türü')); return; }
@@ -683,7 +696,7 @@
                         const canvas = document.createElement('canvas');
                         canvas.width = w; canvas.height = h;
                         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                        resolve(canvas.toDataURL('image/jpeg', 0.80));
+                        resolve(canvas.toDataURL('image/jpeg', quality));
                     };
                     img.onerror = reject;
                     img.src = e.target.result;
@@ -737,7 +750,10 @@
 
             for (const file of files) {
                 try {
-                    const base64 = await compressImageFile(file, 800);
+                    // Renk başına birden fazla görsel birikebildiği için
+                    // (Firestore'un 1MB doküman sınırına takılmamak adına)
+                    // kategori görsellerinden daha sıkı sıkıştırılıyor.
+                    const base64 = await compressImageFile(file, 640, 0.7);
                     if (!colorImagesData[color]) colorImagesData[color] = [];
                     colorImagesData[color].push(base64);
                 } catch (e) {

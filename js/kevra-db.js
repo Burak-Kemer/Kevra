@@ -290,13 +290,32 @@ const KevraDB = {
         const id   = productData.id ? String(productData.id) : 'p_' + Date.now();
         const data = { ...productData, id, updatedAt: new Date().toISOString(), createdAt: productData.createdAt || new Date().toISOString() };
 
-        if (await this._firebaseAvailable()) {
+        const firebaseAvailable = await this._firebaseAvailable();
+        let firestoreOk = false;
+        let firestoreError = null;
+        if (firebaseAvailable) {
             try {
                 await window.KevraFirebase.db.collection('products').doc(id).set(data, { merge: true });
-            } catch (e) { console.warn('Firestore ürün kayıt hatası:', e); }
+                firestoreOk = true;
+            } catch (e) {
+                console.warn('Firestore ürün kayıt hatası:', e);
+                firestoreError = e.message;
+            }
         }
 
-        // localStorage güncelle
+        // GÜVENLİK/DOĞRULUK: Ürünler artık müşteri tarafında getProducts
+        // Cloud Function'ı (gerçek Firestore verisi) ile gösteriliyor —
+        // Firestore yazması başarısız olduysa admin panelin kendi
+        // localStorage önbelleğine "başarılı" yazmak yanıltıcı: admin
+        // "eklendi" mesajını görür ama ürün müşterilere hiç görünmez.
+        // Bu yüzden Firestore mevcutken yazma başarısız olursa hata
+        // döndürülür, sahte bir başarı mesajı gösterilmez.
+        if (firebaseAvailable && !firestoreOk) {
+            return { success: false, message: 'Ürün kaydedilemedi: ' + (firestoreError || 'Firestore hatası') };
+        }
+
+        // localStorage güncelle (Firestore'a başarıyla yazıldı ya da Firebase
+        // hiç kullanılamıyor/çevrimdışı geliştirme modu)
         const products = JSON.parse(localStorage.getItem('kevra_products') || '[]');
         const idx = products.findIndex(p => String(p.id) === String(id));
         if (idx >= 0) products[idx] = data; else products.push(data);
