@@ -1039,6 +1039,64 @@ function setupHeaderScroll() {
     });
 }
 
+// Ana sayfadaki "Yeni Gelenler" bölümü (eski Kategoriler'in yerine) — admin
+// panelden eklenen ürünlerden en yeni 4 tanesini gösterir.
+function daysAgoLabel(createdAt) {
+    const created = new Date(createdAt);
+    if (!createdAt || isNaN(created.getTime())) return '';
+    const days = Math.max(0, Math.floor((Date.now() - created.getTime()) / 86400000));
+    if (days === 0) return 'Bugün eklendi';
+    if (days === 1) return 'Dün eklendi';
+    return days + ' gün önce eklendi';
+}
+
+function renderNewArrivals() {
+    const container = document.getElementById('newArrivalsProducts');
+    const section = document.querySelector('.new-arrivals-section');
+    if (!container) return;
+
+    const newest = [...allProducts]
+        .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+        .slice(0, 4);
+
+    if (newest.length === 0) {
+        if (section) section.style.display = 'none';
+        return;
+    }
+    if (section) section.style.display = '';
+
+    container.innerHTML = newest.map(product => {
+        const hasDiscount = product.discount && product.originalPrice > product.price;
+        const discountPercent = hasDiscount ? Math.round((1 - product.price/product.originalPrice) * 100) : 0;
+        const isFav = favorites.some(id => String(id) === String(product.id));
+
+        return `
+            <div class="product-card" data-id="${product.id}" data-product-id="${product.id}">
+                <div class="product-badge yeni">Yeni</div>
+                <button class="fav-btn ${isFav ? "active" : ""}" onclick="event.stopPropagation(); toggleFavorite('${product.id}', event)">
+                    ${isFav ? '♥' : '♡'}
+                </button>
+                <div class="product-image" onclick="openProductDetail('${product.id}')">
+                    <img src="${product.image}" alt="${product.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=No+Image'">
+                    <button class="quick-view-btn" onclick="event.stopPropagation(); openQuickView('${product.id}')">Hızlı İncele</button>
+                </div>
+                <div class="product-info">
+                    <div class="na-days">${daysAgoLabel(product.createdAt)}</div>
+                    <h3 onclick="openProductDetail('${product.id}')">${product.name}</h3>
+                    <div class="product-price">
+                        ${hasDiscount ? `<span class="original-price">${formatPrice(product.originalPrice)}</span>` : ''}
+                        <span class="current-price">${formatPrice(product.price)}</span>
+                        ${hasDiscount ? `<span class="discount-percent">%${discountPercent}</span>` : ''}
+                    </div>
+                    <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCartWithVariant('${product.id}')">
+                        🛒 Sepete Ekle
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
 function renderFromProducts() {
     const isShopPage = document.body.classList.contains('shop-page');
     if (isShopPage) {
@@ -1051,6 +1109,7 @@ function renderFromProducts() {
             else if (featured.length > 4) featured = featured.slice(0, 4);
             renderProducts(featured, featuredContainer);
         }
+        renderNewArrivals();
     }
 }
 

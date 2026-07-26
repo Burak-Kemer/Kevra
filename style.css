@@ -1065,6 +1065,31 @@ padding-top:0;
   font-size:16px;
 }
 
+/* ================= YENİ GELENLER (ana sayfa, Kategoriler'in yerine) ================= */
+.new-arrivals-section .na-kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  font-size:12px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--kevra-gold);
+  margin-bottom:16px;
+}
+.new-arrivals-section .na-kicker::before,
+.new-arrivals-section .na-kicker::after{
+  content:'';
+  width:22px;
+  height:1px;
+  background:var(--kevra-gold);
+}
+.na-days{
+  font-size:11px;
+  color:var(--kevra-light);
+  letter-spacing:0.3px;
+  margin-bottom:6px;
+}
+
 .view-all-container{
   text-align:center;
   margin-top:50px;

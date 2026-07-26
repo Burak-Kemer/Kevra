@@ -2235,38 +2235,16 @@
     </div>
 </section>
 
-<!-- CATEGORIES -->
-<section class="categories">
-    <h2 class="section-title">Kategoriler</h2>
-    <div class="categories-grid">
-        <div class="category-card large" onclick="location.href='shop.html?category=elbise'">
-            <img id="catImgElbise" src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=800" alt="Elbiseler">
-            <div class="category-overlay">
-                <h3>Elbiseler</h3>
-                <span>Keşfet →</span>
-            </div>
-        </div>
-        <div class="category-card" onclick="location.href='shop.html?category=ust'">
-            <img id="catImgUst" src="https://images.unsplash.com/photo-1564257631407-4deb1f99d992?q=80&w=600" alt="Üst Giyim">
-            <div class="category-overlay">
-                <h3>Üst Giyim</h3>
-                <span>Keşfet →</span>
-            </div>
-        </div>
-        <div class="category-card" onclick="location.href='shop.html?category=triko'">
-            <img id="catImgTriko" src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=600" alt="Triko">
-            <div class="category-overlay">
-                <h3>Triko</h3>
-                <span>Keşfet →</span>
-            </div>
-        </div>
-        <div class="category-card" onclick="location.href='shop.html?category=dis'">
-            <img id="catImgDis" src="https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=600" alt="Dış Giyim">
-            <div class="category-overlay">
-                <h3>Dış Giyim</h3>
-                <span>Keşfet →</span>
-            </div>
-        </div>
+<!-- YENİ GELENLER -->
+<section class="products new-arrivals-section">
+    <div class="products-head">
+        <div class="na-kicker">Yeni Gelenler</div>
+        <h2>En Yeni Parçalarımızı Keşfedin</h2>
+        <p>Dolabınıza her hafta yeni bir parça ekleniyor</p>
+    </div>
+    <div class="product-grid" id="newArrivalsProducts"></div>
+    <div class="view-all-container">
+        <a href="shop.html" class="view-all-btn">Tüm Ürünleri Gör →</a>
     </div>
 </section>
 
@@ -2418,29 +2396,11 @@
 <!-- SCRIPTS -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="js/firebase-config.js?v=20260726g"></script>
-<script src="js/kevra-db.js?v=20260726g"></script>
-<script src="js/storage.js?v=20260726g"></script>
-<script src="js/auth.js?v=20260726g"></script>
-<script src="js/main.js?v=20260726g"></script>
-
-<script>
-    // Anasayfa kategori kartlarının görselleri admin panelden değiştirilebilir
-    // (bkz. admin/admin-urunler.html "Kategori Görselleri"). Ayarlanmamışsa
-    // yukarıdaki varsayılan Unsplash görselleri kalır.
-    document.addEventListener('DOMContentLoaded', async function() {
-        try {
-            const imgs = await KevraDB.getCategoryImages();
-            const map = { elbise: 'catImgElbise', ust: 'catImgUst', triko: 'catImgTriko', dis: 'catImgDis' };
-            Object.entries(map).forEach(([slug, id]) => {
-                if (imgs[slug]) {
-                    const el = document.getElementById(id);
-                    if (el) el.src = imgs[slug];
-                }
-            });
-        } catch (e) { console.warn('Kategori görselleri yüklenemedi:', e); }
-    });
-</script>
+<script src="js/firebase-config.js?v=20260727a"></script>
+<script src="js/kevra-db.js?v=20260727a"></script>
+<script src="js/storage.js?v=20260727a"></script>
+<script src="js/auth.js?v=20260727a"></script>
+<script src="js/main.js?v=20260727a"></script>
 
 </body>
 </html>
