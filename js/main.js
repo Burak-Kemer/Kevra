@@ -5,23 +5,18 @@
 // 70 Kadın Ürünü
 let allProducts = [];
 
-// Admin'den gelen ürünleri yükle
+// Admin'den gelen ürünleri yükle (bu tarayıcıda daha önce gerçekten
+// Firestore'dan çekilmiş önbellek). GÜVENLİK/DOĞRULUK: burada sahte/örnek
+// ürün verisi KULLANILMAZ — önbellek yoksa/bozuksa boş listeyle başlanır,
+// aşağıdaki DOMContentLoaded içindeki Firebase çağrısı gerçek ürünlerle
+// dolduracaktır. Aksi halde artık var olmayan (silinmiş) ürünler gerçekmiş
+// gibi gösterilebiliyordu.
 const storedProducts = localStorage.getItem("kevra_products");
-
 try {
-    if (storedProducts) {
-        allProducts = JSON.parse(storedProducts);
-    } else {
-        throw new Error("No stored products");
-    }
+    allProducts = storedProducts ? JSON.parse(storedProducts) : [];
 } catch (e) {
-    console.warn("LocalStorage bozuk veya boş, default ürünler yükleniyor");
-    allProducts = [
-        { id: 1, name: "Siyah Midi Elbise", price: 899, originalPrice: 1299, image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=800", description: "Klasik siyah midi elbise. Her ortama uygun, zamansız tasarım.", badge: "Popüler", badgeType: "popular", category: "elbise", discount: true, colors: ["Siyah", "Bordo", "Lacivert"], sizes: ["XS", "S", "M", "L", "XL"], stock: 25 },
-        { id: 2, name: "Çiçekli Maxi Elbise", price: 749, originalPrice: 749, image: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=80&w=800", description: "Yaz için ideal çiçek desenli maxi elbise.", badge: "Yeni", badgeType: "yeni", category: "elbise", discount: false, colors: ["Pembe", "Mavi", "Sarı"], sizes: ["S", "M", "L"], stock: 18 },
-        { id: 3, name: "Ofis Elbisesi (Bej)", price: 1199, originalPrice: 1599, image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=800", description: "Profesyonel ortamlar için şık ofis elbisesi.", badge: "Premium", badgeType: "premium", category: "elbise", discount: true, colors: ["Bej", "Siyah", "Gri"], sizes: ["XS", "S", "M", "L", "XL"], stock: 15 },
-        { id: 4, name: "Kokteyl Elbisesi", price: 1599, originalPrice: 2299, image: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=800", description: "Özel davetler için parıltılı kokteyl elbisesi.", badge: "İndirim", badgeType: "indirim", category: "elbise", discount: true, colors: ["Altın", "Gümüş", "Siyah"], sizes: ["S", "M", "L"], stock: 8 }
-    ];
+    console.warn("localStorage'daki ürün önbelleği bozuk, boş başlanıyor");
+    allProducts = [];
 }
 
 // State

@@ -229,25 +229,31 @@ const KevraDB = {
 
     getProducts: async function() {
         if (await this._firebaseAvailable()) {
-            try {
-                const snap = await window.KevraFirebase.db.collection('products').orderBy('createdAt', 'desc').get();
-                // Firestore'a başarıyla ulaşıldıysa sonucu OLDUĞU GİBİ döndür —
-                // katalog gerçekten boşsa (admin tüm ürünleri sildiyse) bu,
-                // "Firestore'a ulaşılamadı" ile karıştırılıp yerine sahte
-                // varsayılan ürünler gösterilmemeli (bkz. aşağıdaki catch/fallback).
-                const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                localStorage.setItem('kevra_products', JSON.stringify(products)); // local cache
-                return products;
-            } catch (e) { console.warn('Firestore ürün okuma hatası:', e); }
+            // Mobil ağlarda tek seferlik bağlantı takılmaları yaygın olduğu
+            // için bir kere daha deneniyor, hemen pes edilmiyor.
+            for (let attempt = 0; attempt < 2; attempt++) {
+                try {
+                    const snap = await window.KevraFirebase.db.collection('products').orderBy('createdAt', 'desc').get();
+                    // Firestore'a başarıyla ulaşıldıysa sonucu OLDUĞU GİBİ döndür —
+                    // katalog gerçekten boşsa (admin tüm ürünleri sildiyse) bu,
+                    // "Firestore'a ulaşılamadı" ile karıştırılıp yerine sahte
+                    // varsayılan ürünler gösterilmemeli (bkz. aşağıdaki catch/fallback).
+                    const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    localStorage.setItem('kevra_products', JSON.stringify(products)); // local cache
+                    return products;
+                } catch (e) {
+                    console.warn('Firestore ürün okuma hatası (deneme ' + (attempt + 1) + '):', e);
+                    if (attempt === 0) await new Promise(r => setTimeout(r, 1000));
+                }
+            }
         }
-        // Firestore'a hiç ulaşılamadı (offline/hata) — sadece bu durumda
-        // localStorage önbelleğine, o da yoksa varsayılan ürünlere düş.
-        let products = JSON.parse(localStorage.getItem('kevra_products') || '[]');
-        if (products.length === 0) {
-            products = this._defaultProducts();
-            localStorage.setItem('kevra_products', JSON.stringify(products));
-        }
-        return products;
+        // GÜVENLİK/DOĞRULUK: Firestore'a gerçekten ulaşılamadıysa (offline,
+        // ağ hatası) sahte/örnek ürünler ASLA gösterilmez — bu, gerçekte var
+        // olmayan (silinmiş) ürünlerin gerçekmiş gibi satışa sunulmasına yol
+        // açıyordu. Sadece daha önce gerçekten Firestore'dan çekilmiş, bu
+        // cihazda önbelleklenmiş veri kullanılır; o da yoksa boş liste
+        // döner (arayüz "ürün bulunamadı" durumunu zaten düzgün gösteriyor).
+        return JSON.parse(localStorage.getItem('kevra_products') || '[]');
     },
 
     saveProduct: async function(productData) {
@@ -519,14 +525,6 @@ const KevraDB = {
         let hash = 0;
         for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCodeAt(i); hash = hash & hash; }
         return hash.toString();
-    },
-
-    _defaultProducts: function() {
-        return [
-            { id: 1, name: 'Siyah Midi Elbise',   category: 'elbise', price: 1000, originalPrice: 2000, discount: true, stock: 24, image: 'img/dress1.jpg', badge: 'indirim',  badgeType: 'indirim',  sizes: ['S','M','L','XL'],  colors: ['Siyah','Bordo'] },
-            { id: 2, name: 'Çiçekli Maxi Elbise', category: 'elbise', price: 749,  originalPrice: 749,  discount: false, stock: 18, image: 'img/dress2.jpg', badge: 'yeni',     badgeType: 'yeni',     sizes: ['XS','S','M','L'],  colors: ['Krem','Pembe'] },
-            { id: 3, name: 'Ofis Elbisesi (Bej)', category: 'elbise', price: 1199, originalPrice: 1599, discount: true, stock: 15, image: 'img/dress3.jpg', badge: 'popular',  badgeType: 'popular',  sizes: ['S','M','L','XL'],  colors: ['Bej','Siyah'] }
-        ];
     },
 
     // ===================== İADE TALEPLERİ =====================
