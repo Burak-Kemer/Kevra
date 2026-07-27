@@ -55,10 +55,12 @@ service cloud.firestore {
     // bir sipariş numarasıyla herkese açık olmalı.
     match /orders/{orderId} {
       allow get: if request.auth != null;
+      allow list: if isAdmin();
       allow create, update, delete: if isAdmin();
     }
     match /returns/{returnId} {
       allow get: if request.auth != null;
+      allow list: if isAdmin();
       allow create, update, delete: if isAdmin();
     }
   }
