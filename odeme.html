@@ -1502,6 +1502,13 @@ function validateForm() {
 const PAYTR_FUNCTION_URL = 'https://europe-west1-kevra-88a60.cloudfunctions.net/createPaytrToken';
 
 async function placeOrder() {
+    const currentUser = (window.KevraDB && KevraDB.getCurrentUser()) || null;
+    if (!currentUser) {
+        showToast('Sipariş verebilmek için giriş yapmalısınız', 'error');
+        window.location.href = 'giris.html?redirect=odeme.html';
+        return;
+    }
+
     if (!validateForm()) {
         showToast('Lütfen zorunlu alanları doldurun', 'error');
         return;
@@ -1515,10 +1522,8 @@ async function placeOrder() {
     const total          = subtotal - discountAmount;
     const paymentMethod  = document.querySelector('input[name="payment"]:checked').value;
 
-    const currentUser = (window.KevraDB && KevraDB.getCurrentUser()) || null;
-
     const orderData = {
-        userId:        currentUser ? currentUser.id : 'guest',
+        userId:        currentUser.id,
         items:         [...checkoutCart],
         subtotal:      subtotal,
         discount:      discountAmount,
@@ -1716,6 +1721,13 @@ window.addEventListener('DOMContentLoaded', function() {
     <script src="js/storage.js?v=20260727d"></script>
     <script src="js/auth.js?v=20260727d"></script>
     <script src="js/main.js?v=20260727d"></script>
+
+    <script>
+        // Auth kontrolü — giriş yapmadan sipariş verilemez (profil.html ile aynı desen)
+        if (!KevraAuth.isLoggedIn()) {
+            window.location.href = 'giris.html?redirect=odeme.html';
+        }
+    </script>
 
 <!-- FOOTER -->
 <footer class="footer" id="footer">

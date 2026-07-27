@@ -39,6 +39,10 @@ exports.createPaytrToken = onRequest({ invoker: 'public' }, async (req, res) => 
     try {
         const { orderData } = req.body;
         if (!orderData) { res.status(400).json({ success: false, reason: 'orderData eksik' }); return; }
+        if (!orderData.userId || orderData.userId === 'guest') {
+            res.status(401).json({ success: false, reason: 'Sipariş vermek için giriş yapmalısınız' });
+            return;
+        }
 
         const merchantOid    = 'KVR' + Date.now();
         const userIp         = (req.headers['x-forwarded-for'] || '1.2.3.4').split(',')[0].trim();
@@ -403,13 +407,17 @@ exports.createOrder = onRequest({ invoker: 'public' }, async (req, res) => {
     try {
         const orderData = req.body && req.body.orderData;
         if (!orderData) { res.json({ success: false, message: 'orderData eksik' }); return; }
+        if (!orderData.userId || orderData.userId === 'guest') {
+            res.json({ success: false, message: 'Sipariş vermek için giriş yapmalısınız' });
+            return;
+        }
 
         const verified = await verifyCartAndTotals(orderData);
         if (verified.error) { res.json({ success: false, message: verified.error }); return; }
 
         const newOrder = {
             id:             'KVR' + Date.now(),
-            userId:         orderData.userId || 'guest',
+            userId:         orderData.userId,
             customer:       {
                 firstName: orderData.firstName || '', lastName: orderData.lastName || '',
                 email: orderData.email || '', phone: orderData.phone || '',
