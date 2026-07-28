@@ -832,16 +832,24 @@
                 allOrders = raw.map(normalizeOrder);
             }
             updateStats();
-            renderOrders(allOrders);
+            filterOrders();
+        }
+
+        // Ödemesi tamamlanmadan iptal olmuş/PayTR'de başarısız kalmış siparişler
+        // (status: İptal Edildi) gerçek bir sipariş sayılmadığından varsayılan
+        // listeden ve istatistiklerden hariç tutulur. "Durum" filtresinden
+        // "İptal Edildi" seçilerek yine de görüntülenebilirler.
+        function activeOrders() {
+            return allOrders.filter(o => statusClass(o.status) !== 'cancelled');
         }
 
         function updateStats() {
             const today = new Date().toISOString().split('T')[0];
-            const pending  = allOrders.filter(o => ['pending','Beklemede','processing','Hazırlanıyor'].includes(o.status)).length;
-            const todayOrd = allOrders.filter(o => (o.createdAt || '').startsWith(today)).length;
-            const revenue  = allOrders.filter(o => !['cancelled','İptal Edildi'].includes(o.status))
-                                      .reduce((s,o) => s + (o.total || 0), 0);
-            document.getElementById('totalOrders').textContent   = allOrders.length;
+            const active   = activeOrders();
+            const pending  = active.filter(o => ['pending','Beklemede','processing','Hazırlanıyor'].includes(o.status)).length;
+            const todayOrd = active.filter(o => (o.createdAt || '').startsWith(today)).length;
+            const revenue  = active.reduce((s,o) => s + (o.total || 0), 0);
+            document.getElementById('totalOrders').textContent   = active.length;
             document.getElementById('pendingOrders').textContent = pending;
             document.getElementById('todayOrders').textContent   = todayOrd;
             document.getElementById('totalRevenue').textContent  = '₺' + revenue.toLocaleString('tr-TR');
@@ -886,8 +894,10 @@
             const date   = document.getElementById('dateFilter').value;
             const search = document.getElementById('searchFilter').value.toLowerCase();
 
-            let filtered = allOrders;
-            if (status !== 'all') filtered = filtered.filter(o => statusClass(o.status) === status);
+            // "Tümü" seçiliyken bile iptal edilmiş/ödenmemiş siparişler gösterilmez;
+            // görmek için durum filtresinden özellikle "İptal Edildi" seçilmesi gerekir.
+            let filtered = status === 'all' ? activeOrders()
+                         : allOrders.filter(o => statusClass(o.status) === status);
             if (date) filtered = filtered.filter(o => (o.createdAt || '').startsWith(date));
             if (search) {
                 filtered = filtered.filter(o =>
@@ -905,7 +915,7 @@
             document.getElementById('statusFilter').value = 'all';
             document.getElementById('dateFilter').value = '';
             document.getElementById('searchFilter').value = '';
-            renderOrders(allOrders);
+            filterOrders();
         }
         
         function viewOrder(orderId) {
@@ -1085,7 +1095,7 @@
                     : 'Fatura kaydedildi. (Yalnızca yerel — Firestore bağlantısı yok)';
                 showToast(msg, 'success');
                 closeInvoiceModal();
-                renderOrders(allOrders);
+                filterOrders();
             } catch(e) {
                 showToast('Fatura yükleme hatası: ' + e.message, 'error');
             }

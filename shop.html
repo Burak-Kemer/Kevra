@@ -653,64 +653,6 @@
             gap: 40px;
         }
         
-        .shop-sidebar {
-            width: 280px;
-            flex-shrink: 0;
-        }
-        
-        .filter-section {
-            margin-bottom: 30px;
-        }
-        
-        .filter-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #eee;
-        }
-        
-        .filter-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            cursor: pointer;
-        }
-        
-        .filter-checkbox input {
-            width: 22px;
-            height: 22px;
-            cursor: pointer;
-            min-width: 22px;
-            min-height: 22px;
-        }
-        
-        .size-filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        
-        .size-filter-btn {
-            padding: 10px 18px;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.3s;
-            min-height: 44px;
-            min-width: 44px;
-        }
-        
-        .size-filter-btn:hover,
-        .size-filter-btn.active {
-            background: #1a1a1a;
-            color: white;
-            border-color: #1a1a1a;
-        }
-        
         .shop-main {
             flex: 1;
         }
@@ -765,69 +707,6 @@
             background: #1a1a1a;
             color: white;
             border-color: #1a1a1a;
-        }
-        
-        /* AKTİF FİLTRELER - YENİ */
-        .active-filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-            min-height: 40px;
-        }
-        
-        .active-filter-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
-            background: #1a1a1a;
-            color: white;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            animation: slideIn 0.3s ease;
-            min-height: 40px;
-        }
-        
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .active-filter-tag button {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: all 0.2s;
-        }
-        
-        .active-filter-tag button:hover {
-            background: rgba(255,255,255,0.2);
-        }
-        
-        .clear-all-filters {
-            padding: 10px 16px;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.3s;
-            min-height: 40px;
-        }
-        
-        .clear-all-filters:hover {
-            background: #c0392b;
         }
         
         .product-grid {
@@ -1495,22 +1374,6 @@
             transform: translateX(-50%) translateY(0);
         }
         
-        /* MOBILE FILTERS */
-        .mobile-filter-btn {
-            display: none;
-            padding: 14px 24px;
-            background: #1a1a1a;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-bottom: 20px;
-            min-height: 48px;
-            font-weight: 600;
-        }
-        
-        
         /* FOOTER - index.html ile AYNI */
         .footer {
             background: #1a1a1a;
@@ -1578,7 +1441,6 @@
         @media (max-width: 1024px) {
             .product-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
             .shop-container { padding: 20px; gap: 20px; }
-            .shop-sidebar { width: 260px; }
             .header { padding: 0 20px; }
             .header-link { display: none; }
         }
@@ -1589,20 +1451,6 @@
             .brand-arabic { font-size: 20px; }
             .header-btn { padding: 8px 12px; font-size: 13px; }
             .header-icon { padding: 8px; font-size: 16px; }
-            .shop-sidebar { display: none; }
-            .shop-sidebar.active {
-                display: block;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100vh;
-                background: white;
-                z-index: 9998;
-                padding: 20px;
-                overflow-y: auto;
-            }
-            .mobile-filter-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
             .product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
             .product-image { height: 220px; }
             .cart-drawer, .fav-drawer { width: 100%; right: -100%; max-width: 100%; }
@@ -1930,31 +1778,8 @@
 
 <!-- SHOP CONTAINER -->
 <div class="shop-container">
-    <!-- SIDEBAR FILTERS -->
-    <aside class="shop-sidebar" id="shopSidebar">
-        <div class="filter-section">
-            <h4 class="filter-title">Beden</h4>
-            <div class="size-filters">
-                <button class="size-filter-btn" data-size="XS" onclick="handleSizeFilter(this)">XS</button>
-                <button class="size-filter-btn" data-size="S" onclick="handleSizeFilter(this)">S</button>
-                <button class="size-filter-btn" data-size="M" onclick="handleSizeFilter(this)">M</button>
-                <button class="size-filter-btn" data-size="L" onclick="handleSizeFilter(this)">L</button>
-                <button class="size-filter-btn" data-size="XL" onclick="handleSizeFilter(this)">XL</button>
-            </div>
-        </div>
-        
-        <div class="filter-section">
-            <h4 class="filter-title">Fiyat</h4>
-            <label class="filter-checkbox">
-                <input type="checkbox" id="onlyDiscount" onchange="handleDiscountChange(this)"> Sadece İndirimli
-            </label>
-        </div>
-    </aside>
-    
     <!-- MAIN CONTENT -->
     <main class="shop-main">
-        <button class="mobile-filter-btn" onclick="openMobileFilters()">☰ Filtreler</button>
-        
         <div class="shop-toolbar">
             <span class="results-count"><span id="resultsCount">0</span> ürün bulundu</span>
             <div class="shop-controls">
@@ -1969,9 +1794,6 @@
                 </div>
             </div>
         </div>
-        
-        <!-- AKTİF FİLTRELER - YENİ -->
-        <div class="active-filters" id="activeFilters"></div>
         
         <div class="product-grid" id="shopProducts"></div>
         
@@ -2128,118 +1950,10 @@
 <script src="js/main.js?v=20260727d"></script>
 
 <script>
-// Aktif filtreleri takip et
-let activeFilters = {
-    sizes: [],
-    discount: false
-};
-
-// Beden filtresi değiştiğinde
-function handleSizeFilter(btn) {
-    const size = btn.dataset.size;
-    btn.classList.toggle('active');
-    
-    if (btn.classList.contains('active')) {
-        if (!activeFilters.sizes.includes(size)) {
-            activeFilters.sizes.push(size);
-        }
-    } else {
-        activeFilters.sizes = activeFilters.sizes.filter(s => s !== size);
-    }
-    updateActiveFiltersDisplay();
-    applyFilters();
-}
-
-// İndirim filtresi değiştiğinde
-function handleDiscountChange(checkbox) {
-    activeFilters.discount = checkbox.checked;
-    updateActiveFiltersDisplay();
-    applyFilters();
-}
-
-// Aktif filtreleri göster
-function updateActiveFiltersDisplay() {
-    const container = document.getElementById('activeFilters');
-    let html = '';
-
-    // Beden filtreleri
-    activeFilters.sizes.forEach(size => {
-        html += `
-            <span class="active-filter-tag">
-                Beden: ${size}
-                <button onclick="removeSizeFilter('${size}')" title="Kaldır">×</button>
-            </span>
-        `;
-    });
-    
-    // İndirim filtresi
-    if (activeFilters.discount) {
-        html += `
-            <span class="active-filter-tag">
-                İndirimli Ürünler
-                <button onclick="removeDiscountFilter()" title="Kaldır">×</button>
-            </span>
-        `;
-    }
-    
-    // Tümünü temizle butonu
-    if (activeFilters.sizes.length > 0 || activeFilters.discount) {
-        html += `<button class="clear-all-filters" onclick="clearAllFilters()">Tümünü Temizle</button>`;
-    }
-
-    container.innerHTML = html;
-}
-
-// Beden filtresini kaldır
-function removeSizeFilter(size) {
-    activeFilters.sizes = activeFilters.sizes.filter(s => s !== size);
-    // Butonu inactive yap
-    const btn = document.querySelector(`.size-filter-btn[data-size="${size}"]`);
-    if (btn) btn.classList.remove('active');
-    updateActiveFiltersDisplay();
-    applyFilters();
-}
-
-// İndirim filtresini kaldır
-function removeDiscountFilter() {
-    activeFilters.discount = false;
-    const checkbox = document.getElementById('onlyDiscount');
-    if (checkbox) checkbox.checked = false;
-    updateActiveFiltersDisplay();
-    applyFilters();
-}
-
-// Tüm filtreleri temizle
-function clearAllFilters() {
-    activeFilters = {
-        sizes: [],
-        discount: false
-    };
-
-    document.getElementById('onlyDiscount').checked = false;
-    
-    // Tüm beden butonlarını inactive yap
-    document.querySelectorAll('.size-filter-btn').forEach(btn => btn.classList.remove('active'));
-    
-    updateActiveFiltersDisplay();
-    applyFilters();
-}
-
-// Filtreleri uygula (main.js'deki fonksiyonu override et)
+// Sıralama (main.js'deki applyFilters fonksiyonunu override et)
 function applyFilters() {
     let result = [...allProducts];
 
-    // İndirim filtresi
-    if (activeFilters.discount) {
-        result = result = result.filter(p => p.discount);
-    }
-    
-    // Beden filtresi
-    if (activeFilters.sizes.length > 0) {
-        result = result.filter(p => p.sizes && p.sizes.some(s => activeFilters.sizes.includes(s)));
-    }
-    
-    // Sıralama
     const sortSelect = document.getElementById("sortSelect");
     const sortValue = sortSelect ? sortSelect.value : 'newest';
     switch(sortValue) {
@@ -2250,28 +1964,11 @@ function applyFilters() {
             result.sort((a, b) => b.price - a.price);
             break;
     }
-    
+
     filteredProducts = result;
     currentPage = 1;
     renderProducts(filteredProducts);
-    
-    // Sonuç sayısını güncelle
-    const resultsCount = document.getElementById("resultsCount");
-    if (resultsCount) resultsCount.textContent = result.length;
 }
-
-// Mobil filtreler
-function openMobileFilters() {
-    const sidebar = document.getElementById("shopSidebar");
-    if (sidebar) sidebar.classList.add("active");
-}
-
-// Sayfa yüklendiğinde
-document.addEventListener('DOMContentLoaded', function() {
-    // main.js'deki init fonksiyonu zaten çalışacak
-    // Aktif filtreler başlangıçta boş
-    updateActiveFiltersDisplay();
-});
 </script>
 
 </body>
